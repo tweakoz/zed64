@@ -2,6 +2,7 @@ CFLAGS= --add-source
 SYS=c64
 
 all:
+	mkdir -p gen
 	64tass -C -a -B -i ./inl.s -L ./gen/inl.lst -f -b -o ./gen/main.prg
 	#cc65 yo.c -t none -o yo.s
 	#ca65 yo.s -o yo.o
