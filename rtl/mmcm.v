@@ -1,4 +1,4 @@
-// file: clk_wiz_v3_6.v
+// file: zed_clockgen.v
 // 
 // (c) Copyright 2008 - 2011 Xilinx, Inc. All rights reserved.
 // 
@@ -55,10 +55,13 @@
 // "Output    Output      Phase     Duty      Pk-to-Pk        Phase"
 // "Clock    Freq (MHz) (degrees) Cycle (%) Jitter (ps)  Error (ps)"
 //----------------------------------------------------------------------------
-// CLK_OUT1____65.000______0.000______50.0______247.428____300.278
-// CLK_OUT2____40.000______0.000______50.0______264.672____300.278
-// CLK_OUT3____25.366______0.000______50.0______285.542____300.278
-// CLK_OUT4____14.247______0.000______50.0______319.993____300.278
+// CLK_OUT1___147.500______0.000______50.0______193.727____306.676
+// CLK_OUT2___107.273______0.000______50.0______202.141____306.676
+// CLK_OUT3____98.333______0.000______50.0______204.508____306.676
+// CLK_OUT4____73.750______0.000______50.0______212.554____306.676
+// CLK_OUT5____65.556______0.000______50.0______215.947____306.676
+// CLK_OUT6____31.892______0.000______50.0______238.015____306.676
+// CLK_OUT7____14.390______0.000______50.0______265.212____306.676
 //
 //----------------------------------------------------------------------------
 // "Input Clock   Freq (MHz)    Input Jitter (UI)"
@@ -67,8 +70,8 @@
 
 `timescale 1ps/1ps
 
-(* CORE_GENERATION_INFO = "clk_wiz_v3_6,clk_wiz_v3_6,{component_name=clk_wiz_v3_6,use_phase_alignment=true,use_min_o_jitter=false,use_max_i_jitter=false,use_dyn_phase_shift=false,use_inclk_switchover=false,use_dyn_reconfig=false,feedback_source=FDBK_AUTO,primtype_sel=MMCM_ADV,num_out_clk=4,clkin1_period=10.000,clkin2_period=10.000,use_power_down=false,use_reset=true,use_locked=true,use_inclk_stopped=false,use_status=false,use_freeze=false,use_clk_valid=false,feedback_type=SINGLE,clock_mgr_type=MANUAL,manual_override=false}" *)
-module clk_wiz_v3_6
+(* CORE_GENERATION_INFO = "zed_clockgen,clk_wiz_v3_6,{component_name=zed_clockgen,use_phase_alignment=true,use_min_o_jitter=false,use_max_i_jitter=false,use_dyn_phase_shift=false,use_inclk_switchover=false,use_dyn_reconfig=false,feedback_source=FDBK_AUTO,primtype_sel=MMCM_ADV,num_out_clk=7,clkin1_period=10.000,clkin2_period=10.000,use_power_down=false,use_reset=true,use_locked=true,use_inclk_stopped=false,use_status=false,use_freeze=false,use_clk_valid=false,feedback_type=SINGLE,clock_mgr_type=MANUAL,manual_override=false}" *)
+module zed_clockgen
  (// Clock in ports
   input         CLK_IN1,
   // Clock out ports
@@ -76,6 +79,9 @@ module clk_wiz_v3_6
   output        CLK_OUT2,
   output        CLK_OUT3,
   output        CLK_OUT4,
+  output        CLK_OUT5,
+  output        CLK_OUT6,
+  output        CLK_OUT7,
   // Status and control signals
   input         RESET,
   output        LOCKED
@@ -103,9 +109,6 @@ module clk_wiz_v3_6
   wire        clkout1b_unused;
   wire        clkout2b_unused;
   wire        clkout3b_unused;
-  wire        clkout4_unused;
-  wire        clkout5_unused;
-  wire        clkout6_unused;
   wire        clkfbstopped_unused;
   wire        clkinstopped_unused;
 
@@ -115,25 +118,37 @@ module clk_wiz_v3_6
     .COMPENSATION         ("ZHOLD"),
     .STARTUP_WAIT         ("FALSE"),
     .DIVCLK_DIVIDE        (5),
-    .CLKFBOUT_MULT_F      (52.000),
+    .CLKFBOUT_MULT_F      (59.000),
     .CLKFBOUT_PHASE       (0.000),
     .CLKFBOUT_USE_FINE_PS ("FALSE"),
-    .CLKOUT0_DIVIDE_F     (16.000),
+    .CLKOUT0_DIVIDE_F     (8.000),
     .CLKOUT0_PHASE        (0.000),
     .CLKOUT0_DUTY_CYCLE   (0.500),
     .CLKOUT0_USE_FINE_PS  ("FALSE"),
-    .CLKOUT1_DIVIDE       (26),
+    .CLKOUT1_DIVIDE       (11),
     .CLKOUT1_PHASE        (0.000),
     .CLKOUT1_DUTY_CYCLE   (0.500),
     .CLKOUT1_USE_FINE_PS  ("FALSE"),
-    .CLKOUT2_DIVIDE       (41),
+    .CLKOUT2_DIVIDE       (12),
     .CLKOUT2_PHASE        (0.000),
     .CLKOUT2_DUTY_CYCLE   (0.500),
     .CLKOUT2_USE_FINE_PS  ("FALSE"),
-    .CLKOUT3_DIVIDE       (65),
+    .CLKOUT3_DIVIDE       (16),
     .CLKOUT3_PHASE        (0.000),
     .CLKOUT3_DUTY_CYCLE   (0.500),
     .CLKOUT3_USE_FINE_PS  ("FALSE"),
+    .CLKOUT4_DIVIDE       (18),
+    .CLKOUT4_PHASE        (0.000),
+    .CLKOUT4_DUTY_CYCLE   (0.500),
+    .CLKOUT4_USE_FINE_PS  ("FALSE"),
+    .CLKOUT5_DIVIDE       (37),
+    .CLKOUT5_PHASE        (0.000),
+    .CLKOUT5_DUTY_CYCLE   (0.500),
+    .CLKOUT5_USE_FINE_PS  ("FALSE"),
+    .CLKOUT6_DIVIDE       (82),
+    .CLKOUT6_PHASE        (0.000),
+    .CLKOUT6_DUTY_CYCLE   (0.500),
+    .CLKOUT6_USE_FINE_PS  ("FALSE"),
     .CLKIN1_PERIOD        (10.000),
     .REF_JITTER1          (0.010))
   mmcm_adv_inst
@@ -148,9 +163,9 @@ module clk_wiz_v3_6
     .CLKOUT2B            (clkout2b_unused),
     .CLKOUT3             (clkout3),
     .CLKOUT3B            (clkout3b_unused),
-    .CLKOUT4             (clkout4_unused),
-    .CLKOUT5             (clkout5_unused),
-    .CLKOUT6             (clkout6_unused),
+    .CLKOUT4             (clkout4),
+    .CLKOUT5             (clkout5),
+    .CLKOUT6             (clkout6),
      // Input clock control
     .CLKFBIN             (clkfbout_buf),
     .CLKIN1              (clkin1),
@@ -199,6 +214,18 @@ module clk_wiz_v3_6
   BUFG clkout4_buf
    (.O   (CLK_OUT4),
     .I   (clkout3));
+
+  BUFG clkout5_buf
+   (.O   (CLK_OUT5),
+    .I   (clkout4));
+
+  BUFG clkout6_buf
+   (.O   (CLK_OUT6),
+    .I   (clkout5));
+
+  BUFG clkout7_buf
+   (.O   (CLK_OUT7),
+    .I   (clkout6));
 
 
 

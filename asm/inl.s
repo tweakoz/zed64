@@ -5,7 +5,7 @@
 
 jmp begin
 
-*= $1000
+*= $0200
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -37,7 +37,7 @@ fillbyte256 .macro
   ;
   fillbyte256_loopB:
     lda (\1),x
-    adc $4000
+    adc $3fff
     sta (\2),x
     inx
     cpx #0
@@ -70,30 +70,75 @@ fillbyte4k .macro
 
 begin:
 
+; minimal init
+ldy #$0
+ldx #$ff
+txs ;; init stack pointer
+ldx #$0
+lda #$0
+sta $3fff
+sta $3ffe
+
+; set up interrupt handler
+sei
+lda #<irq_handler
+sta $fffe
+lda #>irq_handler
+sta $ffff
+cli
+
 lda #0
-sta $4000
+sta $3fff
+
+; Fill in text 
+#fillbyte4k table256, $4000
+#fillbyte4k table256, $5000
+#fillbyte4k table256, $6000
+#fillbyte4k table256, $7000
+
+#fillbyte4k table256, $8000
+#fillbyte4k table256, $9000
+#fillbyte4k table256, $A000
+#fillbyte4k table256, $B000
 
 main_loop:
 
-; Fill in text 
-#fillbyte4k table256, $8000
-#fillbyte4k table256, $9000
-#fillbyte4k table256, $a000
+inc $3fff
+#fillbyte256 tableRows, $3800
 
-inc $4000
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 jmp main_loop
+
+irq_handler:
+pha
+txa
+pha
+tya
+pha
+inc $3ffe
+lda $3ffe
+#fillbyte256 tableRows, $2e00
+;;#fillbyte256 tableRows, $2f01
+pla
+tay 
+pla
+tax 
+pla
+rti
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 table256:
 .byte 0.0+range(256)
 
+tableRows:
+.byte range(256)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; FONT
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-*= $c000
+*= $e000
 .binary "chargen" ;; you need a c64 rom font
