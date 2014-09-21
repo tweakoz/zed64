@@ -98,8 +98,8 @@ initial begin
 
 `ifdef XILINX_ISIM 
 
-	//for( i=0; i<2**ADDRWIDTH; i=i+1 )
-	//	mem[i]=8'h0;
+	for( i=0; i<2**ADDRWIDTH; i=i+1 )
+		mem[i]=8'h0;
 
     mem[16'hfffe] = 8'h0; // reset vector
     mem[16'hffff] = 8'h0; // reset vector

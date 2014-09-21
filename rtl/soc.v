@@ -11,38 +11,31 @@
 
 `define USE_M65CO2
 
-module soc( clk, led, seg, an, btnCpuReset, vgaR, vgaG, vgaB, vgaHsync, vgaVsync, RsRx, RsTx );
-
-input clk; // input 100mhz xtal
-output [15:0] led;
-output [6:0] seg;
-output [3:0] an;
-output wire [3:0] vgaR;
-output wire [3:0] vgaG;
-output wire [3:0] vgaB;
-output wire vgaHsync;
-output wire vgaVsync;
-input wire RsRx;
-output wire RsTx;
+module soc( input clk, // 100 mhz input clock
+			output [15:0] led, // individ grn leds
+			output [6:0] seg, // 7seg cathode
+			output [3:0] an, // 7seg anode
+			input btnNotCpuReset, // reset button (0==pushed)
+			output [3:0] vgaR, vgaG, vgaB,
+			output vgaHsync, vgaVsync,
+			input RsRx,
+			output RsTx );
 
 reg [6:0] seg_reg;
 reg [3:0] an_reg;
 
-input btnCpuReset;	// reset signal
-
 assign led[15:4] = {12'b0};
 
 wire [15:0] CPU_AB;	// output reg
-wire CPU_WE;			// wrte enable (output)
-reg IRQ;					// interrupt request
-reg NMI;					// non-maskable interrupt request
-reg RDY;					// Ready signal. Pauses CPU when RDY=0 
+wire CPU_WE;		// wrte enable (output)
+reg IRQ;			// interrupt request
+reg NMI;			// non-maskable interrupt request
+reg RDY;			// Ready signal. Pauses CPU when RDY=0 
 
-wire reset = ! btnCpuReset;
+wire reset = ! btnNotCpuReset;
 
-/////////////////////////////////////////////////////////////////////////////////
-// clock, reset, LED
-/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////// clock, reset, LED
+///////////////////////////////////////////////////////////////////////////////
 
 wire clk_1080p; // 1920x1080p@60 (147.500mhz)
 wire clk_1024p; // 1280x1024@60 (107.273mhz)
@@ -76,40 +69,32 @@ always @(posedge clk_ntscx2 ) begin
    ser_clock_counter <= reset ? 0 : ser_clock_counter+1;
 end
 
-/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 wire cpu_clk = clock_counter[0];//21]; //[0];
 wire lcd_clk = clock_counter[17];
 wire pix_clk = clk_720p; //clock_counter[0];
 wire ser_clk = ser_clock_counter[2];
 
-
-/////////////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////
 wire [15:0] VRAM_AB;	// video address bus
 wire [7:0] VRAM_DO; 	// video data out
 
-/////////////////////////////////////////////////////////////////////////////////
-// interconnect
-/////////////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////// interconnect
+///////////////////////////////////////////////////////////////////////////////
 wire [15:0] RAM_AB = CPU_AB;
 wire [7:0] RAM_DI, RAM_DO;// = CPU_DO;
-//wire [7:0] RAM_DO; 	// ram data out (output reg)
-//wire [7:0] CPU_DI = RAM_DO;
 wire RAM_WE = CPU_WE;
 
 /////////////////////////////////////////////////////////////////////////////////
 
 wire ser_ld_tx_data = 1'b1;
 wire ser_tx_enable = 1'b1;
-//wire ser_tx_out = RsTx;
 wire ser_tx_empty;
 reg [7:0] ser_tx_data = 8'h81;
 
 wire [7:0] ser_rx_data;
 wire ser_rx_enable = 1'b0;
-//wire ser_rx_in = RsRx;
 wire ser_rx_empty;
 
 uart the_uart (
@@ -145,7 +130,7 @@ wire [7:0] CPU_D;
 wire [3:0] xa;
 wire nwp, nwait;
 wire nsel, sck, mosi, miso;
-tri1 rdy;
+wire rdy = reset ? 1'bz : RDY;
 
 M65C02 the_cpu( 
 	.nRst(!reset),
@@ -157,7 +142,7 @@ M65C02 the_cpu(
 	.nNMI(1),//NMI),
 	.nIRQ(1),//IRQ),
 	.nVP(vecpull), 
-	.BE_In(0),//bus_ena),
+	.BE_In(1),//bus_ena),
 	.Sync(sync),
 	.nML(ML),
 	.nCE(ram_ena),
@@ -177,7 +162,7 @@ M65C02 the_cpu(
 	.MISO(miso) 
 ); 
 
-//assign rdy = reset ? 1'z : 1'd1;
+//assign rdy = reset ? 1'z : RDY;
 
 //////////////////////////////////////
 
@@ -192,9 +177,10 @@ bijunction bij( cpu_clk,
 `else
 
 cpu the_cpu( cpu_clk, reset, CPU_AB, CPU_DI, CPU_DO, CPU_WE, vgaHsync, NMI, RDY );
+
 `endif
 
-rwport_byte_sram main_mem( cpu_clk, CPU_WE, RAM_AB, RAM_DI, RAM_DO,
+rwport_byte_sram main_mem( cpu_clk, !CPU_WE, RAM_AB, RAM_DI, RAM_DO,
 									pix_clk, VRAM_AB, VRAM_DO );
 									
 defparam main_mem.ADDRWIDTH = 16;
@@ -211,7 +197,7 @@ x7seg led_display( lcd_clk, reset, CPU_AB, seg, an );
 always @(posedge reset ) begin
 	IRQ <= 0;
 	NMI <= 0;
-	RDY <= 1;
+	RDY <= 0;
 end
 
 initial begin

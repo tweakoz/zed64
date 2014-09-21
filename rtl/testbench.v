@@ -33,7 +33,7 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module testbench;
+module testbench();
 
 	// Inputs
 	reg clk;
@@ -57,7 +57,7 @@ module testbench;
 		.led(led), 
 		.seg(seg), 
 		.an(an), 
-		.btnCpuReset(btnCpuReset), 
+		.btnNotCpuReset(btnCpuReset), 
 		.vgaR(vgaR), 
 		.vgaG(vgaG), 
 		.vgaB(vgaB), 

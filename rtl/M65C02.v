@@ -360,9 +360,9 @@ module M65C02 #(
 
     parameter pROM_AddrWidth = 11,          // Boot/Monitor ROM Addres Width
 
-    parameter pM65C02_uPgm  = "M65C02_uPgm_V3a.coe",
-    parameter pM65C02_IDec  = "M65C02_Decoder_ROM.coe",
-    parameter pBootROM_File = "M65C02_Tst5.txt"
+    parameter pM65C02_uPgm  = "rtl/M65C02_uPgm_V3a.coe",
+    parameter pM65C02_IDec  = "rtl/M65C02_Decoder_ROM.coe",
+    parameter pBootROM_File = "rtl/M65C02_Tst5.txt"
 )(
     input   nRst,               // System Reset Input
     output  nRstO,              // Internal System Reset Output (OC w/ PU)

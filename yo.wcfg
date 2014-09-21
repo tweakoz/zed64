@@ -10,7 +10,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="65" />
+   <WVObjectSize size="70" />
    <wvobject fp_name="divider54" type="divider">
       <obj_property name="label">SOC</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -172,6 +172,32 @@
       <obj_property name="ElementShortName">vgaVsync</obj_property>
       <obj_property name="ObjectShortName">vgaVsync</obj_property>
    </wvobject>
+   <wvobject fp_name="divider66" type="divider">
+      <obj_property name="label">CPUCLKGEN</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/ClkGen/ClkGen/RST_IN" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">RST_IN</obj_property>
+      <obj_property name="ObjectShortName">RST_IN</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/ClkGen/ClkGen/LOCKED_OUT" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">LOCKED_OUT</obj_property>
+      <obj_property name="ObjectShortName">LOCKED_OUT</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/ClkGen/DCM_Locked" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">DCM_Locked</obj_property>
+      <obj_property name="ObjectShortName">DCM_Locked</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/ClkGen/ClkGen/CLKFX_OUT" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">CLKFX_OUT</obj_property>
+      <obj_property name="ObjectShortName">CLKFX_OUT</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/ClkGen/ClkGen/CLK2X_OUT" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">CLK2X_OUT</obj_property>
+      <obj_property name="ObjectShortName">CLK2X_OUT</obj_property>
+   </wvobject>
    <wvobject fp_name="divider52" type="divider">
       <obj_property name="label">CPU</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -189,14 +215,6 @@
    <wvobject fp_name="/testbench/uut/cpu_clk" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">cpu_clk</obj_property>
       <obj_property name="ObjectShortName">cpu_clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/testbench/uut/the_cpu/ClkGen/ClkGen/CLK2X_OUT" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">CLK2X_OUT</obj_property>
-      <obj_property name="ObjectShortName">CLK2X_OUT</obj_property>
-   </wvobject>
-   <wvobject fp_name="/testbench/uut/the_cpu/ClkGen/ClkGen/CLKFX_OUT" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">CLKFX_OUT</obj_property>
-      <obj_property name="ObjectShortName">CLKFX_OUT</obj_property>
    </wvobject>
    <wvobject fp_name="/testbench/uut/the_cpu/Phi2O" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">Phi2O</obj_property>
@@ -241,6 +259,10 @@
    <wvobject fp_name="/testbench/uut/the_cpu/RMW" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">RMW</obj_property>
       <obj_property name="ObjectShortName">RMW</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/uP/AddrGen/AO" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">AO[15:0]</obj_property>
+      <obj_property name="ObjectShortName">AO[15:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/testbench/uut/CPU_AB" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">CPU_AB[15:0]</obj_property>
