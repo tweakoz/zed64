@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/projects/toz/zed64/testbench_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="testbench" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="65" />
+   <wvobject fp_name="divider54" type="divider">
+      <obj_property name="label">SOC</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_clock/LOCKED" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">LOCKED</obj_property>
+      <obj_property name="ObjectShortName">LOCKED</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_clock/RESET" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">RESET</obj_property>
+      <obj_property name="ObjectShortName">RESET</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/btnCpuReset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">btnCpuReset</obj_property>
+      <obj_property name="ObjectShortName">btnCpuReset</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider51" type="divider">
+      <obj_property name="label">LED</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/lcd_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">lcd_clk</obj_property>
+      <obj_property name="ObjectShortName">lcd_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/led" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">led[15:0]</obj_property>
+      <obj_property name="ObjectShortName">led[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/seg" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">seg[6:0]</obj_property>
+      <obj_property name="ObjectShortName">seg[6:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/an" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">an[3:0]</obj_property>
+      <obj_property name="ObjectShortName">an[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider50" type="divider">
+      <obj_property name="label">VIDEO</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/pix_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">pix_clk</obj_property>
+      <obj_property name="ObjectShortName">pix_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/hcount" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">hcount[10:0]</obj_property>
+      <obj_property name="ObjectShortName">hcount[10:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/vcount" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vcount[10:0]</obj_property>
+      <obj_property name="ObjectShortName">vcount[10:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/hsync_fetch" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">hsync_fetch</obj_property>
+      <obj_property name="ObjectShortName">hsync_fetch</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/xpos" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">xpos[10:0]</obj_property>
+      <obj_property name="ObjectShortName">xpos[10:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/ypos" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ypos[10:0]</obj_property>
+      <obj_property name="ObjectShortName">ypos[10:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/char_pixrow" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">char_pixrow[2:0]</obj_property>
+      <obj_property name="ObjectShortName">char_pixrow[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/xcellpos" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">xcellpos[7:0]</obj_property>
+      <obj_property name="ObjectShortName">xcellpos[7:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/ycellpos" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ycellpos[7:0]</obj_property>
+      <obj_property name="ObjectShortName">ycellpos[7:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/y_byteoffset" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">y_byteoffset[15:0]</obj_property>
+      <obj_property name="ObjectShortName">y_byteoffset[15:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/x_byteoffset" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">x_byteoffset[8:0]</obj_property>
+      <obj_property name="ObjectShortName">x_byteoffset[8:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/char_cell_vram_offset" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">char_cell_vram_offset[16:0]</obj_property>
+      <obj_property name="ObjectShortName">char_cell_vram_offset[16:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/row_startL" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">row_startL[15:0]</obj_property>
+      <obj_property name="ObjectShortName">row_startL[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/row_startH" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">row_startH[15:0]</obj_property>
+      <obj_property name="ObjectShortName">row_startH[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/row_start" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">row_start[15:0]</obj_property>
+      <obj_property name="ObjectShortName">row_start[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/hsync_fetch_cycle" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">hsync_fetch_cycle[7:0]</obj_property>
+      <obj_property name="ObjectShortName">hsync_fetch_cycle[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/VRAM_ADDR" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">VRAM_ADDR[15:0]</obj_property>
+      <obj_property name="ObjectShortName">VRAM_ADDR[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/VRAM_DO" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">VRAM_DO[7:0]</obj_property>
+      <obj_property name="ObjectShortName">VRAM_DO[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/x_state" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">x_state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">x_state[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/bg_color" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">bg_color[11:0]</obj_property>
+      <obj_property name="ObjectShortName">bg_color[11:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_vidcon/pg0/fg_color" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">fg_color[11:0]</obj_property>
+      <obj_property name="ObjectShortName">fg_color[11:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/vgaR" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vgaR[3:0]</obj_property>
+      <obj_property name="ObjectShortName">vgaR[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/vgaG" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vgaG[3:0]</obj_property>
+      <obj_property name="ObjectShortName">vgaG[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/vgaB" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vgaB[3:0]</obj_property>
+      <obj_property name="ObjectShortName">vgaB[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/vgaHsync" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">vgaHsync</obj_property>
+      <obj_property name="ObjectShortName">vgaHsync</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/vgaVsync" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">vgaVsync</obj_property>
+      <obj_property name="ObjectShortName">vgaVsync</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider52" type="divider">
+      <obj_property name="label">CPU</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/nRst" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">nRst</obj_property>
+      <obj_property name="ObjectShortName">nRst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/Rst" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">Rst</obj_property>
+      <obj_property name="ObjectShortName">Rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/cpu_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">cpu_clk</obj_property>
+      <obj_property name="ObjectShortName">cpu_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/ClkGen/ClkGen/CLK2X_OUT" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">CLK2X_OUT</obj_property>
+      <obj_property name="ObjectShortName">CLK2X_OUT</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/ClkGen/ClkGen/CLKFX_OUT" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">CLKFX_OUT</obj_property>
+      <obj_property name="ObjectShortName">CLKFX_OUT</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/Phi2O" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">Phi2O</obj_property>
+      <obj_property name="ObjectShortName">Phi2O</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/Phi1O" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">Phi1O</obj_property>
+      <obj_property name="ObjectShortName">Phi1O</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/MC" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">MC[2:0]</obj_property>
+      <obj_property name="ObjectShortName">MC[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/C1" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">C1</obj_property>
+      <obj_property name="ObjectShortName">C1</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/C2" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">C2</obj_property>
+      <obj_property name="ObjectShortName">C2</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/C3" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">C3</obj_property>
+      <obj_property name="ObjectShortName">C3</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/C4" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">C4</obj_property>
+      <obj_property name="ObjectShortName">C4</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/IRQ" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">IRQ</obj_property>
+      <obj_property name="ObjectShortName">IRQ</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/nIRQ" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">nIRQ</obj_property>
+      <obj_property name="ObjectShortName">nIRQ</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/nNMI" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">nNMI</obj_property>
+      <obj_property name="ObjectShortName">nNMI</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/RMW" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">RMW</obj_property>
+      <obj_property name="ObjectShortName">RMW</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/CPU_AB" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">CPU_AB[15:0]</obj_property>
+      <obj_property name="ObjectShortName">CPU_AB[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/CPU_WE" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">CPU_WE</obj_property>
+      <obj_property name="ObjectShortName">CPU_WE</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider53" type="divider">
+      <obj_property name="label">RAM</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/RAM_AB" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">RAM_AB[15:0]</obj_property>
+      <obj_property name="ObjectShortName">RAM_AB[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/RAM_DO" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">RAM_DO[7:0]</obj_property>
+      <obj_property name="ObjectShortName">RAM_DO[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/RAM_DI" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">RAM_DI[7:0]</obj_property>
+      <obj_property name="ObjectShortName">RAM_DI[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/RAM_WE" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">RAM_WE</obj_property>
+      <obj_property name="ObjectShortName">RAM_WE</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider55" type="divider">
+      <obj_property name="label">SER</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/RsTx" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">RsTx</obj_property>
+      <obj_property name="ObjectShortName">RsTx</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/RsRx" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">RsRx</obj_property>
+      <obj_property name="ObjectShortName">RsRx</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/ser_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">ser_clk</obj_property>
+      <obj_property name="ObjectShortName">ser_clk</obj_property>
+   </wvobject>
+</wave_config>

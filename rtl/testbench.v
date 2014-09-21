@@ -70,14 +70,18 @@ module testbench;
 	initial begin
 		// Initialize Inputs
 		clk = 0;
-		btnCpuReset = 0;
+		btnCpuReset = 1;
 		RsRx = 0;
 
 		// Wait 100 ns for global reset to finish
-		#5000000;
+		#20000000;
+		//btnCpuReset = 0;
+
+		// Wait 100 ns for global reset to finish
+		#500000;
         
 		// Add stimulus here
-		btnCpuReset = 1;
+		//btnCpuReset = 1;
 
 
 	end
