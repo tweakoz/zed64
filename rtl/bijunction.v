@@ -5,11 +5,13 @@ module bijunction(	input wire clk, inp_sel,
 
 reg [7:0] inp_reg, out_reg;
 
-assign iop	= inp_sel
+assign iop	= !inp_sel
 			? inp_reg
 			: 8'bZ;
 
-assign out = out_reg;
+assign out = inp_sel
+		   ? 8'bZ
+		   : out_reg;
 
 always @ (posedge clk) begin
 	out_reg <= iop;
