@@ -10,7 +10,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="81" />
+   <WVObjectSize size="88" />
    <wvobject fp_name="divider54" type="divider">
       <obj_property name="label">SOC</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -224,10 +224,6 @@
       <obj_property name="ElementShortName">Phi1O</obj_property>
       <obj_property name="ObjectShortName">Phi1O</obj_property>
    </wvobject>
-   <wvobject fp_name="/testbench/uut/the_cpu/MC" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">MC[2:0]</obj_property>
-      <obj_property name="ObjectShortName">MC[2:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/testbench/uut/the_cpu/C1" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">C1</obj_property>
       <obj_property name="ObjectShortName">C1</obj_property>
@@ -263,10 +259,6 @@
    <wvobject fp_name="/testbench/uut/the_cpu/uP/AddrGen/AO" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">AO[15:0]</obj_property>
       <obj_property name="ObjectShortName">AO[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/testbench/uut/CPU_WE" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">CPU_WE</obj_property>
-      <obj_property name="ObjectShortName">CPU_WE</obj_property>
    </wvobject>
    <wvobject fp_name="divider71" type="divider">
       <obj_property name="label">BIJ</obj_property>
@@ -316,11 +308,19 @@
       <obj_property name="ElementShortName">RAM_DI[7:0]</obj_property>
       <obj_property name="ObjectShortName">RAM_DI[7:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/testbench/uut/RAM_WE" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">RAM_WE</obj_property>
+      <obj_property name="ObjectShortName">RAM_WE</obj_property>
+   </wvobject>
    <wvobject fp_name="divider55" type="divider">
       <obj_property name="label">BUS</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="BkColor">128 128 255</obj_property>
       <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/MC" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">MC[2:0]</obj_property>
+      <obj_property name="ObjectShortName">MC[2:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/testbench/uut/cpu_clk" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">cpu_clk</obj_property>
@@ -330,13 +330,37 @@
       <obj_property name="ElementShortName">Phi2O</obj_property>
       <obj_property name="ObjectShortName">Phi2O</obj_property>
    </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/uP/MemTyp" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">MemTyp[1:0]</obj_property>
+      <obj_property name="ObjectShortName">MemTyp[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/uP/DO" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">DO[7:0]</obj_property>
+      <obj_property name="ObjectShortName">DO[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/uP/DI" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">DI[7:0]</obj_property>
+      <obj_property name="ObjectShortName">DI[7:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/testbench/uut/CPU_AB" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">CPU_AB[15:0]</obj_property>
       <obj_property name="ObjectShortName">CPU_AB[15:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/uP/PC" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">PC[15:0]</obj_property>
+      <obj_property name="ObjectShortName">PC[15:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/testbench/uut/the_cpu/DB" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">DB[7:0]</obj_property>
       <obj_property name="ObjectShortName">DB[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/uP/IR" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">IR[7:0]</obj_property>
+      <obj_property name="ObjectShortName">IR[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/CPU_WE" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">CPU_WE</obj_property>
+      <obj_property name="ObjectShortName">CPU_WE</obj_property>
    </wvobject>
    <wvobject fp_name="/testbench/uut/the_cpu/nRst" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">nRst</obj_property>
@@ -357,5 +381,9 @@
    <wvobject fp_name="/testbench/uut/the_cpu/Sync" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">Sync</obj_property>
       <obj_property name="ObjectShortName">Sync</obj_property>
+   </wvobject>
+   <wvobject fp_name="/testbench/uut/the_cpu/uP/Done" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">Done</obj_property>
+      <obj_property name="ObjectShortName">Done</obj_property>
    </wvobject>
 </wave_config>

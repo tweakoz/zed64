@@ -9,7 +9,7 @@ assign iop	= !inp_sel
 			? inp_reg
 			: 8'bZ;
 
-assign out = inp_sel
+assign out = !inp_sel
 		   ? 8'bZ
 		   : out_reg;
 

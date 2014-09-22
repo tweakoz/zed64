@@ -163,10 +163,15 @@ M65C02 the_cpu(
 
 //assign rdy = reset ? 1'z : RDY;
 
+reg RAM_WE;
+
+always @(*) RAM_WE <= ph2o & ~nwr;
+wire [7:0] RAM_DB = ((~noe) ? RAM_DO : {8{1'bZ}});
+
 //////////////////////////////////////
 
 bijunction bij( ph2o,
-				!CPU_WE,
+				RAM_WE,
 				RAM_DO,
 				RAM_DI,
 				CPU_D );
@@ -179,7 +184,7 @@ cpu the_cpu( cpu_clk, reset, CPU_AB, CPU_DI, CPU_DO, CPU_WE, vgaHsync, NMI, RDY 
 
 `endif
 
-rwport_byte_sram main_mem( cpu_clk, !CPU_WE, RAM_AB, RAM_DI, RAM_DO,
+rwport_byte_sram main_mem( ~ph2o, RAM_WE, RAM_AB, RAM_DI, RAM_DO,
 									pix_clk, VRAM_AB, VRAM_DO );
 									
 defparam main_mem.ADDRWIDTH = 16;
