@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/projects/toz/myhdl1/isedir/tb_top_ise_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_top_ise" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="31" />
+   <wvobject fp_name="/tb_top_ise/reset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffff00</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/clock" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clock</obj_property>
+      <obj_property name="ObjectShortName">clock</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffff00</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_hcount" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_hcount[10:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_hcount[10:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffff00</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_hpulse" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_hpulse[0:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_hpulse[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_hwrap" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_hwrap[0:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_hwrap[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_hblank" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_hblank[0:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_hblank[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_vcount" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_vcount[10:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_vcount[10:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffff00</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_vpulse" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_vpulse[0:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_vpulse[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_vwrap" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_vwrap[0:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_vwrap[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_vblank" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_vblank[0:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_vblank[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_is_blanking" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_is_blanking[0:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_is_blanking[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_pg_xstate" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_pg_xstate[3:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_pg_xstate[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider26" type="divider">
+      <obj_property name="label">ADDR</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_pg_hsync_fetch" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_pg_hsync_fetch[0:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_pg_hsync_fetch[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_pg_xcell" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_pg_xcell[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_pg_xcell[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_pg_xcellp1" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_pg_xcellp1[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_pg_xcellp1[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_pg_ycell" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_pg_ycell[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_pg_ycell[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_pg_ycellp1" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_pg_ycellp1[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_pg_ycellp1[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider16" type="divider">
+      <obj_property name="label">SHIFTED</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vram_adr_out" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vram_adr_out[15:0]</obj_property>
+      <obj_property name="ObjectShortName">vram_adr_out[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vram_dat_in" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vram_dat_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vram_dat_in[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_pg_charcode" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_pg_charcode[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_pg_charcode[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_pg_fontoffs" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_pg_fontoffs[15:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_pg_fontoffs[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_pg_row_start" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_pg_row_start[15:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_pg_row_start[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider24" type="divider">
+      <obj_property name="label">VOUT</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_pg_pix8" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_pg_pix8[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_pg_pix8[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_pg_pixbit" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_pg_pixbit[2:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_pg_pixbit[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/vtop_pg_current_pixel" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vtop_pg_current_pixel[0:0]</obj_property>
+      <obj_property name="ObjectShortName">vtop_pg_current_pixel[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/out_red" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">out_red[3:0]</obj_property>
+      <obj_property name="ObjectShortName">out_red[3:0]</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ff0000</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/out_grn" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">out_grn[3:0]</obj_property>
+      <obj_property name="ObjectShortName">out_grn[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/dut/out_blu" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">out_blu[3:0]</obj_property>
+      <obj_property name="ObjectShortName">out_blu[3:0]</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#0000ff</obj_property>
+   </wvobject>
+</wave_config>
