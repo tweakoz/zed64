@@ -46,4 +46,5 @@ Digilent Nexys4
 3. **./make.py synvhd**      re-generates VHDL (not working yet... ;<)
 4. **./make.py ise**      launches ise with zed64 project
 
+After the first time you run make prep, a *zed.build.ini* file will be generated. Edit this to reflect your environment.
 
