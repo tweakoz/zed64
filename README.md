@@ -41,9 +41,9 @@ Digilent Nexys4
 // Building
 /////////////////////////////////////////////////////////
 
-1. ./make.py prep *downloads dependencies, makes build folders, generates verilog*
-2. ./make.py synver *re-generates verilog*
-3. ./make.py synvhd *re-generates VHDL (not working yet... ;<)*
-4. ./make.py ise *launches ise with zed64 project*
+1. **./make.py prep**      downloads dependencies, makes build folders, generates verilog
+2. **./make.py synver**      re-generates verilog
+3. **./make.py synvhd**      re-generates VHDL (not working yet... ;<)
+4. **./make.py ise**      launches ise with zed64 project
 
 
