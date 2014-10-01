@@ -1,3 +1,14 @@
+#######################################################################
+##
+## Zed64 MetroComputer
+##
+## Unless a module otherwise marked,
+## Copyright 2014, Michael T. Mayers (michael@tweakoz.com
+## Provided under the Creative Commons Attribution License 3.0
+## Please see https://creativecommons.org/licenses/by/3.0/us/legalcode
+##
+#######################################################################
+
 import sys, os
 from myhdl import *
 from stdlib import  *
