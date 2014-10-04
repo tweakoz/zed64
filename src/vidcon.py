@@ -43,11 +43,11 @@ class VideoImpl:
         ######################################
         # internal registers
         ######################################
-        fcount = RegMod64()
+        fcount = SigMod64()
         fpulse = SigBool()
-        hcp1, hcp2 = Gen2(RegPixCnt)
-        vcp1, vcp2 = Gen2(RegPixCnt)
-        get_hc, get_vc = Gen2(RegPixCnt)
+        hcp1, hcp2 = Gen2(SigPixCnt)
+        vcp1, vcp2 = Gen2(SigPixCnt)
+        get_hc, get_vc = Gen2(SigPixCnt)
         hb, vb = Gen2(SigBool)
         v0 = mline.v0
         h0 = mline.h0
@@ -104,20 +104,20 @@ class VideoImpl:
         # internal registers
         ######################################
         #gen_r, gen_g, gen_b = Gen3(SigColorChannel)
-        pix8 = RegByte()
-        dat_i = RegByte()
+        pix8 = SigByte()
+        dat_i = SigByte()
         hlines = mline.h0
         hsync_inv = mline.hsi
         ######################################
-        xpos, ypos = Gen2(RegAdr16)
-        xposp1, yposp1 = Gen2(RegAdr16)
+        xpos, ypos = Gen2(SigAdr16)
+        xposp1, yposp1 = Gen2(SigAdr16)
         sela = Sel2(xpos,hcount,0,is_blanking)
         selb = Sel2(ypos,vcount,0,is_blanking)
         selc = Sel2(xposp1,hcount+1,0,is_blanking)
         seld = Sel2(yposp1,vcount+1,0,is_blanking)
         ######################################
-        xcell, ycell = Gen2(RegByte)
-        xcellp1, ycellp1 = Gen2(RegByte)
+        xcell, ycell = Gen2(SigByte)
+        xcellp1, ycellp1 = Gen2(SigByte)
         hsync_fetch = SigBool()
         pixbit = Signal(modbv(0)[3:])
         @always_comb
@@ -141,12 +141,12 @@ class VideoImpl:
             ycell_subrow.next = concat(ypos[3:0])
             current_pixel.next = pix8[pixbit]
         ######################################
-        row_start = RegAdr16()
+        row_start = SigAdr16()
         @always_seq(hblank.posedge,self.reset)
         def hblankgen():
             row_start.next = CELL_BASE + xcellp1*0x100
         ######################################
-        hsync_fetch_cycle = RegByte()
+        hsync_fetch_cycle = SigByte()
         @always_seq(self.pix_clk.posedge,self.reset)
         def addrgen0():
             if hsync_fetch:
@@ -155,8 +155,8 @@ class VideoImpl:
                 hsync_fetch_cycle.next = 0
             dat_i.next = vram_dat_in
         ######################################
-        charcode = RegByte()
-        fontoffs = RegAdr16()
+        charcode = SigByte()
+        fontoffs = SigAdr16()
         ##############
         ## DDR fetching (use both pos/neg clock edges)
         ##############
@@ -177,7 +177,7 @@ class VideoImpl:
                     charcode.next = vram_dat_in
                     # font addr
                     fontoffs.next = concat( intbv(0)[5:],  # 5 bits
-                                            charcode.next,      # 8 bits
+                                            charcode.next, # 8 bits
                                             ycell_subrow ) # 3 bits
                 ########################################
                 elif xstate==1: # read pixrow
@@ -191,12 +191,12 @@ class VideoImpl:
         ######################################
         # internal registers
         ######################################
-        hcount, vcount = Gen2(RegPixCnt)
+        hcount, vcount = Gen2(SigPixCnt)
         hpulse, vpulse = Gen2(SigBool)
         hblank, vblank = Gen2(SigBool)
         hwrap, vwrap = Gen2(SigBool)
         is_blanking = SigBool()
-        frame_counter,line_counter = Gen2(RegMod64)
+        frame_counter,line_counter = Gen2(SigMod64)
         sel_r,sel_g,sel_b = Gen3(SigColorChannel)
         ######################################
         pix_r,pix_g,pix_b = Gen3(SigColorChannel)
@@ -213,7 +213,7 @@ class VideoImpl:
                                     pix_r,pix_g,pix_b )
         ######################################
         # enforce black pixels in blanking regions
-        #  sync wont work otherwise!
+        #  syncho won't work otherwise!
         ######################################
         sela = Sel2(sel_r,pix_r,0,is_blanking)
         selb = Sel2(sel_g,pix_g,0,is_blanking)
@@ -250,9 +250,13 @@ def video(  reset,pixel_clock,
 
     return instances()
 ################################################
-def generate_verilog( name, out_folder, timescale, ios ):
-    toVerilog.timescale = timescale
+def gen_verilog( name, vparams ):
+
+    ios = vparams.ios
+    outfolder = vparams.outfolder
+
     toVerilog.name = name
+    toVerilog.timescale = vparams.timescale
     veri_inst = toVerilog(  video,
                             ios["reset"],
                             ios["pixel_clock"],
@@ -263,10 +267,12 @@ def generate_verilog( name, out_folder, timescale, ios ):
                             ios["out_blu"],
                             ios["out_hsync"],
                             ios["out_vsync"])
-    os.system("mv %s.v %s/" % (name,out_folder) )
-    os.system("mv tb_%s.v %s/" % (name,out_folder) )
+
+    os.system("mv %s.v %s/" % (name,outfolder) )
+    os.system("mv tb_%s.v %s/" % (name,outfolder) )
+
 ################################################
-def generate_vhdl( ios ):
+def gen_vhdl( ios ):
     # this does not work yet!
     # the vhdl generator
     # complains about the reset signal not having a 

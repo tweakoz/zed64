@@ -19,22 +19,28 @@ hvcount_bits = 11
 
 ################################################33
 
+def SigReset():
+    return ResetSignal(0, active=1, async=True)
+
+def SigWord(size=1,def_val=0):
+    return Signal(intbv(def_val)[size:])
+
 def SigBool(def_val=False):
     return Signal(intbv(def_val)[1:])
 
-def RegByte(def_val=0):
+def SigByte(def_val=0):
     return Signal(intbv(def_val)[8:])
 
-def RegAdr16(def_val=0):
+def SigAdr16(def_val=0):
     return Signal(intbv(def_val)[16:])
 
-def RegMod64(def_val=0):
+def SigMod64(def_val=0):
     return modbv(def_val)[64:]
 
 def pixdimval(value):
     return modbv(value)[hvcount_bits:]
 
-def RegPixCnt(initval=0):
+def SigPixCnt(initval=0):
     return Signal(pixdimval(initval))
 
 def Sel2(output,inpa,inpb,sel):
@@ -71,55 +77,6 @@ def Gen2( x ):
     return x(), x()
 def Gen3( x ):
     return x(), x(), x()
-
-################################################33
-
-class AsyncRomFile:
-    def __init__(self,instname,filename,addrwidth,datawidth):
-        self.filename = filename
-        self.file = open(filename,"r")
-        self.file_data = self.file.read()
-        self.size = len(self.file_data)
-        self.m5 = md5.new()
-        self.m5.update(self.file_data)
-        self.chks = self.m5.hexdigest()
-        self.addrwidth = addrwidth
-        self.datawidth = datawidth
-        self.instance_name = instname
-        print "ROM fname<%s> len<%s> md5<%s>" % (filename,self.size,self.chks)
-
-        max_size = 2**self.addrwidth        
-        assert(self.size<=max_size)
-
-        romsig = [Signal(intbv(0)[self.datawidth:]) for ii in range(max_size)]
-
-        for i in range(max_size):
-            romsig[i] = 0
-        for i in range(self.size):
-            romsig[i] = ord(self.file_data[i])
-
-        self.content = tuple(romsig)
-
-    def gen(self,addr,data,content):
-
-        mcont = content
-        @always_comb
-        def read_rom():
-            lookup = mcont[int(addr)]
-            data.next = lookup
-
-        return instances()
-
-    def generate_verilog(self, out_folder, timescale,ios):
-        toVerilog.timescale = timescale
-        toVerilog.name = self.instance_name
-        addr = Signal(intbv(0)[self.addrwidth:])
-        data = Signal(intbv(0)[self.datawidth:])
-        content = self.content
-        #module = AsyncRomFile(Addr,Data,filename)
-        veri_inst = toVerilog( self.gen, addr, data, content )
-        os.system("mv %s.v %s/" % (self.instance_name,out_folder) )
-        os.system("mv tb_%s.v %s/" % (self.instance_name,out_folder) )
 
 ################################################33
 
@@ -196,6 +153,14 @@ def popdir(a):
 
 ################################################33
 
+class verilog_params:
+    def __init__(self,outfolder,timescale,ios):
+        self.outfolder = outfolder
+        self.timescale = timescale
+        self.ios = ios
+
+################################################33
+
 states = enum( "Reset",
                "StateA",
                "StateB",
@@ -226,16 +191,18 @@ def FSM(reset,clock):
 timescale = "1ns/1ps"
 
 __all__ = [ 'timescale',
+            "verilog_params",
+            "SigReset",
+            "SigWord",
             'SigColorChannel',
             'SigBool',
-            'RegMod64',
-            'RegPixCnt',
-            'RegByte',
-            'RegAdr16',
+            'SigMod64',
+            'SigPixCnt',
+            'SigByte',
+            'SigAdr16',
             'Sel2',
             'ModeLine',
             'Gen2',
             'Gen3',
-            'AsyncRomFile',
             'UcfGen',
             'pushdir','popdir']

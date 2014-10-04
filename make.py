@@ -7,6 +7,9 @@ import localopts
 
 from myhdl import *
 from stdlib import *
+from memory import *
+from cpu import *
+
 import vidcon
 
 ################################################33
@@ -31,8 +34,8 @@ ios["out_grn"] = SigColorChannel()
 ios["out_blu"] = SigColorChannel()
 ios["out_hsync"] = SigBool()
 ios["out_vsync"] = SigBool()
-ios["vram_adr_out"] = RegAdr16()
-ios["vram_dat_in"] = RegByte()
+ios["vram_adr_out"] = SigAdr16()
+ios["vram_dat_in"] = SigByte()
 
 #for io_name in ios:
 #    io = ios[io_name]
@@ -59,12 +62,23 @@ if len(sys.argv)!=2:
 
 ########################################
 if sys.argv[1]=="synver":
-    vidcon.generate_verilog("vidcon", "rtl/",timescale,ios)
+
+    vparams = verilog_params("rtl/",timescale,ios)
+
+    vidcon.gen_verilog("vidcon", vparams)
+
     chargen = AsyncRomFile("chargen","roms/chargen.bin",12,8)
-    chargen.generate_verilog("rtl/",timescale,ios)
+    chargen.gen_verilog(vparams)
+
+    dpram = DualSepPortRam("dpram", 16, 8 )
+    dpram.gen_verilog(vparams)
+
+    cpu = CPU02("cpu")
+    cpu.gen_verilog(vparams)
+
 ########################################
 elif sys.argv[1]=="synvhd":
-    vidcon.generate_vhdl(ios)
+    vidcon.gen_vhdl(ios)
 ########################################
 elif sys.argv[1]=="ise":
     print localopts.ISE_BIN_DIR()
