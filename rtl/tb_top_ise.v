@@ -14,7 +14,7 @@ wire cpu_din;
 wire cpu_dout = 0;
 
 wire [3:0] R,G,B;
-wire H,S; // hsync, vsync
+wire H,V; // hsync, vsync
 wire [15:0] vpu_addr;
 wire [7:0] vram_data_in; // from vram
 wire [7:0] vram_data_out = 0; // to vram
@@ -24,7 +24,7 @@ wire [7:0] char_data;
 
 ///////////////////////////////////////////////////
 
-CPU02 the_cpu(
+cpu the_cpu(
 		reset, cpu_clk,
 		cpu_addr,
 		cpu_data_in,
@@ -33,7 +33,7 @@ CPU02 the_cpu(
 vidcon the_vpu(
     reset, pix_clk,
     vpu_addr, vram_data_in,
-	R,G,B,H,S
+	R,G,B,H,V
 );
 
 dpram dpr(

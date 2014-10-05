@@ -143,4 +143,96 @@ class AsyncRomFile:
         os.system("mv %s.v %s/" % (self.instance_name,out_folder) )
         os.system("mv tb_%s.v %s/" % (self.instance_name,out_folder) )
 
-__all__ = [ 'AsyncRomFile', "DualSepPortRam" ]
+###########################################
+## Synchronous fifo
+###########################################
+
+class SynchronousFifo:
+
+    def __init__(self,name,addrwidth,datawidth):
+        self.name = name
+        self.addrwidth = addrwidth
+        self.nelem = 2**addrwidth
+        self.datawidth = datawidth
+        self.ramsig = [Signal(intbv(0)[self.datawidth:]) for ii in range(self.nelem)]
+
+    def top(self,reset,clk,din,dout,rena,wena,full,empty):
+        
+        nelem = self.nelem
+        addrw = self.addrwidth
+        mem = self.ramsig
+        count = SigByte()
+        idxI = SigMod(addrw)
+        idxO = SigMod(addrw)
+        emp = SigBool()
+        ful = SigBool()
+        do_read = SigBool()
+        do_write = SigBool()
+
+        @always_comb
+        def emp_ful():
+            emp.next = (count==0)
+            ful.next = (count==nelem)
+
+        @always_comb
+        def emp_ful2():
+            do_read.next = (rena & (~emp))
+            do_write.next = (wena & (~ful))
+
+        @always_seq(clk.posedge,reset)
+        def counter():
+            if reset:
+                count.next = 0
+            elif do_read & ~ do_write:
+                count.next = count-1
+            elif do_write & ~ do_read:
+                count.next = count+1
+
+        @always_seq(clk.posedge,reset)
+        def indices():
+            if reset:
+                idxI.next = 0
+                idxO.next = 0
+            else:
+                if do_write:
+                    idxO.next = (idxO+1)
+                if do_read:
+                    idxI.next = (idxI+1)
+
+        @always_seq(clk.posedge,reset)
+        def read():
+            if reset:
+                dout.next = 0
+            elif do_read:
+                dout.next = mem[idxI]
+
+        @always_seq(clk.posedge,reset)
+        def write():
+            if do_write:
+                mem[idxO].next = din
+
+
+
+        return instances()
+
+
+
+    def gen_verilog(self, vparams):
+        out_folder = vparams.outfolder
+        ios = vparams.ios
+        toVerilog.timescale = vparams.timescale
+        toVerilog.name = self.name
+        veri_inst = toVerilog( 
+                self.top, 
+                SigReset(), # reset
+                SigBool(),  # clk
+                SigByte(),  # din
+                SigByte(),  # dout
+                SigBool(),  # rena
+                SigBool(),  # wena
+                SigBool(),  # full
+                SigBool())  # empty
+        os.system("mv %s.v %s/" % (self.name,out_folder) )
+        os.system("mv tb_%s.v %s/" % (self.name,out_folder) )
+
+__all__ = [ 'AsyncRomFile', "DualSepPortRam", "SynchronousFifo" ]

@@ -37,6 +37,9 @@ def SigAdr16(def_val=0):
 def SigMod64(def_val=0):
     return modbv(def_val)[64:]
 
+def SigMod(w=4,def_val=0):
+    return modbv(def_val)[w:]
+
 def pixdimval(value):
     return modbv(value)[hvcount_bits:]
 
@@ -50,6 +53,12 @@ def Sel2(output,inpa,inpb,sel):
             output.next = inpb
         else:
             output.next = inpa
+
+    __verilog__ = \
+    """assign %(output)s = %(sel)s ? %(inpb)s : %(inpa)s;"""
+
+    output.driven = "wire"
+
     return logic
 
 def SigColorChannel():
@@ -194,6 +203,7 @@ __all__ = [ 'timescale',
             "verilog_params",
             "SigReset",
             "SigWord",
+            "SigMod",
             'SigColorChannel',
             'SigBool',
             'SigMod64',

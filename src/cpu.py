@@ -13,6 +13,8 @@
 
 from myhdl import *
 from stdlib import *
+from memory import *
+
 import sys, os, md5, string
 import localopts
 
@@ -22,6 +24,21 @@ class CPU02:
 
     def __init__( self, instname ):
     	self.instance_name = instname
+
+    ########################################
+    # registers
+    ########################################
+
+    def reg( self, reset, clk ):
+
+    	A = SigByte()
+    	X = SigByte()
+    	Y = SigByte()
+    	S = SigByte()
+
+    	#@always_seq( clk.posedge, reset )
+    	#	def init():
+    	#		if reset:
 
     ########################################
     # instruction decoder
@@ -39,14 +56,25 @@ class CPU02:
 
     def alu( self, reset, clk, oper, a, b, result ):
 
-    	@always_seq( clk.posedge, reset )
-    	def compute():
-    		if oper==0:
-    			result = a+b
-    		else:
-    			result = a & b
+		alu_fifo_din = SigByte()
+		alu_fifo_dout = SigByte()
+		alu_fifo_full = SigBool()
+		alu_fifo_empty = SigBool()
 
-    	return instances()
+		aluf = SynchronousFifo("alu_fifo",3,8)
+		alu_fifo = aluf.top(	reset,clk,
+								alu_fifo_din, alu_fifo_dout,
+								SigBool(1), SigBool(1),
+								alu_fifo_full, alu_fifo_empty )
+
+		@always_seq( clk.posedge, reset )
+		def compute():
+			if oper==0:
+				result = a+b
+			else:
+				result = a & b
+
+		return instances()
 
     ########################################
     # load store unit

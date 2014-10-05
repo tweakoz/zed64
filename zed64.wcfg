@@ -10,7 +10,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="11" />
+   <WVObjectSize size="17" />
    <wvobject fp_name="/tb_top_ise/reset" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">reset</obj_property>
       <obj_property name="ObjectShortName">reset</obj_property>
@@ -47,10 +47,6 @@
       <obj_property name="ElementShortName">H</obj_property>
       <obj_property name="ObjectShortName">H</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_top_ise/S" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">S</obj_property>
-      <obj_property name="ObjectShortName">S</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_top_ise/R" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">R[3:0]</obj_property>
       <obj_property name="ObjectShortName">R[3:0]</obj_property>
@@ -62,5 +58,35 @@
    <wvobject fp_name="/tb_top_ise/B" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">B[3:0]</obj_property>
       <obj_property name="ObjectShortName">B[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider12" type="divider">
+      <obj_property name="label">CPU/ALU</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/cpu_addr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">cpu_addr[15:0]</obj_property>
+      <obj_property name="ObjectShortName">cpu_addr[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/cpu_data_out" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">cpu_data_out[7:0]</obj_property>
+      <obj_property name="ObjectShortName">cpu_data_out[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/cpu_dout" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">cpu_dout</obj_property>
+      <obj_property name="ObjectShortName">cpu_dout</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/cpu_data_in" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">cpu_data_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">cpu_data_in[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/cpu_din" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">cpu_din</obj_property>
+      <obj_property name="ObjectShortName">cpu_din</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/cpu_wena" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">cpu_wena</obj_property>
+      <obj_property name="ObjectShortName">cpu_wena</obj_property>
    </wvobject>
 </wave_config>
