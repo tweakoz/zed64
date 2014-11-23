@@ -27,22 +27,22 @@ always @(posedge C6_CLK_8MHZ)
 
 //////////////////////////////////////////////////
 
-assign sid_clock = clk_counter[3];
+assign sid_clock = clk_counter[2];
 reg [31:0] sid_cycle_counter;
 
-always @(posedge sid_clock)
+always @(posedge sid_clock) // 1mhz
 	sid_cycle_counter <= sid_reset ? 0 : sid_cycle_counter+1;	
 
 //////////////////////////////////////////////////
 
-//wire [15:0] sid_subcyc = sid_cycle_counter[15:0]; // 1m/64 == 16Khz (4sec loop)
-//wire [15:0] sid_subcyc = sid_cycle_counter[25:10]; // 1m/64 == 16Khz (4sec loop)
+//wire [15:0] sid_subcyc = sid_cycle_counter[15:0]; // 1mhz (1/16sec)
+//wire [15:0] sid_subcyc = sid_cycle_counter[19:4]; // 1mhz/16 == 64Khz (1 sec loop)
+//wire [15:0] sid_subcyc = sid_cycle_counter[20:5]; // 1mhz/32 == 32Khz (2 sec loop)
 wire [15:0] sid_subcyc = sid_cycle_counter[21:6]; // 1m/64 == 16Khz (4sec loop)
-//wire [15:0] sid_subcyc = sid_cycle_counter[31:16]; // 1m/64k == 16hz
 //wire [7:0] sid_subcyc = sid_cycle_counter[21:14]; // 1m/256 == 4Khz (16sec loop)
 //wire [15:0] sid_subcyc = sid_cycle_counter[27:20]; // 1m/1m == 1hz
 
-assign C6_LED[3:0] = sid_subcyc[7:4];
+assign C6_LED[3:0] = sid_subcyc[15:12];
 
 reg [15:0] frq0;
 
@@ -134,11 +134,15 @@ always @(posedge sid_clock) begin
 	//		sid_addr<=5'h17;
 	//		sid_data<=8'hff;  // reson=15, filter all
 	//		end
-	else if( sid_subcyc == 16'h0032 ) begin
+	else if( sid_subcyc == 16'h0022 ) begin
+			sid_addr<=5'h18;
+			sid_data<=8'hf;  // gate off(tri)
+			end
+	else if( sid_subcyc == 16'hf000 ) begin
 			sid_addr<=5'h4;
 			sid_data<=8'h10;  // gate off(tri)
 			end
-	else if( sid_subcyc == 16'h8034 ) begin
+	else if( sid_subcyc == 16'hf002 ) begin
 			sid_addr<=5'h18;
 			sid_data<=8'hf;  // gate off(tri)
 			end
