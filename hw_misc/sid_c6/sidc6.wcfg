@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/projects/toz/zed64/hw_misc/sid_c6/sidtestbench_isim_beh1.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="sidtestbench" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="8" />
+   <wvobject fp_name="/sidtestbench/SID_NOTRES" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">SID_NOTRES</obj_property>
+      <obj_property name="ObjectShortName">SID_NOTRES</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/SID_CLK" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">SID_CLK</obj_property>
+      <obj_property name="ObjectShortName">SID_CLK</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/SID_ADDR" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">SID_ADDR[4:0]</obj_property>
+      <obj_property name="ObjectShortName">SID_ADDR[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/SID_DATA" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">SID_DATA[7:0]</obj_property>
+      <obj_property name="ObjectShortName">SID_DATA[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/SID_NOTCS" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">SID_NOTCS</obj_property>
+      <obj_property name="ObjectShortName">SID_NOTCS</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/C6_LED" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">C6_LED[3:0]</obj_property>
+      <obj_property name="ObjectShortName">C6_LED[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/C6_CLK_8MHZ" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">C6_CLK_8MHZ</obj_property>
+      <obj_property name="ObjectShortName">C6_CLK_8MHZ</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/BTN_0" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">BTN_0</obj_property>
+      <obj_property name="ObjectShortName">BTN_0</obj_property>
+   </wvobject>
+</wave_config>
