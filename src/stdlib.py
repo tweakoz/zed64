@@ -170,33 +170,6 @@ class verilog_params:
 
 ################################################33
 
-states = enum( "Reset",
-               "StateA",
-               "StateB",
-               "StateC",
-               encoding="one_hot" )
-
-def FSM(reset,clock):
-    st = Signal(states.Reset)
-    
-    @always(clock.posedge)
-    def gen():
-        if reset:
-            st.next = states.Reset
-        else:
-            if st==states.Reset:
-                st.next = states.StateA
-            elif st==states.StateA:
-                st.next = states.StateC
-            elif st==states.StateB:
-                st.next = states.StateA
-            elif st==states.StateC:
-                st.next = states.StateB
-            else:
-                st.next = states.Reset
-
-    return instances()
-
 timescale = "1ns/1ps"
 
 __all__ = [ 'timescale',

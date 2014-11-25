@@ -65,6 +65,11 @@ if sys.argv[1]=="synver":
 
     vparams = verilog_params("rtl/",timescale,ios)
 
+    teda = eda_test("edatest")
+    teda.gen_verilog(vparams)
+
+    #sys.exit(0)
+
     vidcon.gen_verilog("vidcon", vparams)
 
     chargen = AsyncRomFile("chargen","roms/chargen.bin",12,8)
@@ -75,6 +80,7 @@ if sys.argv[1]=="synver":
 
     cpu = CPU02("cpu")
     cpu.gen_verilog(vparams)
+
 
 ########################################
 elif sys.argv[1]=="synvhd":

@@ -10,7 +10,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="17" />
+   <WVObjectSize size="22" />
    <wvobject fp_name="/tb_top_ise/reset" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">reset</obj_property>
       <obj_property name="ObjectShortName">reset</obj_property>
@@ -88,5 +88,27 @@
    <wvobject fp_name="/tb_top_ise/cpu_wena" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">cpu_wena</obj_property>
       <obj_property name="ObjectShortName">cpu_wena</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider22" type="divider">
+      <obj_property name="label">PCU</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/the_cpu/PCU_pc" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">PCU_pc[15:0]</obj_property>
+      <obj_property name="ObjectShortName">PCU_pc[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/the_cpu/PCU_state" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">PCU_state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">PCU_state[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/the_cpu/PCU_next_state" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">PCU_next_state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">PCU_next_state[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_top_ise/the_cpu/PCU_opcode" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">PCU_opcode[7:0]</obj_property>
+      <obj_property name="ObjectShortName">PCU_opcode[7:0]</obj_property>
    </wvobject>
 </wave_config>
