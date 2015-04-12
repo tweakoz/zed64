@@ -1,0 +1,782 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/projects/toz/zed64_nas/sidtest/tmp/sidtestbench_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="sidtestbench" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="44" />
+   <wvobject fp_name="divider18" type="divider">
+      <obj_property name="label">INPUTS</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/BTN_0" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">BTN_0</obj_property>
+      <obj_property name="ObjectShortName">BTN_0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/C6_CLK_8MHZ" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">C6_CLK_8MHZ</obj_property>
+      <obj_property name="ObjectShortName">C6_CLK_8MHZ</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider19" type="divider">
+      <obj_property name="label">DCM</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/locked" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">locked</obj_property>
+      <obj_property name="ObjectShortName">locked</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/dcm_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">dcm_clk</obj_property>
+      <obj_property name="ObjectShortName">dcm_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider20" type="divider">
+      <obj_property name="label">TOP</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/sid_reset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">sid_reset</obj_property>
+      <obj_property name="ObjectShortName">sid_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/SID_NOTRES" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">SID_NOTRES</obj_property>
+      <obj_property name="ObjectShortName">SID_NOTRES</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/clk_counter" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">clk_counter[31:0]</obj_property>
+      <obj_property name="ObjectShortName">clk_counter[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/sid_cycle_counter" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">sid_cycle_counter[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sid_cycle_counter[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/sid_subcyc" type="array" db_ref_id="1">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">sid_subcyc[15:0]</obj_property>
+      <obj_property name="ObjectShortName">sid_subcyc[15:0]</obj_property>
+      <obj_property name="label">sid_subcyc[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider23" type="divider">
+      <obj_property name="label">FRQ</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider33" type="divider">
+      <obj_property name="label">PHASE</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider21" type="divider">
+      <obj_property name="label">OUTPUTS</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/SID_CLK" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">SID_CLK</obj_property>
+      <obj_property name="ObjectShortName">SID_CLK</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/SID_ADDR" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">SID_ADDR[4:0]</obj_property>
+      <obj_property name="ObjectShortName">SID_ADDR[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/SID_DATA" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">SID_DATA[7:0]</obj_property>
+      <obj_property name="ObjectShortName">SID_DATA[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/SID_NOTCS" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">SID_NOTCS</obj_property>
+      <obj_property name="ObjectShortName">SID_NOTCS</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/C6_LED" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">C6_LED[3:0]</obj_property>
+      <obj_property name="ObjectShortName">C6_LED[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/PWM_OUT" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">PWM_OUT</obj_property>
+      <obj_property name="ObjectShortName">PWM_OUT</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider17" type="divider">
+      <obj_property name="label">DSP</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/the_dsp/reset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/the_dsp/pwm_counter" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">pwm_counter[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pwm_counter[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/the_dsp/sample_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">sample_clk</obj_property>
+      <obj_property name="ObjectShortName">sample_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/the_dsp/dac_output_latch" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">dac_output_latch[11:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_output_latch[11:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider43" type="divider">
+      <obj_property name="label">VCF_CLOCK</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="group128" type="group">
+      <obj_property name="label">DspBaseClock</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_clk" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">dsp_clk</obj_property>
+         <obj_property name="ObjectShortName">dsp_clk</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+         <obj_property name="CustomSignalColor">#ffffff</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_180_clk" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">dsp_180_clk</obj_property>
+         <obj_property name="ObjectShortName">dsp_180_clk</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+         <obj_property name="CustomSignalColor">#ffffff</obj_property>
+      </wvobject>
+      <wvobject fp_name="group81" type="group">
+         <obj_property name="label">DivClock</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_clk_div2" type="logic" db_ref_id="1">
+            <obj_property name="ElementShortName">dsp_clk_div2</obj_property>
+            <obj_property name="ObjectShortName">dsp_clk_div2</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_clk_180_div2" type="logic" db_ref_id="1">
+            <obj_property name="ElementShortName">dsp_clk_180_div2</obj_property>
+            <obj_property name="ObjectShortName">dsp_clk_180_div2</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_clk_180_div2n" type="logic" db_ref_id="1">
+            <obj_property name="ElementShortName">dsp_clk_180_div2n</obj_property>
+            <obj_property name="ObjectShortName">dsp_clk_180_div2n</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="divider72" type="divider">
+      <obj_property name="label">New Divider</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">#ff0000</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider129" type="divider">
+      <obj_property name="label">OPCODES</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="group127" type="group">
+      <obj_property name="label">VCF_OPC</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/PC_stack_index" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">PC_stack_index[5:0]</obj_property>
+         <obj_property name="ObjectShortName">PC_stack_index[5:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="group165" type="group">
+         <obj_property name="label">IF</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/IF_PC" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">IF_PC[7:0]</obj_property>
+            <obj_property name="ObjectShortName">IF_PC[7:0]</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/IF_instruction_word" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">IF_instruction_word[31:0]</obj_property>
+            <obj_property name="ObjectShortName">IF_instruction_word[31:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group166" type="group">
+         <obj_property name="label">DE</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/DE_PC" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">DE_PC[7:0]</obj_property>
+            <obj_property name="ObjectShortName">DE_PC[7:0]</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/DE_instruction_word" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">DE_instruction_word[31:0]</obj_property>
+            <obj_property name="ObjectShortName">DE_instruction_word[31:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group167" type="group">
+         <obj_property name="label">EX</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/EX_PC" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">EX_PC[7:0]</obj_property>
+            <obj_property name="ObjectShortName">EX_PC[7:0]</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/EX_instruction_word" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">EX_instruction_word[31:0]</obj_property>
+            <obj_property name="ObjectShortName">EX_instruction_word[31:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group168" type="group">
+         <obj_property name="label">IO</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/IO_PC" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">IO_PC[7:0]</obj_property>
+            <obj_property name="ObjectShortName">IO_PC[7:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/IO_instruction_word" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">IO_instruction_word[31:0]</obj_property>
+            <obj_property name="ObjectShortName">IO_instruction_word[31:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group169" type="group">
+         <obj_property name="label">WB</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/WB_PC" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">WB_PC[7:0]</obj_property>
+            <obj_property name="ObjectShortName">WB_PC[7:0]</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/WB_instruction_word" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">WB_instruction_word[31:0]</obj_property>
+            <obj_property name="ObjectShortName">WB_instruction_word[31:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group164" type="group">
+         <obj_property name="label">New Group</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/ifde_pot_data_hazard" type="logic" db_ref_id="1">
+            <obj_property name="ElementShortName">ifde_pot_data_hazard</obj_property>
+            <obj_property name="ObjectShortName">ifde_pot_data_hazard</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/ifex_pot_data_hazard" type="logic" db_ref_id="1">
+            <obj_property name="ElementShortName">ifex_pot_data_hazard</obj_property>
+            <obj_property name="ObjectShortName">ifex_pot_data_hazard</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/ifio_pot_data_hazard" type="logic" db_ref_id="1">
+            <obj_property name="ElementShortName">ifio_pot_data_hazard</obj_property>
+            <obj_property name="ObjectShortName">ifio_pot_data_hazard</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/ifins_is_mut" type="logic" db_ref_id="1">
+            <obj_property name="ElementShortName">ifins_is_mut</obj_property>
+            <obj_property name="ObjectShortName">ifins_is_mut</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/hazard" type="logic" db_ref_id="1">
+            <obj_property name="ElementShortName">hazard</obj_property>
+            <obj_property name="ObjectShortName">hazard</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group82" type="group">
+      <obj_property name="label">ALU</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/DE_R_ALU_OPA" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">DE_R_ALU_OPA[35:0]</obj_property>
+         <obj_property name="ObjectShortName">DE_R_ALU_OPA[35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/DE_R_ALU_OPB" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">DE_R_ALU_OPB[35:0]</obj_property>
+         <obj_property name="ObjectShortName">DE_R_ALU_OPB[35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/EX_R_ALU_OPA" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">EX_R_ALU_OPA[35:0]</obj_property>
+         <obj_property name="ObjectShortName">EX_R_ALU_OPA[35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/EX_R_ALU_OPB" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">EX_R_ALU_OPB[35:0]</obj_property>
+         <obj_property name="ObjectShortName">EX_R_ALU_OPB[35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/alu_reg" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">alu_reg[35:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_reg[35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/shf_reg" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">shf_reg[35:0]</obj_property>
+         <obj_property name="ObjectShortName">shf_reg[35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/cmp_reg" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">cmp_reg[35:0]</obj_property>
+         <obj_property name="ObjectShortName">cmp_reg[35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/R_MUL_OPA" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">R_MUL_OPA[24:0]</obj_property>
+         <obj_property name="ObjectShortName">R_MUL_OPA[24:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/R_MUL_OPB" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">R_MUL_OPB[17:0]</obj_property>
+         <obj_property name="ObjectShortName">R_MUL_OPB[17:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/prod_ab" type="array" db_ref_id="1">
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="ElementShortName">prod_ab[42:0]</obj_property>
+         <obj_property name="ObjectShortName">prod_ab[42:0]</obj_property>
+         <obj_property name="label">prod_ab[71:0]</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+         <obj_property name="CustomSignalColor">#00ffff</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/prod_cd" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">prod_cd[42:0]</obj_property>
+         <obj_property name="ObjectShortName">prod_cd[42:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/product_ab" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">product_ab[42:0]</obj_property>
+         <obj_property name="ObjectShortName">product_ab[42:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/product_cd" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">product_cd[42:0]</obj_property>
+         <obj_property name="ObjectShortName">product_cd[42:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group186" type="group">
+      <obj_property name="label">LOADSTORE</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="group90" type="group">
+      <obj_property name="label">VCF_MEM</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_ram/out_data" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">out_data[35:0]</obj_property>
+         <obj_property name="ObjectShortName">out_data[35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_ram/in_clock" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">in_clock</obj_property>
+         <obj_property name="ObjectShortName">in_clock</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+         <obj_property name="CustomSignalColor">#ffffff</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/mem_write_ena" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">mem_write_ena</obj_property>
+         <obj_property name="ObjectShortName">mem_write_ena</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/mem_output_IO" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">mem_output_IO[35:0]</obj_property>
+         <obj_property name="ObjectShortName">mem_output_IO[35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/mem_inp_data" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">mem_inp_data[35:0]</obj_property>
+         <obj_property name="ObjectShortName">mem_inp_data[35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_ram/mem" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">mem[15:0,35:0]</obj_property>
+         <obj_property name="ObjectShortName">mem[15:0,35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_ram/in_addr" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">in_addr[3:0]</obj_property>
+         <obj_property name="ObjectShortName">in_addr[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_ram/in_data" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">in_data[35:0]</obj_property>
+         <obj_property name="ObjectShortName">in_data[35:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group179" type="group">
+      <obj_property name="label">DSP_IO</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/EX_RDST" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">EX_RDST[2:0]</obj_property>
+         <obj_property name="ObjectShortName">EX_RDST[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/EX_REG_DST" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">EX_REG_DST[35:0]</obj_property>
+         <obj_property name="ObjectShortName">EX_REG_DST[35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/EX_RB" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">EX_RB[2:0]</obj_property>
+         <obj_property name="ObjectShortName">EX_RB[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/EX_REG_B" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">EX_REG_B[35:0]</obj_property>
+         <obj_property name="ObjectShortName">EX_REG_B[35:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/io_addr" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">io_addr[7:0]</obj_property>
+         <obj_property name="ObjectShortName">io_addr[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/io_data" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">io_data[7:0]</obj_property>
+         <obj_property name="ObjectShortName">io_data[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/io_wr_ena" type="logic" db_ref_id="1">
+         <obj_property name="ElementShortName">io_wr_ena</obj_property>
+         <obj_property name="ObjectShortName">io_wr_ena</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">dsp_clk</obj_property>
+      <obj_property name="ObjectShortName">dsp_clk</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffffff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_180_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">dsp_180_clk</obj_property>
+      <obj_property name="ObjectShortName">dsp_180_clk</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#ffffff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/sample_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">sample_clk</obj_property>
+      <obj_property name="ObjectShortName">sample_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider133" type="divider">
+      <obj_property name="label">New Divider</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="group131" type="group">
+      <obj_property name="label">VCF_REG</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/R" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">R[0:7,35:0]</obj_property>
+         <obj_property name="ObjectShortName">R[0:7,35:0]</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+         <obj_property name="CustomSignalColor">#ffff00</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/R[0]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[0,35:0]</obj_property>
+            <obj_property name="ObjectShortName">R[0,35:0]</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
+            <obj_property name="CustomSignalColor">#ffff00</obj_property>
+            <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/R[1]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[1,35:0]</obj_property>
+            <obj_property name="ObjectShortName">R[1,35:0]</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
+            <obj_property name="CustomSignalColor">#ffff00</obj_property>
+            <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/R[2]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[2,35:0]</obj_property>
+            <obj_property name="ObjectShortName">R[2,35:0]</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
+            <obj_property name="CustomSignalColor">#ffff00</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/R[3]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[3,35:0]</obj_property>
+            <obj_property name="ObjectShortName">R[3,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/R[4]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[4,35:0]</obj_property>
+            <obj_property name="ObjectShortName">R[4,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/R[5]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[5,35:0]</obj_property>
+            <obj_property name="ObjectShortName">R[5,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/R[6]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[6,35:0]</obj_property>
+            <obj_property name="ObjectShortName">R[6,35:0]</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
+            <obj_property name="CustomSignalColor">#ffff00</obj_property>
+            <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/R[7]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[7,35:0]</obj_property>
+            <obj_property name="ObjectShortName">R[7,35:0]</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
+            <obj_property name="CustomSignalColor">#ffff00</obj_property>
+            <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="divider134" type="divider">
+      <obj_property name="label">New Divider</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="group130" type="group">
+      <obj_property name="label">VCF_STACK</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack_index" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">stack_index[5:0]</obj_property>
+         <obj_property name="ObjectShortName">stack_index[5:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">stack[0:63,35:0]</obj_property>
+         <obj_property name="ObjectShortName">stack[0:63,35:0]</obj_property>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[0]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[0,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[0,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[1]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[1,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[1,35:0]</obj_property>
+            <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[2]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[2,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[2,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[3]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[3,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[3,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[4]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[4,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[4,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[5]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[5,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[5,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[6]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[6,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[6,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[7]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[7,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[7,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[8]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[8,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[8,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[9]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[9,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[9,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[10]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[10,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[10,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[11]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[11,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[11,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[12]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[12,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[12,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[13]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[13,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[13,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[14]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[14,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[14,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[15]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[15,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[15,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[16]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[16,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[16,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[17]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[17,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[17,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[18]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[18,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[18,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[19]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[19,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[19,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[20]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[20,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[20,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[21]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[21,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[21,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[22]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[22,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[22,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[23]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[23,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[23,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[24]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[24,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[24,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[25]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[25,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[25,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[26]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[26,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[26,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[27]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[27,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[27,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[28]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[28,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[28,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[29]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[29,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[29,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[30]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[30,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[30,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[31]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[31,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[31,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[32]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[32,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[32,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[33]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[33,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[33,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[34]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[34,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[34,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[35]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[35,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[35,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[36]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[36,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[36,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[37]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[37,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[37,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[38]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[38,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[38,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[39]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[39,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[39,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[40]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[40,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[40,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[41]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[41,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[41,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[42]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[42,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[42,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[43]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[43,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[43,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[44]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[44,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[44,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[45]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[45,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[45,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[46]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[46,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[46,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[47]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[47,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[47,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[48]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[48,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[48,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[49]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[49,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[49,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[50]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[50,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[50,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[51]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[51,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[51,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[52]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[52,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[52,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[53]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[53,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[53,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[54]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[54,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[54,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[55]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[55,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[55,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[56]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[56,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[56,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[57]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[57,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[57,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[58]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[58,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[58,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[59]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[59,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[59,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[60]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[60,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[60,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[61]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[61,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[61,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[62]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[62,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[62,35:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/stack[63]" type="array" db_ref_id="1">
+            <obj_property name="ElementShortName">[63,35:0]</obj_property>
+            <obj_property name="ObjectShortName">stack[63,35:0]</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="divider135" type="divider">
+      <obj_property name="label">New Divider</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sidtestbench/uut/the_dsp/the_core/dsp_result" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">dsp_result[17:0]</obj_property>
+      <obj_property name="ObjectShortName">dsp_result[17:0]</obj_property>
+   </wvobject>
+</wave_config>
