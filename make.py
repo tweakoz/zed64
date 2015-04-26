@@ -19,7 +19,7 @@ import vidcon
 timescale = "1ns/1ps"
 
 def usage():
-    print "usage make.py prep|synver|synvhd|ise"
+    print "usage make.py prep|synver|synvhd|ise|sidasm"
     sys.exit(0)
 
 ################################################33
@@ -53,7 +53,7 @@ u.addnet( "vgaH", "B11" )
 u.addnet( "vgaV", "B12" )
 u.addsep()
 u.addnet("sys_reset", "C12" )
-u.emit("./rtl/nexys.ucf")
+#u.emit("./rtl/nexys.ucf")
 
 ################################################33
 
@@ -89,6 +89,10 @@ elif sys.argv[1]=="synvhd":
 elif sys.argv[1]=="ise":
     print localopts.ISE_BIN_DIR()
     os.system("%s/ise zed64.xise"%localopts.ISE_BIN_DIR())
+########################################
+elif sys.argv[1]=="sidasm":
+    os.chdir("./sidtest")
+    os.system( "./aspasm.py ./test.asm")
 ########################################
 elif sys.argv[1]=="prep":
     os.system("rm -rf isedir")
