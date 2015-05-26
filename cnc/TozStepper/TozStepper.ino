@@ -20,8 +20,8 @@ AccelStepper stepper_z2(AccelStepper::HALF4WIRE, 40,41,42,43);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-const int yspeed = 400;
-const int yaccel = 400;
+int yspeed = 400;
+int yaccel = 400;
 
 
 const int initspeed = 200;
@@ -32,6 +32,9 @@ const int maxspeed = 700;
 const int slospeed = 100;
 const int slozonsiz = 250;
 
+int steptop = 1500;
+int stepbot = 0;
+int stepsiz = 30;
 
 int stepCount = 0;  // number of steps the motor has taken
 
@@ -50,6 +53,8 @@ int spindle_pwm_pin = 13;
 
 int prvtim = 0;
 int has_homed = 0;
+
+bool lockxz = false;
 
 int current_command = 0;
 int previous_command = 1;
@@ -106,11 +111,43 @@ void usage()
   prser( "//  cmds: cz <pos> : move to z rel 2 ctr" );
   prser( "//  cmds: cxz <pos2> : move xz rel 2 ctr" );
   prser( "//  cmds: spin <spd> : spindle speed" );
+  prser( "//  cmds: lockxz <bool> : lockxz axis on idle" );
   prser( "//  cmds: s.xz <pos>" );
   prser( "//  cmds: s.y <pos>" );
+  prser( "//  cmds: stepdrill" );
+  prser( "//  cmds: stepline <x>" );
   prser( "////////////////////////" );
 }
 
+void speedxz(int sp)
+{
+    stepper_z1.setMaxSpeed(sp);
+    stepper_z2.setMaxSpeed(sp);
+    stepper_x.setMaxSpeed(sp);
+}
+void speedy(int sp)
+{
+    stepper_y.setMaxSpeed(sp);
+    stepper_y.setAcceleration(sp);
+    yspeed = sp;
+    yaccel = sp;
+}
+void dolockxz( int lxz)
+{
+  prser( "DOLOCKXZ<%d>", lxz );
+  
+  if( lxz )
+  {  stepper_x.enableOutputs();
+     stepper_z1.enableOutputs();
+     stepper_z2.enableOutputs();
+  }
+  else
+  {  stepper_x.disableOutputs();
+     stepper_z1.disableOutputs();
+     stepper_z2.disableOutputs();
+  }
+  lockxz = (bool) lxz ;
+}
 void slowspeed()
 {
     stepper_x.setMaxSpeed(initspeed);
@@ -127,12 +164,12 @@ void slowspeed()
 void highspeed()
 {
   stepper_x.setAcceleration(maxaccel);
-  stepper_y.setAcceleration(yspeed);
+  stepper_y.setAcceleration(yspeed/10);
   stepper_z1.setAcceleration(maxaccel);
   stepper_z2.setAcceleration(maxaccel);
 
   stepper_x.setMaxSpeed(maxspeed);
-  stepper_y.setMaxSpeed(yaccel);
+  stepper_y.setMaxSpeed(yaccel/10);
   stepper_z1.setMaxSpeed(maxspeed);
   stepper_z2.setMaxSpeed(maxspeed);
 
@@ -143,6 +180,37 @@ void spindle_power( int p )
   prser("set spindle power<%d>", p );
   analogWrite( spindle_pwm_pin, p );
 
+}
+void stepdrill()
+{
+  prser( "stepdrill from_y<%d> to_y<%d> step_y<%d)", steptop, stepbot, stepsiz );
+  movy(steptop);
+  int top = steptop;
+  int bot = steptop-stepsiz;
+  while( bot>stepbot )
+  {
+    stepper_y.setMaxSpeed(yspeed);
+    stepper_y.setAcceleration(yaccel);
+    movy(bot);
+
+    stepper_y.setMaxSpeed(500);
+    stepper_y.setAcceleration(500);
+
+    int dtb = (steptop-bot);
+    int top = bot+(dtb/2);
+    movy(top);
+    top -= stepsiz;
+    bot -= stepsiz;
+  }
+  movy(steptop);
+}
+void stepline(int x)
+{
+  prser( "stepline x<%d>", x );
+  for( int z=400; z<=700; z+=50 )
+  { movxz(center_x()+x,center_z()+z);
+    stepdrill();
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -193,7 +261,17 @@ void parse()
 
       if (arg1 == 0) 
       {
-        if( 0 == strcmp(command, "home") )
+        
+        if( 0 == strcmp(command, "pxyz") )
+        {
+          int cx = (target_x-center_x());
+          int cy = (target_y-center_y());
+          int cz = (target_z-center_z());
+          prser( "print xyz" );
+          prser( " abs <x:%d z:%d y:%d>", target_x, target_z, target_y );
+          prser( " ctr <x:%d z:%d y:%d>", cx, cz, cy );
+        }
+        else if( 0 == strcmp(command, "home") )
         {
           //prser( ">> going home" );
           home();
@@ -208,6 +286,10 @@ void parse()
           //prser( ">> going home" );
           test_pattern();
         }
+          else if( 0 == strcmp(command, "stepdrill") )
+          {
+            stepdrill();
+          }
         else
           usage();
 
@@ -238,16 +320,30 @@ void parse()
             movy(arg1_as_int);
           else if( 0 == strcmp(command,"cx" ) )
             movx(center_x()+arg1_as_int);
-          else if( 0 == strcmp(command,"ay" ) )
-            prser( ">> y-pos<%d>", arg1_as_int );
           else if( 0 == strcmp(command,"az" ) )
             movz(arg1_as_int);
           else if( 0 == strcmp(command,"cz" ) )
             movx(center_z()+arg1_as_int);
           else if( 0 == strcmp(command,"s.xz" ) )
-            prser( ">> xz-spd<%d>", arg1_as_int );
+            speedxz(arg1_as_int);
           else if( 0 == strcmp(command,"s.y" ) )
-            prser( ">> y-spd<%d>", arg1_as_int );
+            speedy(arg1_as_int);
+           else if( 0 == strcmp(command,"lockxz") )
+            dolockxz(arg1_as_int);
+          else if( 0 == strcmp(command, "steptop") )
+          {
+            steptop = arg1_as_int;
+            prser( "STEPTOP<%d>", steptop );
+          }
+          else if( 0 == strcmp(command, "stepsiz") )
+          {
+            stepsiz = arg1_as_int;
+            prser( "STEPSIZ<%d>", stepsiz );
+          }
+          else if( 0 == strcmp(command, "stepline") )
+          {
+            stepline(arg1_as_int);
+          }
           else
             usage();
 
@@ -311,9 +407,16 @@ int read_limit_mask()
 
 void begin_idle()
 {
-  stepper_x.disableOutputs();
-  stepper_z1.disableOutputs();
-  stepper_z2.disableOutputs();
+  if( lockxz )
+  {  stepper_x.enableOutputs();
+    stepper_z1.enableOutputs();
+    stepper_z2.enableOutputs();
+  }
+  else
+  {  stepper_x.disableOutputs();
+    stepper_z1.disableOutputs();
+    stepper_z2.disableOutputs();
+  }
 }
 void update_idle()
 {
@@ -592,7 +695,10 @@ void movx(int xpos)
         stepper_x.run();
 
     }
-    stepper_x.disableOutputs();
+    if( lockxz )
+      stepper_x.enableOutputs();
+    else
+      stepper_x.disableOutputs();
 
 }
 
@@ -653,11 +759,17 @@ void movz(int zpos)
 
     }
 
-  stepper_z1.disableOutputs();
-  stepper_z2.disableOutputs();
-
+    if( lockxz )
+    {
+      stepper_z1.enableOutputs();
+      stepper_z2.enableOutputs();
+    }
+    else
+    {
+      stepper_z1.disableOutputs();
+      stepper_z2.disableOutputs();
+    }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -701,9 +813,16 @@ void movxz( int xpos, int zpos )
       }
 
     }
-  stepper_x.disableOutputs();
-  stepper_z1.disableOutputs();
-  stepper_z2.disableOutputs();
+    if( lockxz )
+    {  stepper_x.enableOutputs();
+       stepper_z1.enableOutputs();
+       stepper_z2.enableOutputs();
+    }
+    else
+    {  stepper_x.disableOutputs();
+       stepper_z1.disableOutputs();
+       stepper_z2.disableOutputs();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
