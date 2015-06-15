@@ -1,0 +1,44 @@
+import os, glob, string
+import ork.build.utils as obu
+import ork.build.common as cmn
+import ork.build.slnprj as sln
+
+# set scons options ######################
+
+SetOption('implicit_cache',1)
+Decider('MD5-timestamp')
+VariantDir( 'obj', 'src',duplicate=0 )
+SetOption('num_jobs', obu.num_cores) 
+sln.optset.add("ork.upp")
+BasicEnv = Environment( ENV=os.environ )
+
+obu.install_files("src/*.h","include/unittest++")
+obu.install_files("src/Posix/*.h","include/unittest++/Posix")
+
+# basics #################################
+
+class upp:
+  def __init__(self):
+	ARGS = cmn.BuildArgs
+	##########################################
+
+	SRC_FOLDERS  = " . Posix "
+
+	LIBS = ''
+
+	##########################################
+
+	prj_lib = sln.Project(ARGS,BasicEnv,"ork.unittestpp")
+	prj_lib.SetSrcBase( "src" )
+	prj_lib.AddFolders( SRC_FOLDERS, "*.cpp" )
+	prj_lib.AddLibs( LIBS )
+	prj_lib.Configure()
+	self.lib = prj_lib.SharedLibrary( )
+
+###########################
+
+a = upp()
+ret = list()
+ret += a.lib
+Return("ret")
+

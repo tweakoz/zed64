@@ -1,0 +1,9 @@
+stage
+ork.build.ini
+*.dblite
+*.os
+*.o
+*.so
+obj
+docs/html_doxygen
+

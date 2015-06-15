@@ -1,0 +1,56 @@
+import os, glob, string
+import ork.build.utils as obu
+import ork.build.common as cmn
+import ork.build.slnprj as sln
+
+# set scons options ######################
+
+SetOption('implicit_cache',1)
+Decider('MD5-timestamp')
+VariantDir( 'obj', 'src',duplicate=0 )
+SetOption('num_jobs', obu.num_cores) 
+sln.optset.add("ork.upp")
+BasicEnv = Environment( ENV=os.environ )
+
+#obu.install_files("src/*.h","include/unittest++")
+#obu.install_files("src/Posix/*.h","include/unittest++/Posix")
+obu.install_headers("inc/*")
+
+# basics #################################
+
+class core:
+ def __init__(self):
+  ARGS = cmn.BuildArgs
+  suffix = sln.BuildSuffix(ARGS)
+  ##########################################
+  SRC_FOLDERS  = " . meshutil math concurrency"
+  LIBS = ''
+  ##########################################
+  prj_lib = sln.Project(ARGS,BasicEnv,"ork.core")
+  prj_lib.SetSrcBase( "src" )
+  prj_lib.AddFolders( SRC_FOLDERS, "*.cpp" )
+  prj_lib.AddLibs( LIBS )
+  prj_lib.Configure()
+  self.lib = prj_lib.SharedLibrary( )
+  ##########################################
+  prj_test = sln.Project(ARGS,BasicEnv,"ork.core.test")
+  prj_test.SetSrcBase( "src" )
+  prj_test.AddFolders( "test", "*.cpp" )
+  prj_test.AddLibs( LIBS )
+  prj_test.AddLibs( "ork.unittestpp.%s"%suffix )
+  prj_test.AddProjectDep( prj_lib )
+  prj_test.AddIncludePaths("../ork.core/inc")
+  prj_test.Configure()
+  self.test_prg = prj_test.Program( )
+  prj_test.AddProjectDep( prj_lib )
+  Depends(self.test_prg,self.lib)
+  #prj_test.AddProjectDep( upp_lib )
+  self.test = prj_test.Program()
+
+
+a = core()
+ret = list()
+ret += a.lib
+ret += a.test
+Return("ret")
+

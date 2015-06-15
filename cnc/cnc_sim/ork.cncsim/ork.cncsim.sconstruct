@@ -1,0 +1,58 @@
+import os, glob, string
+import ork.build.utils as obu
+import ork.build.common as cmn
+import ork.build.slnprj as sln
+
+# set scons options ######################
+
+SetOption('implicit_cache',1)
+Decider('MD5-timestamp')
+VariantDir( 'obj', 'src',duplicate=0 )
+SetOption('num_jobs', obu.num_cores) 
+sln.optset.add("ork.upp")
+BasicEnv = Environment( ENV=os.environ )
+
+# basics #################################
+
+class cncsim:
+ def __init__(self):
+  self.ARGS = cmn.BuildArgs
+  self.suffix = sln.BuildSuffix(self.ARGS)
+  ##########################################
+  SRC_FOLDERS  = " . "
+  ##########################################
+  prj_lib = sln.Project(self.ARGS,BasicEnv,"ork.cncsim")
+  prj_lib.SetSrcBase( "src" )
+  prj_lib.AddFolders( SRC_FOLDERS, "*.cpp" )
+  libs = sln.explibnams("ork.core")
+  prj_lib.AddLibs( libs )
+  prj_lib.Configure()
+  self.prjlib = prj_lib
+  self.lib = prj_lib.SharedLibrary( )
+  self.t1 = self.make_test("cncsim")
+  ##########################################
+ def make_test(self,name):
+   files = "main.cpp"
+   the_test = sln.Project(self.ARGS,BasicEnv,name)
+   the_test.SetSrcBase( "." )
+   the_test.AddFolders( "test", files )
+   libs = sln.explibnams("ork.cncsim ork.core")
+   print "LIBS: %s" % libs
+   the_test.AddLibs( libs )
+   if cmn.IsOsx:
+     the_test.AddFrameworks( "GLUT OpenGL" )
+   else:
+     the_test.AddLibs( "glut GL GLU" )
+   the_test.AddIncludePaths("../ork.cncsim/src")
+   the_test.Configure()
+   the_test_prg = the_test.Program( )
+   the_test.AddProjectDep( self.prjlib )
+   Depends(the_test_prg,self.lib)
+   return the_test_prg
+
+a = cncsim()
+ret = list()
+ret += a.lib
+ret += a.t1
+Return("ret")
+

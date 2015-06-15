@@ -1,0 +1,30 @@
+import os, glob, string
+import ork.build.utils as obu
+import ork.build.slnprj as sln
+import sys
+
+AddOption('--build', default='stage')
+SetOption('implicit_cache',1)
+Decider('MD5-timestamp')
+VariantDir( 'obj', 'src' )
+SetOption('num_jobs', obu.num_cores) 
+#sln.optset.add("ork.core")
+#sln.optset.add("ork.core.test")
+BasicEnv = Environment( ENV=os.environ )
+
+#####################################################
+
+utpp = SConscript('ork.unittestpp/ork.unittestpp.sconstruct')
+core = SConscript('ork.core/ork.core.sconstruct')
+cncsim = SConscript('ork.cncsim/ork.cncsim.sconstruct')
+
+#####################################################
+
+def DeclDep( itemlist, deplist ):
+ if itemlist!=None and deplist!=None:
+  for item in itemlist:
+   for it2 in deplist:
+    Depends( item, it2 )
+
+DeclDep( core, utpp )
+DeclDep( cncsim, core )
