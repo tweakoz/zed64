@@ -20,6 +20,8 @@ void drwxz(int,int);
 void prser(const char *fmt, ... );
 int y_mm_to_steps(float in);
 float in_to_mm(float in);
+void slow();
+void fast();
 
 
 const int kmovexz_speed = 300;
@@ -29,7 +31,7 @@ const int kdrawxz_accel = 10;
 const int kmovey_speed = 300;
 const int kmovey_accel = 300;
 const int spindle_pwm_pin = 13;
-const int homestep = 1000;
+const int homestep = 2500;
 const float drillspeedIPS = 0.02f; // inches per second
 bool lockxz = false;
 float drill_depth = 0.5f;
@@ -213,7 +215,7 @@ void axis::home()
   bool done = false;
 
   if( is_xz() )
-     setSpeedAccel(250,250);
+     setSpeedAccel(350,350);
   else
      setSpeedAccel(350,350);
 
@@ -470,6 +472,8 @@ void usage()
   prser( "//  cmds: / : info" );
   prser( "//  cmds: ? : help" );
   prser( "//  cmds: 0 : zero" );
+  prser( "//  cmds: slow : xz slow" );
+  prser( "//  cmds: fast : xz fast" );
   prser( "//  cmds: c : goto center" );
   prser( "//  cmds: cx <pos> : move to x rel 2 ctr" );
   prser( "//  cmds: cy <pos> : move to y rel 2 ctr" );
@@ -592,7 +596,7 @@ void movxz_xf(float x, float z)
 void dip28()
 {
   spindle_power(100);
-  stepdrill_inner();
+  top();
 
   // pins 1..14
   for(int i=0; i<14; i++)
@@ -717,6 +721,10 @@ void parse()
           z_axis.moveTo(z_axis.center);
           y_axis.moveTo(y_axis.center);
         }
+        else if( 0 == strcmp(command, "slow") )
+          slow();
+        else if( 0 == strcmp(command, "fast") )
+          fast();
         else if( 0 == strcmp(command, "top") )
           y_axis.moveToMax();
         else if( 0 == strcmp(command, "bottom") )
@@ -983,6 +991,16 @@ void drwxz( int xpos, int zpos )
   movxz_inner(xpos,zpos);
 }
 
+void slow()
+{
+  x_axis.setSpeedAccel(kdrawxz_speed,kdrawxz_accel);
+  z_axis.setSpeedAccel(kdrawxz_speed,kdrawxz_accel);  
+}
+void fast()
+{
+  x_axis.setSpeedAccel(kmovexz_speed,kmovexz_accel);
+  z_axis.setSpeedAccel(kmovexz_speed,kmovexz_accel);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1001,6 +1019,8 @@ void calibrate()
   x_axis.calibrate();
   z_axis.home();
   z_axis.calibrate();
+
+  movxz_xf( 0.0f, 0.0f );
 
   y_axis.home();
   y_axis.calibrate();

@@ -101,25 +101,25 @@ AccelStepper::AccelStepper(int type,int pina, int pinb, int pinc, int pind )
 {
     if( pina == 22 )
     {    mName = "Y";
-         mPhysMaximumPosition = 6000.0;
+         mPhysMaximumPosition = 4079.0;
          mPhysActualPosition = 2000.0;
          stepper_Y = this;
     }
     else if( pina == 28 )
     {    mName = "X";
-         mPhysMaximumPosition = 5100.0;
+         mPhysMaximumPosition = 5176.0;
          mPhysActualPosition = 2000.0;
          stepper_X = this;
     }
     else if( pina == 34 )
     {    mName = "Z1";
-         mPhysMaximumPosition = 4300.0;
+         mPhysMaximumPosition = 4304.0;
          mPhysActualPosition = 2000.0;
          stepper_Z1 = this;
     }
     else if( pina == 40 )
     {    mName = "Z2";
-         mPhysMaximumPosition = 4300.0;
+         mPhysMaximumPosition = 4304.0;
          mPhysActualPosition = 2000.0;
          stepper_Z2 = this;
     }
