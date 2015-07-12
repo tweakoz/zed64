@@ -1,2 +1,4 @@
-micro_ork
+CNC simulator
 =========
+
+![ScreenShot](cncsim.png)
