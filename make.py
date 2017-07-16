@@ -124,7 +124,7 @@ if len(sys.argv)!=2:
 ########################################
 if sys.argv[1]=="synver":
 
-    vparams = verilog_params("nexys4/rtl/gen/",timescale,ios)
+    vparams = verilog_params("zed64/rtl/gen/",timescale,ios)
 
     modeline.gen_verilog(vparams)
     vidcon.gen_verilog("vidcon", vparams)
@@ -162,7 +162,7 @@ elif sys.argv[1]=="simv":
 ########################################
 elif sys.argv[1]=="ise":
     print localopts.ISE_BIN_DIR()
-    os.system("%s/ise nexys4/zed64.xise"%localopts.ISE_BIN_DIR())
+    os.system("%s/ise zed64/zed64.xise"%localopts.ISE_BIN_DIR())
 ########################################
 elif sys.argv[1]=="sidasm":
     os.chdir("./sidtest")
@@ -171,10 +171,10 @@ elif sys.argv[1]=="sidasm":
 elif sys.argv[1]=="prep":
     os.system("rm -rf isedir")
     os.system("rm -rf isim")
-    os.system("rm -rf nexys4/rtl/gen")
+    os.system("rm -rf zed64/rtl/gen")
     os.system("mkdir -p isedir/isim")
     os.system("mkdir -p roms/")
-    os.system("mkdir -p nexys4/rtl/gen/")
+    os.system("mkdir -p zed64/rtl/gen/")
     os.system("wget http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c64/characters.901225-01.bin -O ./roms/chargen.bin")
     os.system("ln -s isedir/isim isim" )
     os.system("./make.py synver")

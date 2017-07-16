@@ -5,10 +5,10 @@
 *.exe
 zed.build.ini
 isim
-nexys4/isedir
-nexys4/iseconfig
-nexys4/rtl/gen
-nexys4/rtl/nexys_gen.ucf
+zed64/isedir
+zed64/iseconfig
+zed64/rtl/gen
+zed64/rtl/nexys_gen.ucf
 roms
 a.out
 *.vcd
