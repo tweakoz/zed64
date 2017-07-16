@@ -14,7 +14,7 @@ import vidcon
 import modeline
 
 Z64ROOT = os.environ["Z64ROOT"]
-NX4ROOT = Z64ROOT+"/nexys4"
+NX4ROOT = Z64ROOT+"/zed64"
 
 ################################################33
 # output
@@ -75,7 +75,7 @@ u.addnet( "pclkout", "H4", constraints='SLEW="FAST"' )
 u.addsep()
 u.addnet("sys_reset", "C12" )
 u.addnet("but_center", "E16", constraints='CLOCK_DEDICATED_ROUTE="FALSE"' )
-u.emit("nexys4/rtl/nexys_gen.ucf")
+u.emit("zed64/rtl/nexys_gen.ucf")
 
 ################################################33
 
@@ -95,24 +95,24 @@ def compile(opts=""):
     cmd += " -y "+lfix+"XilinxCoreLib"
     cmd += " -o nx4test.exe"
     cmd += " "+lfix+"glbl.v"
-    cmd += " nexys4/rtl/xilinx/pll_hdtv.v"
-    cmd += " nexys4/rtl/xilinx/pll_vesa.v"
-    cmd += " nexys4/rtl/xilinx/dpram.v"
-    cmd += " nexys4/rtl/vidcon.v"
-    cmd += " nexys4/rtl/gen/chargen.v"
-    cmd += " nexys4/rtl/gen/modeline_hdisp.v"
-    cmd += " nexys4/rtl/gen/modeline_hstart.v"
-    cmd += " nexys4/rtl/gen/modeline_hend.v"
-    cmd += " nexys4/rtl/gen/modeline_htot.v"
-    cmd += " nexys4/rtl/gen/modeline_hsi.v"
-    cmd += " nexys4/rtl/gen/modeline_vdisp.v"
-    cmd += " nexys4/rtl/gen/modeline_vstart.v"
-    cmd += " nexys4/rtl/gen/modeline_vend.v"
-    cmd += " nexys4/rtl/gen/modeline_vtot.v"
-    cmd += " nexys4/rtl/gen/modeline_vsi.v"
-    cmd += " nexys4/rtl/gen/cpu.v"
-    cmd += " nexys4/rtl/tb_top_ise.v"
-    cmd += " nexys4/rtl/nexys4_top.v"
+    cmd += " zed64/rtl/xilinx/pll_hdtv.v"
+    cmd += " zed64/rtl/xilinx/pll_vesa.v"
+    cmd += " zed64/rtl/xilinx/dpram.v"
+    cmd += " zed64/rtl/vidcon.v"
+    cmd += " zed64/rtl/gen/chargen.v"
+    cmd += " zed64/rtl/gen/modeline_hdisp.v"
+    cmd += " zed64/rtl/gen/modeline_hstart.v"
+    cmd += " zed64/rtl/gen/modeline_hend.v"
+    cmd += " zed64/rtl/gen/modeline_htot.v"
+    cmd += " zed64/rtl/gen/modeline_hsi.v"
+    cmd += " zed64/rtl/gen/modeline_vdisp.v"
+    cmd += " zed64/rtl/gen/modeline_vstart.v"
+    cmd += " zed64/rtl/gen/modeline_vend.v"
+    cmd += " zed64/rtl/gen/modeline_vtot.v"
+    cmd += " zed64/rtl/gen/modeline_vsi.v"
+    cmd += " zed64/rtl/gen/cpu.v"
+    cmd += " zed64/rtl/tb_top_ise.v"
+    cmd += " zed64/rtl/nexys4_top.v"
     print cmd
     os.system(cmd)
 
