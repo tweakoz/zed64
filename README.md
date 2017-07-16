@@ -45,6 +45,8 @@ Digilent Nexys4
 2. **./make.py synver**      re-generates verilog
 3. **./make.py synvhd**      re-generates VHDL (not working yet... ;<)
 4. **./make.py ise**      launches ise with zed64 project
+5. **./make.py sim**      iverilog simulate (generates a png bitmap via iverilogs VPI interface)
+6. **./make.py simv**     iverilog simulate (generates a vcd wave file)
 
 After the first time you run make prep, a *zed.build.ini* file will be generated. Edit this to reflect your environment.
 
