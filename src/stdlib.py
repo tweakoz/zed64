@@ -15,7 +15,7 @@ from myhdl import *
 import sys, os, md5, string
 import localopts
 
-hvcount_bits = 11
+hvcount_bits = 12
 
 ################################################33
 
@@ -27,6 +27,9 @@ def SigWord(size=1,def_val=0):
 
 def SigBool(def_val=False):
     return Signal(intbv(def_val)[1:])
+
+def SigNyb(def_val=0):
+    return Signal(intbv(def_val)[4:])
 
 def SigByte(def_val=0):
     return Signal(intbv(def_val)[8:])
@@ -64,21 +67,6 @@ def Sel2(output,inpa,inpb,sel):
 def SigColorChannel():
     return Signal(intbv(0)[4:])
 
-class ModeLine:
-    def __init__(   self,
-                    hlines,hfp,hpulse,hsp,hsi,
-                    vlines,vfp,vpulse,vsp,vsi ):
-        self.h0 = hlines
-        self.h1 = self.h0+hfp
-        self.h2 = self.h1+hpulse
-        self.hN = self.h2+hsp-4
-        self.h3 = self.h2+hsp
-        self.hsi = hsi
-        self.v0 = vlines
-        self.v1 = self.v0+vfp
-        self.v2 = self.v1+vpulse
-        self.v3 = self.v2+vsp
-        self.vsi = vsi
 
 ################################################33
 
@@ -170,6 +158,33 @@ class verilog_params:
 
 ################################################33
 
+states = enum( "Reset",
+               "StateA",
+               "StateB",
+               "StateC",
+               encoding="one_hot" )
+
+def FSM(reset,clock):
+    st = Signal(states.Reset)
+    
+    @always(clock.posedge)
+    def gen():
+        if reset:
+            st.next = states.Reset
+        else:
+            if st==states.Reset:
+                st.next = states.StateA
+            elif st==states.StateA:
+                st.next = states.StateC
+            elif st==states.StateB:
+                st.next = states.StateA
+            elif st==states.StateC:
+                st.next = states.StateB
+            else:
+                st.next = states.Reset
+
+    return instances()
+
 timescale = "1ns/1ps"
 
 __all__ = [ 'timescale',
@@ -177,14 +192,15 @@ __all__ = [ 'timescale',
             "SigReset",
             "SigWord",
             "SigMod",
+            'pixdimval',
             'SigColorChannel',
             'SigBool',
             'SigMod64',
             'SigPixCnt',
             'SigByte',
+            'SigNyb',
             'SigAdr16',
             'Sel2',
-            'ModeLine',
             'Gen2',
             'Gen3',
             'UcfGen',

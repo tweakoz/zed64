@@ -1,74 +1,37 @@
 #!/usr/bin/python
-import os
-import sys
-import string
+import os, sys, string
+import search as search
+from common import deco
+
+decor = deco()
 
 #################################################################################
-
-def find(word):
- def _find(path):
-  with open(path, "rb") as fp:
-   for n, line in enumerate(fp):
-    if word in line:
-     yield n+1, line
- return _find
-
-#################################################################################
-
-class result:
- def __init__(self,path,lineno,text):
-  self.path = path
-  self.lineno = lineno
-  self.text = text
-
-#################################################################################
-
-def search_at_root(word, root):
- finder = find(word)
- results = list()
- for root, dirs, files in os.walk(root):
-  for f in files:
-   path = os.path.join(root, f)
-   spl = os.path.splitext(path)
-   ext = spl[1]
-   if ext==".c" or ext==".cpp" or ext==".cc" or ext==".h" or ext==".hpp" or ext==".inl" or ext==".qml" or ext==".m" or ext==".mm" or ext==".py":
-     for line_number, line in finder(path):
-      line = line.replace("\n","")
-      res = result(path,line_number,line)
-      results.append(res)
- return results  
-
-#################################################################################
-
-pathset =  "src rtl"
-pathspl = string.split(pathset)
-
-#################################################################################
-
-pathlist = ""
-for p in pathspl:
-  pathlist += "%s " % (p)
-
-pathlist = string.split(pathlist)
-
-#################################################################################
-
-def search(word):
-  for path in pathlist:
-   results = search_at_root(word,path)
-   have_results = len(results)!=0
-   if have_results:
+class visitor:
+  def __init__(self):
+    pass
+  def onPath(self,pth):
     print "/////////////////////////////////////////////////////////////"
-    print "// path : %s" % path
+    print "// path : %s" % pth
     print "/////////"
-    for item in results:
-     print "%s : line %d : '%s'" % (item.path, item.lineno, item.text) 
-
+  def onItem(self,item):
+    print "%-*s : line %-*s : %s" % (40, decor.magenta(item.path), 5, decor.white(str(item.lineno)), decor.yellow(item.text))
 #################################################################################
 
 if __name__ == "__main__":
- if not len(sys.argv) == 2:
-  print("usage: word")
-  sys.exit(1)
- word = sys.argv[1]
- search(word)
+  #########################
+  if not len(sys.argv) >= 2:
+    print("usage: word [module]")
+    sys.exit(1)
+  #########################
+  modulelist = None
+  if len(sys.argv) == 3:
+    modulelist = search.makeModuleList(sys.argv[2])
+  #########################
+  wsdir = os.environ["Z64ROOT"]
+  os.chdir(wsdir)
+  find_word = sys.argv[1]
+  print("searching for word<%s>" % find_word)
+  subdirs =  "nexys4 xilinx_lib "
+  extensions  = " .v "
+
+  search.visit(find_word,visitor(),subdirs,extensions)

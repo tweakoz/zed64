@@ -35,28 +35,37 @@ class DualSepPortRam:
         print "yo, that was an awfully slow method to create a memory block!"
 
     def gen(    self,
-                a_clk, a_wena, a_addr, a_din, a_dout,
-                b_clk, b_wena, b_addr, b_din, b_dout ):
+                a_clk, a_wena, a_addr, a_data,
+                b_clk, b_wena, b_addr, b_data ):
 
         mem = self.ramsig
 
         #################3
         # port A
         #################3
+
+        @always(a_clk.negedge)
+        def a_do_read():
+            a_dout.next = mem[a_addr]
+
         @always(a_clk.posedge)
         def a_write():
             if a_wena:
-                mem[a_addr].next = a_din
+                mem[a_addr].next = a_data
 
         @always_comb
-        def a_read():
+        def a_select():
             a_dout.next = mem[a_addr]
 
         #################3
         # port B
         #################3
+        @always(a_clk.negedge)
+        def b_do_read():
+            b_dout.next = mem[b_addr]
+
         @always(b_clk.posedge)
-        def b_write():
+        def do_write():
             if b_wena:
                 mem[b_addr].next = b_din
 
@@ -73,17 +82,15 @@ class DualSepPortRam:
         a_clk = SigBool()
         a_addr = SigWord(self.addrwidth)
         a_wena = SigBool()
-        a_din = SigWord(self.datawidth)
-        a_dout = SigWord(self.datawidth)
+        a_data = SigWord(self.datawidth)
         b_clk = SigBool()
         b_addr = SigWord(self.addrwidth)
-        b_din = SigWord(self.datawidth)
-        b_dout = SigWord(self.datawidth)
+        b_data = SigWord(self.datawidth)
         b_wena = SigBool()
         #module = AsyncRomFile(Addr,Data,filename)
         veri_inst = toVerilog(  self.gen, 
-                                a_clk, a_wena, a_addr, a_din, a_dout,
-                                b_clk, b_wena, b_addr, b_din, b_dout )
+                                a_clk, a_wena, a_addr, a_data,
+                                b_clk, b_wena, b_addr, b_data )
 
         outf = vparams.outfolder
         name = self.instance_name
