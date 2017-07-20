@@ -20,7 +20,7 @@ NX4ROOT = Z64ROOT+"/zed64"
 # output
 ################################################33
 
-timescale = "1ns/1ps"
+timescale = "1ns/1ns"
 
 def usage():
     print "usage make.py prep|synver|synvhd|ise|sidasm"
@@ -152,11 +152,11 @@ elif sys.argv[1]=="compile":
     os.system("make")
 ########################################
 elif sys.argv[1]=="sim":
-    compile("-DDO_VPI")
+    compile("-DDO_VPI -DDO_SIM")
     os.system("vvp -M%s nx4test.exe" % (NX4ROOT+"/vpi") )
 ########################################
 elif sys.argv[1]=="simv":
-    compile("-DDO_DUMP")
+    compile("-DDO_DUMP -DDO_SIM")
     os.system("vvp -M%s nx4test.exe" % (NX4ROOT+"/vpi") )
     os.system("gtkwave n4.vcd n4.gtkw")
 ########################################

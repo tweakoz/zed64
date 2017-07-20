@@ -139,7 +139,7 @@ end
 wire [15:0] cpu_addr;
 wire [7:0] cpu_data;
 
-wire [15:0] chip_addr;
+wire [11:0] chip_addr;
 wire [7:0] chip_data;
 
 ///////////////////////////////////
@@ -169,7 +169,8 @@ DualPortRam dpa(  cpuclk,
 
 ///////////////////////////////////
 	
-wire hwrap;
+wire is_blank;
+wire is_linestart;
 
 vidcon V(
     act_reset,
@@ -191,7 +192,8 @@ vidcon V(
     vgaB,
     vgaH,
     vgaV,
-    hwrap
+    is_blank,
+    is_linestart
      );
 
 assign vgaHout = vgaH; 

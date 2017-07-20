@@ -102,12 +102,13 @@ static int vpi_zed_calltf(char*user_data) {
     int chipaddr = getint();
     int chipdata = getint();
     int Hsize = getint();
-    int Hwrap = getint();
+    int is_blank = getint();
     int vgaH = getint();
     int vgaV = getint();
     int vgaR = getint();
     int vgaG = getint();
     int vgaB = getint();
+    static int prv_blank = -1;
 
     /////////////////////////////////////////
 
@@ -116,25 +117,34 @@ static int vpi_zed_calltf(char*user_data) {
                    | (vgaG<<12)
                    | (vgaR<<4);
 
-    //printf( "Hwrap<%d> pixel<%08x>\n", Hwrap, pixel );
+    //printf( "is_blank<%d> pixel<%08x> chipaddr<%04x> chipdata<%04x>\n", is_blank, pixel, chipaddr, chipdata );
 
-    if( Hwrap )
+    if( is_blank )
     {
         int linecount = wr._lines.size();
 
-        printf( "linecount<%d> npix<%d>\n", linecount, (int)line._pixels.size() );
         if( line._pixels.size() )
+        {
+            printf( "linecount<%d> npix<%d>\n", linecount, (int)line._pixels.size() );
             wr._lines.push_back(line);
+        }
         line._pixels.clear();
-        linecount++;
+
+        if(linecount==32)
+            exit(0);
     }
-
-    int X = line._pixels.size();
-
-    if( X<Hsize )
+    else
     {
-        line._pixels.push_back(pixel);
+        int X = line._pixels.size();
+
+        if( X<Hsize )
+        {
+            line._pixels.push_back(pixel);
+        }
+
     }
+
+    prv_blank = is_blank;
 
     //vpi_printf("chip_addr<%04x> chip_data<%02x> vgaH<%d> vgaV<%d>\n", chipaddr, chipdata, vgaH, vgaV );
 

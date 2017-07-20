@@ -26,7 +26,7 @@ always @(posedge a_clk) begin: DPRAM_A_WRITE
         mem[a_addr] <= a_data;
     end
     else begin
-        aout <= mem[a_addr];
+        #20 aout <= mem[a_addr];
     end
 end
 
@@ -35,7 +35,7 @@ always @(posedge b_clk) begin: DPRAM_B_WRITE
         mem[b_addr] <= b_data;
     end
     else begin
-        bout <= mem[b_addr];
+        #20 bout <= mem[b_addr];
     end
 end
 

@@ -48,6 +48,7 @@ initial begin
     $dumpvars(0,vgaH);
     $dumpvars(0,n4t.font_addrbus);
     $dumpvars(0,n4t.font_databus);
+    $dumpvars(0,n4t.is_linestart);
 `endif
 
 end
@@ -80,13 +81,13 @@ always @(posedge n4t.V.vblank) begin: ONVGAV
 end
 
 always @(posedge n4t.pclkout) begin: ONPCLK
-    $vpi_zed(n4t.chip_addr,n4t.chip_data,n4t.mline_hdisp,n4t.hwrap,vgaH,vgaV,vgaR,vgaG,vgaB);
+    $vpi_zed(n4t.chip_addr,n4t.chip_data,n4t.mline_hdisp,n4t.is_blank,vgaH,vgaV,vgaR,vgaG,vgaB);
 end
 
 `else 
 
 initial begin
-    #7200
+    #14400
     $finish;
 end
 `endif
