@@ -18,7 +18,7 @@ module vidcon (
     input [11:0] vsyncend,
     input [11:0] vtotal,
     input vsyncinvert,
-    output reg [11:0] vram_adr_out,
+    output reg [12:0] vram_adr_out,
     input [7:0] vram_dat_in,
     output [3:0] out_red,
     output [3:0] out_grn,
@@ -69,7 +69,9 @@ wire phase2 = ((hcountS2&7)==0)&&(hcountS2<hdisp)&&ipixel_clock;
 wire phase3 = ((hcountS3&7)==0)&&(hcountS3<hdisp)&&ipixel_clock;
 wire phase4 = ((hcountS4&7)==0)&&(hcountS4<hdisp)&&ipixel_clock;
 wire phase5 = ((hcountS5&7)==0)&&(hcountS5<hdisp)&&ipixel_clock;
+wire fphase5 = ((hcountS5&7)==0)&&(hcountS5<hdisp);
 wire phase6 = ((hcountS6&7)==0)&&(hcountS6<hdisp)&&ipixel_clock;
+wire phase6b = ((hcountS6&7)==0)&&(hcountS6<hdisp)&&pixel_clock;
 wire phase7 = ((hcountS7&7)==0)&&(hcountS7<hdisp)&&ipixel_clock;
 assign out_linestart = ((hcount)==1);
 
@@ -104,13 +106,20 @@ wire [2:0] pg_pixbit = 7-hcountS7[2:0];
 reg [7:0] charcell;
 reg [7:0] pg_pix8;
 reg character_pixel;
+reg [11:0] charcell_addr;
 wire [2:0] cell_row = vcount[2:0];
 
-always @(negedge phase6, posedge reset) begin: CHARCELL_ADDRGEN
-    charcell <= (reset|hwrap) ? 0 : hcount[10:3];
+always @(negedge phase4, posedge reset) begin: CHARCELL_ADDRGEN
+    charcell_addr <= reset ? 0 : hdisp*(vcount/8)+(hcount/8);
 end
-always @(posedge phase7, posedge reset) begin: CHARCELL_ADDRSET
-    vram_adr_out <= reset ? 0 : {charcell[7:0], cell_row};
+
+always @(posedge phase5, posedge phase7, posedge reset) begin: CHARCELL_ADDROUT
+    vram_adr_out <= reset ? 0 
+                          : fphase5 ? {1'b1,charcell_addr}
+                                    : {1'b0,charcell[7:0], cell_row};
+end
+always @(negedge phase6, posedge reset) begin: CHARCELL_READ
+    charcell <= (reset|hwrap) ? 0 : vram_dat_in;
 end
 always @(negedge phase7, posedge reset) begin: FETCH_CHARCELL_ROW
     pg_pix8 <= reset ? 0 : vram_dat_in;

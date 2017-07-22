@@ -46,8 +46,6 @@ initial begin
     $dumpvars(0,n4t.V);
     $dumpvars(0,vgaR);
     $dumpvars(0,vgaH);
-    $dumpvars(0,n4t.font_addrbus);
-    $dumpvars(0,n4t.font_databus);
     $dumpvars(0,n4t.is_linestart);
 `endif
 
@@ -59,6 +57,18 @@ initial begin
     but_center = 0;
 
     $display("begin vidcon sim");
+
+    
+    n4t.dpa.mem[0] <= 8; // h
+    n4t.dpa.mem[1] <= 5; // e
+    n4t.dpa.mem[2] <= 12; // l 
+    n4t.dpa.mem[3] <= 12; // l
+    n4t.dpa.mem[4] <= 15; // o
+    n4t.dpa.mem[5] <= 23; // w
+    n4t.dpa.mem[6] <= 15; // o
+    n4t.dpa.mem[7] <= 18; // r
+    n4t.dpa.mem[8] <= 12; // l
+    n4t.dpa.mem[9] <= 4; // d
 
     #40
     sys_reset = 0;

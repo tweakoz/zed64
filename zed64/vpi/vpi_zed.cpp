@@ -130,7 +130,7 @@ static int vpi_zed_calltf(char*user_data) {
         }
         line._pixels.clear();
 
-        if(linecount==32)
+        if(linecount==64)
             exit(0);
     }
     else

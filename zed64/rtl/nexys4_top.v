@@ -138,25 +138,27 @@ end
 
 wire [15:0] cpu_addr;
 wire [7:0] cpu_data;
-
-wire [11:0] chip_addr;
+wire [12:0] chip_addr;
+wire [7:0] char_data;
+wire [7:0] rom2_data;
+wire [7:0] dpa_data;
 wire [7:0] chip_data;
 
 ///////////////////////////////////
 
-wire [11:0] font_addrbus;
-wire [7:0] font_databus;
-chargen CH(chip_addr[11:0],chip_data);
+chargen CH(chip_addr[11:0],char_data);
+rom2gen R2(chip_addr[11:0],rom2_data);
 
-reg [7:0] font_datareg;
-always @(posedge clkmux) begin : LOADROW
-    font_datareg[7:0] <= font_databus[7:0];
-end
+//wire [11:0] font_addrbus;
+//wire [7:0] font_databus;
+//reg [7:0] font_datareg;
+//always @(posedge clkmux) begin : LOADROW
+//    font_datareg[7:0] <= font_databus[7:0];
+//end
 
 ///////////////////////////////////
 // dpram ports (a: cpu b: hw)
 
-wire [7:0] dpa_out;
 
 DualPortRam dpa(  cpuclk,
                   1'b0, //a_wena,
@@ -165,7 +167,13 @@ DualPortRam dpa(  cpuclk,
                   clkmux, //b_clk,
                   1'b0, //b_wena,
                   chip_addr[11:0], //b_addr,
-                  font_databus ); //b_data );
+                  dpa_data ); //b_data );
+
+///////////////////////////////////
+
+
+assign chip_data = chip_addr[12] ? rom2_data[7:0] 
+                                 : char_data[7:0];
 
 ///////////////////////////////////
 	

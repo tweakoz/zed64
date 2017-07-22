@@ -69,7 +69,7 @@ mode_1024p = (   "1024p", 4, # 108
                  1024,1025,1028,1066,False )
 
 mode_test = (   "test", 4, # 108 
-                 256,258,260,264,False,
+                 128,130,132,134,False,
                  128,136,144,152,False )
 
 #modelist = [ mode_720p, mode_1024p, mode_ntscp, mmode_svga60 ]

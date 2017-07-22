@@ -100,6 +100,7 @@ def compile(opts=""):
     cmd += " zed64/rtl/xilinx/dpram.v"
     cmd += " zed64/rtl/vidcon.v"
     cmd += " zed64/rtl/gen/chargen.v"
+    cmd += " zed64/rtl/gen/rom2gen.v"
     cmd += " zed64/rtl/gen/modeline_hdisp.v"
     cmd += " zed64/rtl/gen/modeline_hstart.v"
     cmd += " zed64/rtl/gen/modeline_hend.v"
@@ -132,6 +133,9 @@ if sys.argv[1]=="synver":
     chargen = AsyncRomFile("chargen","roms/chargen.bin",12,8)
     chargen.gen_verilog(vparams)
 
+    rom2gen = AsyncRomFile("rom2gen","roms/rom2gen.bin",12,8)
+    rom2gen.gen_verilog(vparams)
+
     #dpram = DualSepPortRam("dpram", 12, 8 )
     #dpram.gen_verilog(vparams)
 
@@ -157,7 +161,7 @@ elif sys.argv[1]=="sim":
 ########################################
 elif sys.argv[1]=="simv":
     compile("-DDO_DUMP -DDO_SIM")
-    os.system("vvp -M%s nx4test.exe" % (NX4ROOT+"/vpi") )
+    os.system("vvp nx4test.exe" )
     os.system("gtkwave n4.vcd n4.gtkw")
 ########################################
 elif sys.argv[1]=="ise":
@@ -173,7 +177,6 @@ elif sys.argv[1]=="prep":
     os.system("rm -rf isim")
     os.system("rm -rf zed64/rtl/gen")
     os.system("mkdir -p isedir/isim")
-    os.system("mkdir -p roms/")
     os.system("mkdir -p zed64/rtl/gen/")
     os.system("wget http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c64/characters.901225-01.bin -O ./roms/chargen.bin")
     os.system("ln -s isedir/isim isim" )
