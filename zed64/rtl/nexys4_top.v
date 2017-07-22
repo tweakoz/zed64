@@ -147,7 +147,7 @@ wire [7:0] chip_data;
 ///////////////////////////////////
 
 chargen CH(chip_addr[11:0],char_data);
-rom2gen R2(chip_addr[11:0],rom2_data);
+rom2 R2(chip_addr[11:0],rom2_data);
 
 //wire [11:0] font_addrbus;
 //wire [7:0] font_databus;

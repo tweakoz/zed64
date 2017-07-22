@@ -100,7 +100,7 @@ def compile(opts=""):
     cmd += " zed64/rtl/xilinx/dpram.v"
     cmd += " zed64/rtl/vidcon.v"
     cmd += " zed64/rtl/gen/chargen.v"
-    cmd += " zed64/rtl/gen/rom2gen.v"
+    cmd += " zed64/rtl/gen/rom2.v"
     cmd += " zed64/rtl/gen/modeline_hdisp.v"
     cmd += " zed64/rtl/gen/modeline_hstart.v"
     cmd += " zed64/rtl/gen/modeline_hend.v"
@@ -144,12 +144,12 @@ if sys.argv[1]=="synver":
 
     print("Generating Rom2")
     os.chdir(Z64ROOT+"/roms")
-    os.system("g++ gentxt.cpp -o gentxt.exe")
-    os.system("./gentxt.exe > rom2gen.bin")
+    os.system("g++ genrom2.cpp -o genrom2.exe")
+    os.system("./genrom2.exe > rom2.bin")
 
     os.chdir(Z64ROOT)
-    rom2gen = AsyncRomFile("rom2gen","roms/rom2gen.bin",12,8)
-    rom2gen.gen_verilog(vparams)
+    rom2 = AsyncRomFile("rom2","roms/rom2.bin",12,8)
+    rom2.gen_verilog(vparams)
 
     print("Generating Rom2 complete..")
 
