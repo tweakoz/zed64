@@ -127,20 +127,31 @@ if sys.argv[1]=="synver":
 
     vparams = verilog_params("zed64/rtl/gen/",timescale,ios)
 
+    os.chdir(Z64ROOT)
+
     modeline.gen_verilog(vparams)
     vidcon.gen_verilog("vidcon", vparams)
 
     chargen = AsyncRomFile("chargen","roms/chargen.bin",12,8)
     chargen.gen_verilog(vparams)
 
-    rom2gen = AsyncRomFile("rom2gen","roms/rom2gen.bin",12,8)
-    rom2gen.gen_verilog(vparams)
 
     #dpram = DualSepPortRam("dpram", 12, 8 )
     #dpram.gen_verilog(vparams)
 
     cpu = CPU02("cpu")
     cpu.gen_verilog(vparams)
+
+    print("Generating Rom2")
+    os.chdir(Z64ROOT+"/roms")
+    os.system("g++ gentxt.cpp -o gentxt.exe")
+    os.system("./gentxt.exe > rom2gen.bin")
+
+    os.chdir(Z64ROOT)
+    rom2gen = AsyncRomFile("rom2gen","roms/rom2gen.bin",12,8)
+    rom2gen.gen_verilog(vparams)
+
+    print("Generating Rom2 complete..")
 
 ########################################
 elif sys.argv[1]=="synvhd":
