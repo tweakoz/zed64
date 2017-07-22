@@ -72,8 +72,8 @@ mode_test = (   "test", 4, # 108
                  128,130,132,134,False,
                  128,136,144,152,False )
 
-#modelist = [ mode_720p, mode_1024p, mode_ntscp, mmode_svga60 ]
-modelist = [ mode_test, mode_test, mode_test, mode_test ]
+modelist = [ mode_720p, mode_1024p, mode_ntscp, mmode_svga60 ]
+#modelist = [ mode_test, mode_test, mode_test, mode_test ]
 
 ###########################################################
 

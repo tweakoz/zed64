@@ -113,7 +113,9 @@ always @(negedge phase4, posedge reset) begin: CHARCELL_ADDRGEN
     charcell_addr <= reset ? 0 : hdisp*(vcount/8)+(hcount/8);
 end
 
-always @(posedge phase5, posedge phase7, posedge reset) begin: CHARCELL_ADDROUT
+wire p5edge = phase5 | phase7;
+
+always @(posedge p5edge, posedge reset) begin: CHARCELL_ADDROUT
     vram_adr_out <= reset ? 0 
                           : fphase5 ? {1'b1,charcell_addr}
                                     : {1'b0,charcell[7:0], cell_row};
