@@ -9,5 +9,5 @@ COL2="\[$(tput setaf 7)\]"
 COL3="\[$(tput setaf 8)\]"
 RESET="\[$(tput sgr0)\]"
 export PS1="${COL1}(zed64)${COL2}\u${COL3}\w >${RESET}"
-bash
+bash --norc
 
