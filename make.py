@@ -83,7 +83,7 @@ def compile(opts=""):
 #    CXXFLAGS = "--std=c++11 -I /usr/local/include/iverilog -O3"
     CXXFLAGS = "--std=c++11 -I /usr/include/iverilog -O3"
     os.chdir(NX4ROOT+"/vpi")
-    os.system("clang++ %s vpi_zed.cpp -c -o vpi_zed.o"%CXXFLAGS)
+    os.system("clang++ %s vpi_zed.cpp -c -fPIC -o vpi_zed.o"%CXXFLAGS)
     os.system("iverilog-vpi -v -lOpenImageIO vpi_zed.o")
     #
     os.chdir(Z64ROOT)
@@ -157,6 +157,15 @@ if sys.argv[1]=="synver":
 ########################################
 elif sys.argv[1]=="synvhd":
     vidcon.gen_vhdl(ios)
+########################################
+elif sys.argv[1]=="cc65test":
+    os.chdir(NX4ROOT+"/testprogs")
+    os.system("make")
+    os.system("hexdump -C ./gen/test1.bin > ./gen/test1.hex")
+    os.system("ls -l ./gen")
+    os.chdir(Z64ROOT+"/6502sim")
+    os.system("make")
+    os.system("./6502sim.exe ../zed64/testprogs/gen/test1.bin")
 ########################################
 elif sys.argv[1]=="compile":
     os.chdir(Z64ROOT)

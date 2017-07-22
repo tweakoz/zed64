@@ -15,3 +15,6 @@ a.out
 xilinx_lib
 *.gtkw
 z64test.png
+gen
+*.cmd
+*.log

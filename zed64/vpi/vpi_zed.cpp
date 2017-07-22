@@ -66,7 +66,7 @@ struct WRITER
             out->open (filename, spec);
             out->write_image (TypeDesc::UINT8, pixels);
             out->close ();
-            ImageOutput::destroy (out);
+            //ImageOutput::destroy (out);
         }
 
         printf( "~WRITER\n");
@@ -130,7 +130,7 @@ static int vpi_zed_calltf(char*user_data) {
         }
         line._pixels.clear();
 
-        if(linecount==64)
+        if(linecount==32)
             exit(0);
     }
     else
