@@ -71,6 +71,33 @@ mos6502::mos6502(BusRead r, BusWrite w)
 
 	// insert opcodes
 	
+    InstrTable[0x09] = GENINS(IMM,ORA);
+    InstrTable[0x0D] = GENINS(ABS,ORA);
+    InstrTable[0x05] = GENINS(ZER,ORA);
+    InstrTable[0x01] = GENINS(INX,ORA);
+    InstrTable[0x11] = GENINS(INY,ORA);
+    InstrTable[0x15] = GENINS(ZEX,ORA); 
+    InstrTable[0x1D] = GENINS(ABX,ORA);
+    InstrTable[0x19] = GENINS(ABY,ORA);
+
+    InstrTable[0x29] = GENINS(IMM,AND);
+    InstrTable[0x2D] = GENINS(ABS,AND);
+    InstrTable[0x25] = GENINS(ZER,AND);
+    InstrTable[0x21] = GENINS(INX,AND);
+    InstrTable[0x31] = GENINS(INY,AND);
+    InstrTable[0x35] = GENINS(ZEX,AND); 
+    InstrTable[0x3D] = GENINS(ABX,AND);
+    InstrTable[0x39] = GENINS(ABY,AND);
+
+    InstrTable[0x49] = GENINS(IMM,EOR);
+    InstrTable[0x4D] = GENINS(ABS,EOR);
+    InstrTable[0x45] = GENINS(ZER,EOR);
+    InstrTable[0x41] = GENINS(INX,EOR);
+    InstrTable[0x51] = GENINS(INY,EOR);
+    InstrTable[0x55] = GENINS(ZEX,EOR); 
+    InstrTable[0x5D] = GENINS(ABX,EOR);
+    InstrTable[0x59] = GENINS(ABY,EOR);
+
 	InstrTable[0x69] = GENINS(IMM,ADC);
 	InstrTable[0x6D] = GENINS(ABS,ADC);
 	InstrTable[0x65] = GENINS(ZER,ADC);
@@ -81,186 +108,171 @@ mos6502::mos6502(BusRead r, BusWrite w)
 	InstrTable[0x7D] = GENINS(ABX,ADC);
 	InstrTable[0x79] = GENINS(ABY,ADC);
 	
-	InstrTable[0x29] = GENINS(IMM,AND);
-	InstrTable[0x2D] = GENINS(ABS,AND);
-	InstrTable[0x25] = GENINS(ZER,AND);
-	InstrTable[0x21] = GENINS(INX,AND);
-	InstrTable[0x31] = GENINS(INY,AND);
-	InstrTable[0x35] = GENINS(ZEX,AND);	
-	InstrTable[0x3D] = GENINS(ABX,AND);
-	InstrTable[0x39] = GENINS(ABY,AND);
+    // 89?
+    InstrTable[0x8D] = GENINS(ABS,STA);
+    InstrTable[0x85] = GENINS(ZER,STA);
+    InstrTable[0x81] = GENINS(INX,STA);
+    InstrTable[0x91] = GENINS(INY,STA);
+    InstrTable[0x95] = GENINS(ZEX,STA);
+    InstrTable[0x9D] = GENINS(ABX,STA);
+    InstrTable[0x99] = GENINS(ABY,STA);
 	
+    InstrTable[0xA9] = GENINS(IMM,LDA);
+    InstrTable[0xAD] = GENINS(ABS,LDA);
+    InstrTable[0xA5] = GENINS(ZER,LDA);
+    InstrTable[0xA1] = GENINS(INX,LDA);
+    InstrTable[0xB1] = GENINS(INY,LDA);
+    InstrTable[0xB2] = GENINS(ZER,LDA); //65c02 ZP
+    InstrTable[0xB5] = GENINS(ZEX,LDA); 
+    InstrTable[0xBD] = GENINS(ABX,LDA);
+    InstrTable[0xB9] = GENINS(ABY,LDA);
+
+    InstrTable[0xC9] = GENINS(IMM,CMP);
+    InstrTable[0xCD] = GENINS(ABS,CMP);
+    InstrTable[0xC5] = GENINS(ZER,CMP);
+    InstrTable[0xC1] = GENINS(INX,CMP);
+    InstrTable[0xD1] = GENINS(INY,CMP);
+    InstrTable[0xD5] = GENINS(ZEX,CMP); 
+    InstrTable[0xDD] = GENINS(ABX,CMP);
+    InstrTable[0xD9] = GENINS(ABY,CMP);
+
+    InstrTable[0xE9] = GENINS(IMM,SBC);
+    InstrTable[0xED] = GENINS(ABS,SBC);
+    InstrTable[0xE5] = GENINS(ZER,SBC);
+    InstrTable[0xE1] = GENINS(INX,SBC);
+    InstrTable[0xF1] = GENINS(INY,SBC);
+    InstrTable[0xF5] = GENINS(ZEX,SBC);
+    InstrTable[0xFD] = GENINS(ABX,SBC);
+    InstrTable[0xF9] = GENINS(ABY,SBC);
+
+    //
+
+    InstrTable[0x06] = GENINS(ZER,ASL);
+    InstrTable[0x0A] = GENINS(ACC,ASL_ACC); 
 	InstrTable[0x0E] = GENINS(ABS,ASL);
-	InstrTable[0x06] = GENINS(ZER,ASL);
-	InstrTable[0x0A] = GENINS(ACC,ASL_ACC);	
 	InstrTable[0x16] = GENINS(ZEX,ASL);
 	InstrTable[0x1E] = GENINS(ABX,ASL);
+
+    InstrTable[0x26] = GENINS(ZER,ROL);
+    InstrTable[0x2A] = GENINS(ACC,ROL_ACC);
+    InstrTable[0x2E] = GENINS(ABS,ROL);
+    InstrTable[0x36] = GENINS(ZEX,ROL);
+    InstrTable[0x3E] = GENINS(ABX,ROL);
+
+    InstrTable[0x46] = GENINS(ZER,LSR);
+    InstrTable[0x4A] = GENINS(ACC,LSR_ACC);
+    InstrTable[0x4E] = GENINS(ABS,LSR);
+    InstrTable[0x56] = GENINS(ZEX,LSR);
+    InstrTable[0x5E] = GENINS(ABX,LSR);
+    
+    InstrTable[0x66] = GENINS(ZER,ROR);
+    InstrTable[0x6A] = GENINS(ACC,ROR_ACC);
+    InstrTable[0x6E] = GENINS(ABS,ROR);
+    InstrTable[0x76] = GENINS(ZEX,ROR);
+    InstrTable[0x7E] = GENINS(ABX,ROR);
+
+    //
 	
+    InstrTable[0x00] = GENINS(IMP,BRK);
+
+    InstrTable[0x10] = GENINS(REL,BPL);
+    InstrTable[0x30] = GENINS(REL,BMI);
+    InstrTable[0x50] = GENINS(REL,BVC);
+    InstrTable[0x70] = GENINS(REL,BVS);
 	InstrTable[0x90] = GENINS(REL,BCC);
 	InstrTable[0xB0] = GENINS(REL,BCS);
-	InstrTable[0xF0] = GENINS(REL,BEQ);
-	
-	InstrTable[0x2C] = GENINS(ABS,BIT);
-	InstrTable[0x24] = GENINS(ZER,BIT);
-	
-	InstrTable[0x30] = GENINS(REL,BMI);
-	InstrTable[0xD0] = GENINS(REL,BNE);
-	InstrTable[0x10] = GENINS(REL,BPL);
+    InstrTable[0xD0] = GENINS(REL,BNE);
+	InstrTable[0xF0] = GENINS(REL,BEQ);	
 
-	InstrTable[0x00] = GENINS(IMP,BRK);
-	
-	InstrTable[0x50] = GENINS(REL,BVC);
-	InstrTable[0x70] = GENINS(REL,BVS);
-	
-	InstrTable[0x18] = GENINS(IMP,CLC);	
-	InstrTable[0xD8] = GENINS(IMP,CLD);
-	InstrTable[0x58] = GENINS(IMP,CLI);
-	InstrTable[0xB8] = GENINS(IMP,CLV);
-	
-	InstrTable[0xC9] = GENINS(IMM,CMP);
-	InstrTable[0xCD] = GENINS(ABS,CMP);
-	InstrTable[0xC5] = GENINS(ZER,CMP);
-	InstrTable[0xC1] = GENINS(INX,CMP);
-	InstrTable[0xD1] = GENINS(INY,CMP);
-	InstrTable[0xD5] = GENINS(ZEX,CMP);	
-	InstrTable[0xDD] = GENINS(ABX,CMP);
-	InstrTable[0xD9] = GENINS(ABY,CMP);
-	
+    //
+
+    InstrTable[0x18] = GENINS(IMP,CLC); 
+    InstrTable[0x58] = GENINS(IMP,CLI);
+    InstrTable[0xB8] = GENINS(IMP,CLV);
+    InstrTable[0xD8] = GENINS(IMP,CLD);
+
+    InstrTable[0x38] = GENINS(IMP,SEC);
+    InstrTable[0xF8] = GENINS(IMP,SED);
+    InstrTable[0x78] = GENINS(IMP,SEI);
+
+    InstrTable[0xEA] = GENINS(IMP,NOP);
+
+    InstrTable[0x08] = GENINS(IMP,PHP);
+    InstrTable[0x28] = GENINS(IMP,PLP);
+    InstrTable[0x48] = GENINS(IMP,PHA);
+    InstrTable[0x68] = GENINS(IMP,PLA);
+
+    InstrTable[0x88] = GENINS(IMP,DEY);
+    InstrTable[0xC8] = GENINS(IMP,INY);
+    InstrTable[0xCA] = GENINS(IMP,DEX);
+    InstrTable[0xE8] = GENINS(IMP,INX);
+
+    InstrTable[0x8A] = GENINS(IMP,TXA);
+    InstrTable[0x98] = GENINS(IMP,TYA);
+    InstrTable[0x9A] = GENINS(IMP,TXS);
+    InstrTable[0xA8] = GENINS(IMP,TAY);
+    InstrTable[0xAA] = GENINS(IMP,TAX);
+    InstrTable[0xBA] = GENINS(IMP,TSX);
+
+    //
+
+    InstrTable[0x2C] = GENINS(ABS,BIT);
+    InstrTable[0x24] = GENINS(ZER,BIT);
+
+    //
+
 	InstrTable[0xE0] = GENINS(IMM,CPX);
 	InstrTable[0xEC] = GENINS(ABS,CPX);
 	InstrTable[0xE4] = GENINS(ZER,CPX);
-	
 	InstrTable[0xC0] = GENINS(IMM,CPY);
 	InstrTable[0xCC] = GENINS(ABS,CPY);
 	InstrTable[0xC4] = GENINS(ZER,CPY);
-	
+
+    //
+
     InstrTable[0x3A] = GENINS(IMP,DEC);
 	InstrTable[0xCE] = GENINS(ABS,DEC);
 	InstrTable[0xC6] = GENINS(ZER,DEC);
 	InstrTable[0xD6] = GENINS(ZEX,DEC);
 	InstrTable[0xDE] = GENINS(ABX,DEC);
-	
-	InstrTable[0xCA] = GENINS(IMP,DEX);
-	InstrTable[0x88] = GENINS(IMP,DEY);
-	
-	InstrTable[0x49] = GENINS(IMM,EOR);
-	InstrTable[0x4D] = GENINS(ABS,EOR);
-	InstrTable[0x45] = GENINS(ZER,EOR);
-	InstrTable[0x41] = GENINS(INX,EOR);
-	InstrTable[0x51] = GENINS(INY,EOR);
-	InstrTable[0x55] = GENINS(ZEX,EOR);	
-	InstrTable[0x5D] = GENINS(ABX,EOR);
-	InstrTable[0x59] = GENINS(ABY,EOR);
-	
     InstrTable[0x1A] = GENINS(IMP,INC);
-	InstrTable[0xEE] = GENINS(ABS,INC);
-	InstrTable[0xE6] = GENINS(ZER,INC);
-	InstrTable[0xF6] = GENINS(ZEX,INC);
-	InstrTable[0xFE] = GENINS(ABX,INC);
+    InstrTable[0xEE] = GENINS(ABS,INC);
+    InstrTable[0xE6] = GENINS(ZER,INC);
+    InstrTable[0xF6] = GENINS(ZEX,INC);
+    InstrTable[0xFE] = GENINS(ABX,INC);
 	
-	InstrTable[0xE8] = GENINS(IMP,INX);
-	InstrTable[0xC8] = GENINS(IMP,INY);
+	//
 	
-	InstrTable[0x4C] = GENINS(ABS,JMP);
+    InstrTable[0x20] = GENINS(ABS,JSR);
+    InstrTable[0x40] = GENINS(IMP,RTI);
+    InstrTable[0x4C] = GENINS(ABS,JMP);
+    InstrTable[0x60] = GENINS(IMP,RTS);
 	InstrTable[0x6C] = GENINS(ABI,JMP);
-
-	InstrTable[0x20] = GENINS(ABS,JSR);
 	
-	InstrTable[0xA9] = GENINS(IMM,LDA);
-	InstrTable[0xAD] = GENINS(ABS,LDA);
-	InstrTable[0xA5] = GENINS(ZER,LDA);
-	InstrTable[0xA1] = GENINS(INX,LDA);
-	InstrTable[0xB1] = GENINS(INY,LDA);
-    InstrTable[0xB2] = GENINS(ZER,LDA); //65c02 ZP
-	InstrTable[0xB5] = GENINS(ZEX,LDA);	
-	InstrTable[0xBD] = GENINS(ABX,LDA);
-	InstrTable[0xB9] = GENINS(ABY,LDA);
+    //
 	
+    InstrTable[0xA0] = GENINS(IMM,LDY);
 	InstrTable[0xA2] = GENINS(IMM,LDX);
+    InstrTable[0xA4] = GENINS(ZER,LDY);
+    InstrTable[0xA6] = GENINS(ZER,LDX);
+    InstrTable[0xAC] = GENINS(ABS,LDY);
 	InstrTable[0xAE] = GENINS(ABS,LDX);
-	InstrTable[0xA6] = GENINS(ZER,LDX);
+    InstrTable[0xB4] = GENINS(ZEX,LDY);
+    InstrTable[0xB6] = GENINS(ZEY,LDX);
 	InstrTable[0xBE] = GENINS(ABY,LDX);
-	InstrTable[0xB6] = GENINS(ZEY,LDX);
-	
-	InstrTable[0xA0] = GENINS(IMM,LDY);
-	InstrTable[0xAC] = GENINS(ABS,LDY);
-	InstrTable[0xA4] = GENINS(ZER,LDY);
-	InstrTable[0xB4] = GENINS(ZEX,LDY);
 	InstrTable[0xBC] = GENINS(ABX,LDY);
-	
-	InstrTable[0x4E] = GENINS(ABS,LSR);
-	InstrTable[0x46] = GENINS(ZER,LSR);
-	InstrTable[0x4A] = GENINS(ACC,LSR_ACC);
-	InstrTable[0x56] = GENINS(ZEX,LSR);
-	InstrTable[0x5E] = GENINS(ABX,LSR);
-	
-	InstrTable[0xEA] = GENINS(IMP,NOP);
-	
-	InstrTable[0x09] = GENINS(IMM,ORA);
-	InstrTable[0x0D] = GENINS(ABS,ORA);
-	InstrTable[0x05] = GENINS(ZER,ORA);
-	InstrTable[0x01] = GENINS(INX,ORA);
-	InstrTable[0x11] = GENINS(INY,ORA);
-	InstrTable[0x15] = GENINS(ZEX,ORA);	
-	InstrTable[0x1D] = GENINS(ABX,ORA);
-	InstrTable[0x19] = GENINS(ABY,ORA);
-	
-	InstrTable[0x48] = GENINS(IMP,PHA);
-	InstrTable[0x08] = GENINS(IMP,PHP);
-	InstrTable[0x68] = GENINS(IMP,PLA);
-	InstrTable[0x28] = GENINS(IMP,PLP);
-	
-	InstrTable[0x2E] = GENINS(ABS,ROL);
-	InstrTable[0x26] = GENINS(ZER,ROL);
-	InstrTable[0x2A] = GENINS(ACC,ROL_ACC);
-	InstrTable[0x36] = GENINS(ZEX,ROL);
-	InstrTable[0x3E] = GENINS(ABX,ROL);
-	
-	InstrTable[0x6E] = GENINS(ABS,ROR);
-	InstrTable[0x66] = GENINS(ZER,ROR);
-	InstrTable[0x6A] = GENINS(ACC,ROR_ACC);
-	InstrTable[0x76] = GENINS(ZEX,ROR);
-	InstrTable[0x7E] = GENINS(ABX,ROR);
-	
-	InstrTable[0x40] = GENINS(IMP,RTI);
-	InstrTable[0x60] = GENINS(IMP,RTS);
-	
-	InstrTable[0xE9] = GENINS(IMM,SBC);
-	InstrTable[0xED] = GENINS(ABS,SBC);
-	InstrTable[0xE5] = GENINS(ZER,SBC);
-	InstrTable[0xE1] = GENINS(INX,SBC);
-	InstrTable[0xF1] = GENINS(INY,SBC);
-	InstrTable[0xF5] = GENINS(ZEX,SBC);
-	InstrTable[0xFD] = GENINS(ABX,SBC);
-	InstrTable[0xF9] = GENINS(ABY,SBC);
-	
-	InstrTable[0x38] = GENINS(IMP,SEC);
-	InstrTable[0xF8] = GENINS(IMP,SED);
-	InstrTable[0x78] = GENINS(IMP,SEI);
-	
-	InstrTable[0x8D] = GENINS(ABS,STA);
-	InstrTable[0x85] = GENINS(ZER,STA);
-	InstrTable[0x81] = GENINS(INX,STA);
-	InstrTable[0x91] = GENINS(INY,STA);
-	InstrTable[0x95] = GENINS(ZEX,STA);
-	InstrTable[0x9D] = GENINS(ABX,STA);
-	InstrTable[0x99] = GENINS(ABY,STA);
-	
+				
+    //
+
+    InstrTable[0x84] = GENINS(ZER,STY);
+    InstrTable[0x86] = GENINS(ZER,STX);
+    InstrTable[0x8C] = GENINS(ABS,STY);
 	InstrTable[0x8E] = GENINS(ABS,STX);
-	InstrTable[0x86] = GENINS(ZER,STX);
-	InstrTable[0x96] = GENINS(ZEY,STX);
+    InstrTable[0x94] = GENINS(ZEX,STY);
+	InstrTable[0x96] = GENINS(ZEY,STX);	
 	
-	InstrTable[0x8C] = GENINS(ABS,STY);
-	InstrTable[0x84] = GENINS(ZER,STY);
-	InstrTable[0x94] = GENINS(ZEX,STY);
-	
-	InstrTable[0xAA] = GENINS(IMP,TAX);
-	InstrTable[0xA8] = GENINS(IMP,TAY);
-	InstrTable[0xBA] = GENINS(IMP,TSX);
-	InstrTable[0x8A] = GENINS(IMP,TXA);
-	InstrTable[0x9A] = GENINS(IMP,TXS);
-	InstrTable[0x98] = GENINS(IMP,TYA);
-	
+    //
+
 	Reset();
 	
 	return;
