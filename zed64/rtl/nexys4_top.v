@@ -14,34 +14,39 @@ module nexys4_top(
 	output vgaHout,
 	output pclkout,
 	output rgbled1_b, rgbled2_b
-	 );
+);
 
-	reg [11:0] mline_hdisp;
-	reg [11:0] mline_hsyncstart;
-	reg [11:0] mline_hsyncend;
-	reg [11:0] mline_htotal;
-	reg [0:0] mline_hsyncinvert;
-	reg [11:0] mline_vdisp;
-	reg [11:0] mline_vsyncstart;
-	reg [11:0] mline_vsyncend;
-	reg [11:0] mline_vtotal;
-	reg [0:0] mline_vsyncinvert;
+wire sys_clock_buffered;
+wire act_reset = ! sys_reset;
 
-	wire pixclk_148mhz;
-	wire pixclk_108mhz;
-	wire pixclk_74mhz;
-	wire pixclk_40mhz;
-	wire pixclk_36mhz;
-	wire pixclk_27mhz;
-	wire pixclk_13mhz;
-	
-	wire act_reset = ! sys_reset;
-	
-	wire sys_clock_buffered;
+IBUFG clkin1_buf(
+    .O (sys_clock_buffered),
+    .I (sys_clk)
+);
 
-IBUFG clkin1_buf
-   (.O (sys_clock_buffered),
-    .I (sys_clk));
+///////////////////////////////////
+// VIDCON
+///////////////////////////////////
+
+reg [11:0] mline_hdisp;
+reg [11:0] mline_hsyncstart;
+reg [11:0] mline_hsyncend;
+reg [11:0] mline_htotal;
+reg [0:0] mline_hsyncinvert;
+reg [11:0] mline_vdisp;
+reg [11:0] mline_vsyncstart;
+reg [11:0] mline_vsyncend;
+reg [11:0] mline_vtotal;
+reg [0:0] mline_vsyncinvert;
+
+wire pixclk_148mhz;
+wire pixclk_108mhz;
+wire pixclk_74mhz;
+wire pixclk_40mhz;
+wire pixclk_36mhz;
+wire pixclk_27mhz;
+wire pixclk_13mhz;
+
 
 zed_pll_vesa ZEDPLLVESA( 
 	sys_clock_buffered,
@@ -57,8 +62,6 @@ zed_pll_hdtv ZEDPLLHDTV(
 	pixclk_148mhz, // 148.5
 	pixclk_74mhz, // 74.25
 	act_reset );
-
-wire cpuclk = pixclk_148mhz;
 
 ///////////////////////////////////
 // select pixel clock
@@ -146,32 +149,6 @@ wire [7:0] chip_data;
 
 ///////////////////////////////////
 
-chargen CH(chip_addr[11:0],char_data);
-rom2 R2(chip_addr[11:0],rom2_data);
-
-//wire [11:0] font_addrbus;
-//wire [7:0] font_databus;
-//reg [7:0] font_datareg;
-//always @(posedge clkmux) begin : LOADROW
-//    font_datareg[7:0] <= font_databus[7:0];
-//end
-
-///////////////////////////////////
-// dpram ports (a: cpu b: hw)
-
-
-DualPortRam dpa(  cpuclk,
-                  1'b0, //a_wena,
-                  cpu_addr[11:0], //a_addr
-                  cpu_data, //a_data,
-                  clkmux, //b_clk,
-                  1'b0, //b_wena,
-                  chip_addr[11:0], //b_addr,
-                  dpa_data ); //b_data );
-
-///////////////////////////////////
-
-
 assign chip_data = chip_addr[12] ? rom2_data[7:0] 
                                  : char_data[7:0];
 
@@ -183,26 +160,60 @@ wire is_linestart;
 vidcon V(
     act_reset,
 	pclkout,
-    mline_hdisp,
-    mline_hsyncstart,
-    mline_hsyncend,
-    mline_htotal,
-    mline_hsyncinvert,
-    mline_vdisp,
-    mline_vsyncstart,
-    mline_vsyncend,
-    mline_vtotal,
-    mline_vsyncinvert,
-	chip_addr,
-	chip_data,
-    vgaR,
-    vgaG,
-    vgaB,
-    vgaH,
-    vgaV,
+    mline_hdisp, mline_hsyncstart, mline_hsyncend, mline_htotal, mline_hsyncinvert,
+    mline_vdisp, mline_vsyncstart, mline_vsyncend, mline_vtotal, mline_vsyncinvert,
+	chip_addr, chip_data,
+    vgaR, vgaG, vgaB, vgaH, vgaV,
     is_blank,
     is_linestart
-     );
+);
 
 assign vgaHout = vgaH; 
+
+///////////////////////////////////
+// CPU
+///////////////////////////////////
+
+wire cpu_clk = sys_clk;
+wire cpu_cs = 0;
+wire cpu_wr = 0;
+wire cpu_memrdy = 1;
+wire cpu_datavalid = 1;
+reg [7:0] cpu_datar;
+wire [7:0] cpu_dataw;
+
+m6502 CPU(  cpu_clk,
+            sys_reset,
+            cpu_cs,
+            cpu_wr,
+            cpu_addr,
+            cpu_memrdy,
+            cpu_datavalid,
+            cpu_datar,
+            cpu_dataw );
+
+always @ (posedge cpu_clk,posedge act_reset) begin: latchmem
+    cpu_datar <= act_reset ? 0 : cpu_data;
+end // mem_io_update
+
+///////////////////////////////////
+// DPRAM ports (a: cpu b: hw)
+///////////////////////////////////
+
+DualPortRam dpa(  cpu_clk,
+                  1'b0, //a_wena,
+                  cpu_addr[11:0], //a_addr
+                  cpu_data, //a_data,
+                  clkmux, //b_clk,
+                  1'b0, //b_wena,
+                  chip_addr[11:0], //b_addr,
+                  dpa_data ); //b_data );
+
+///////////////////////////////////
+
+chargen CH(chip_addr[11:0],char_data);
+rom2 R2(chip_addr[11:0],rom2_data);
+
+///////////////////////////////////
+
 endmodule

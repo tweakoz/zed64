@@ -27,7 +27,7 @@ nexys4_top n4t( sys_reset,sys_clk,but_center,
 initial begin
 
 `ifdef DO_DUMP 
-    #3400
+    #0
     $display("starting dump");
 
     $dumpfile("n4.vcd");
@@ -44,6 +44,19 @@ initial begin
     $dumpvars(0,n4t.pclkout);
     $dumpvars(0,n4t.msel2);
     $dumpvars(0,n4t.V);
+    $dumpvars(0,n4t.cpu_clk);
+    $dumpvars(0,n4t.cpu_cs);
+    $dumpvars(0,n4t.cpu_wr);
+    $dumpvars(0,n4t.cpu_addr);
+    $dumpvars(0,n4t.cpu_data);
+    $dumpvars(0,n4t.cpu_datar);
+    $dumpvars(0,n4t.cpu_dataw);
+    $dumpvars(0,n4t.CPU.opcode_reg);
+    $dumpvars(0,n4t.CPU.pc_reg);
+    $dumpvars(0,n4t.CPU.a_reg);
+    $dumpvars(0,n4t.CPU.x_reg);
+    $dumpvars(0,n4t.CPU.y_reg);
+    $dumpvars(0,n4t.CPU.m6502_ctrl_new);
     $dumpvars(0,vgaR);
     $dumpvars(0,vgaH);
     $dumpvars(0,n4t.is_linestart);
@@ -59,11 +72,11 @@ initial begin
     $display("begin vidcon sim");
 
     
-    n4t.dpa.mem[0] <= 8; // h
-    n4t.dpa.mem[1] <= 5; // e
-    n4t.dpa.mem[2] <= 12; // l 
-    n4t.dpa.mem[3] <= 12; // l
-    n4t.dpa.mem[4] <= 15; // o
+    n4t.dpa.mem[0] <= 8'hc6; // dec
+    n4t.dpa.mem[1] <= 8'hff; // $ff
+    n4t.dpa.mem[2] <= 8'h4c; // jmp
+    n4t.dpa.mem[3] <= 8'h00; // $00
+    n4t.dpa.mem[4] <= 8'h00; //  00
     n4t.dpa.mem[5] <= 23; // w
     n4t.dpa.mem[6] <= 15; // o
     n4t.dpa.mem[7] <= 18; // r
