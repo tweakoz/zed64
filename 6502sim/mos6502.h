@@ -61,20 +61,42 @@ struct mos6502
 	uint32_t cycles;
 	
 	typedef void (mos6502::*CodeExec)(uint16_t);
-	typedef uint16_t (mos6502::*AddrExec)();
+    typedef uint16_t (mos6502::*AddrExec)();
 
-	typedef struct Instr
+    struct AddrMode
+    {
+        AddrExec compute;
+        std::string _name;
+    };
+
+	struct Instr
 	{
-		AddrExec addr;
+        std::string _name;
+		AddrMode addr;
 		CodeExec code;
 	};
 	
 	Instr InstrTable[256];
 	
-	void Exec(Instr i);
+    Instr _curins;
+	void Exec();
 	
 	bool illegalOpcode;
 	
+    AddrMode _amACC;
+    AddrMode _amIMM;
+    AddrMode _amABS;
+    AddrMode _amZER;
+    AddrMode _amZEX;
+    AddrMode _amZEY;
+    AddrMode _amABX;
+    AddrMode _amABY;
+    AddrMode _amIMP;
+    AddrMode _amREL;
+    AddrMode _amINX;
+    AddrMode _amINY;
+    AddrMode _amABI;
+
 	// addressing modes
 	uint16_t Addr_ACC(); // ACCUMULATOR
 	uint16_t Addr_IMM(); // IMMEDIATE
@@ -201,4 +223,5 @@ std::string Format( const char* formatstring, ... );
 #define HIL    "\x1b[37m"
 #define RESET   "\x1b[0m"
 
-#define NUMCOL "\x1b[35m"
+#define NUMCOL "\x1b[36m"
+#define CHGCOL "\x1b[35m"

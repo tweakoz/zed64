@@ -1,530 +1,261 @@
 
 #include "mos6502.h"
-	
+#include <assert.h>
+
+
+#define GENINS(m,op) {#op,_am##m,&mos6502::Op_##op}
+
 mos6502::mos6502(BusRead r, BusWrite w)
 {
 	Write = (BusWrite)w;
 	Read = (BusRead)r;
 	Instr instr;
-	
-	// fill jump table with ILLEGALs
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_ILLEGAL;
-	for(int i = 0; i < 256; i++)
-	{
-		InstrTable[i] = instr;
-	}
-	
+		
+    _amACC = {
+        &mos6502::Addr_ACC,
+        "ACC"
+    };
+    _amIMM = {
+        &mos6502::Addr_IMM,
+        "IMM"
+    };
+    _amABS = {
+        &mos6502::Addr_ABS,
+        "ABS"
+    };
+    _amZER = {
+        &mos6502::Addr_ZER,
+        "ZER"
+    };
+    _amZEX = {
+        &mos6502::Addr_ZEX,
+        "ZEX"
+    };
+    _amZEY = {
+        &mos6502::Addr_ZEY,
+        "ZEY"
+    };
+    _amABX = {
+        &mos6502::Addr_ABX,
+        "ABX"
+    };
+    _amABY = {
+        &mos6502::Addr_ABY,
+        "ABY"
+    };
+    _amIMP = {
+        &mos6502::Addr_IMP,
+        "IMP"
+    };
+    _amREL = {
+        &mos6502::Addr_REL,
+        "REL"
+    };
+    _amINX = {
+        &mos6502::Addr_INX,
+        "INX"
+    };
+    _amINY = {
+        &mos6502::Addr_INY,
+        "INY"
+    };
+    _amABI = {
+        &mos6502::Addr_ABI,
+        "ABI"
+    };
+
+    // fill jump table with ILLEGALs
+
+    for(int i = 0; i < 256; i++)
+        InstrTable[i] =  GENINS(IMP,ILLEGAL);
+
 	// insert opcodes
 	
-	instr.addr = &mos6502::Addr_IMM;
-	instr.code = &mos6502::Op_ADC;
-	InstrTable[0x69] = instr;
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_ADC;
-	InstrTable[0x6D] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_ADC;
-	InstrTable[0x65] = instr;
-	instr.addr = &mos6502::Addr_INX;
-	instr.code = &mos6502::Op_ADC;
-	InstrTable[0x61] = instr;
-	instr.addr = &mos6502::Addr_INY;
-	instr.code = &mos6502::Op_ADC;
-	InstrTable[0x71] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_ADC;
-	InstrTable[0x75] = instr;	
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_ADC;
-	InstrTable[0x7D] = instr;
-	instr.addr = &mos6502::Addr_ABY;
-	instr.code = &mos6502::Op_ADC;
-	InstrTable[0x79] = instr;
+	InstrTable[0x69] = GENINS(IMM,ADC);
+	InstrTable[0x6D] = GENINS(ABS,ADC);
+	InstrTable[0x65] = GENINS(ZER,ADC);
+	InstrTable[0x61] = GENINS(INX,ADC);
+	InstrTable[0x71] = GENINS(INY,ADC);
+	InstrTable[0x75] = GENINS(ZEX,ADC);	
+	InstrTable[0x7D] = GENINS(ABX,ADC);
+	InstrTable[0x79] = GENINS(ABY,ADC);
 	
-	instr.addr = &mos6502::Addr_IMM;
-	instr.code = &mos6502::Op_AND;
-	InstrTable[0x29] = instr;
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_AND;
-	InstrTable[0x2D] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_AND;
-	InstrTable[0x25] = instr;
-	instr.addr = &mos6502::Addr_INX;
-	instr.code = &mos6502::Op_AND;
-	InstrTable[0x21] = instr;
-	instr.addr = &mos6502::Addr_INY;
-	instr.code = &mos6502::Op_AND;
-	InstrTable[0x31] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_AND;
-	InstrTable[0x35] = instr;	
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_AND;
-	InstrTable[0x3D] = instr;
-	instr.addr = &mos6502::Addr_ABY;
-	instr.code = &mos6502::Op_AND;
-	InstrTable[0x39] = instr;
+	InstrTable[0x29] = GENINS(IMM,AND);
+	InstrTable[0x2D] = GENINS(ABS,AND);
+	InstrTable[0x25] = GENINS(ZER,AND);
+	InstrTable[0x21] = GENINS(INX,AND);
+	InstrTable[0x31] = GENINS(INY,AND);
+	InstrTable[0x35] = GENINS(ZEX,AND);	
+	InstrTable[0x3D] = GENINS(ABX,AND);
+	InstrTable[0x39] = GENINS(ABY,AND);
 	
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_ASL;
-	InstrTable[0x0E] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_ASL;
-	InstrTable[0x06] = instr;
-	instr.addr = &mos6502::Addr_ACC;
-	instr.code = &mos6502::Op_ASL_ACC;
-	InstrTable[0x0A] = instr;	
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_ASL;
-	InstrTable[0x16] = instr;
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_ASL;
-	InstrTable[0x1E] = instr;
+	InstrTable[0x0E] = GENINS(ABS,ASL);
+	InstrTable[0x06] = GENINS(ZER,ASL);
+	InstrTable[0x0A] = GENINS(ACC,ASL_ACC);	
+	InstrTable[0x16] = GENINS(ZEX,ASL);
+	InstrTable[0x1E] = GENINS(ABX,ASL);
 	
-	instr.addr = &mos6502::Addr_REL;
-	instr.code = &mos6502::Op_BCC;
-	InstrTable[0x90] = instr;
+	InstrTable[0x90] = GENINS(REL,BCC);
+	InstrTable[0xB0] = GENINS(REL,BCS);
+	InstrTable[0xF0] = GENINS(REL,BEQ);
 	
-	instr.addr = &mos6502::Addr_REL;
-	instr.code = &mos6502::Op_BCS;
-	InstrTable[0xB0] = instr;
+	InstrTable[0x2C] = GENINS(ABS,BIT);
+	InstrTable[0x24] = GENINS(ZER,BIT);
 	
-	instr.addr = &mos6502::Addr_REL;
-	instr.code = &mos6502::Op_BEQ;
-	InstrTable[0xF0] = instr;
+	InstrTable[0x30] = GENINS(REL,BMI);
+	InstrTable[0xD0] = GENINS(REL,BNE);
+	InstrTable[0x10] = GENINS(REL,BPL);
+
+	InstrTable[0x00] = GENINS(IMP,BRK);
 	
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_BIT;
-	InstrTable[0x2C] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_BIT;
-	InstrTable[0x24] = instr;
+	InstrTable[0x50] = GENINS(REL,BVC);
+	InstrTable[0x70] = GENINS(REL,BVS);
 	
-	instr.addr = &mos6502::Addr_REL;
-	instr.code = &mos6502::Op_BMI;
-	InstrTable[0x30] = instr;
+	InstrTable[0x18] = GENINS(IMP,CLC);	
+	InstrTable[0xD8] = GENINS(IMP,CLD);
+	InstrTable[0x58] = GENINS(IMP,CLI);
+	InstrTable[0xB8] = GENINS(IMP,CLV);
 	
-	instr.addr = &mos6502::Addr_REL;
-	instr.code = &mos6502::Op_BNE;
-	InstrTable[0xD0] = instr;
+	InstrTable[0xC9] = GENINS(IMM,CMP);
+	InstrTable[0xCD] = GENINS(ABS,CMP);
+	InstrTable[0xC5] = GENINS(ZER,CMP);
+	InstrTable[0xC1] = GENINS(INX,CMP);
+	InstrTable[0xD1] = GENINS(INY,CMP);
+	InstrTable[0xD5] = GENINS(ZEX,CMP);	
+	InstrTable[0xDD] = GENINS(ABX,CMP);
+	InstrTable[0xD9] = GENINS(ABY,CMP);
 	
-	instr.addr = &mos6502::Addr_REL;
-	instr.code = &mos6502::Op_BPL;
-	InstrTable[0x10] = instr;
+	InstrTable[0xE0] = GENINS(IMM,CPX);
+	InstrTable[0xEC] = GENINS(ABS,CPX);
+	InstrTable[0xE4] = GENINS(ZER,CPX);
 	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_BRK;
-	InstrTable[0x00] = instr;
+	InstrTable[0xC0] = GENINS(IMM,CPY);
+	InstrTable[0xCC] = GENINS(ABS,CPY);
+	InstrTable[0xC4] = GENINS(ZER,CPY);
 	
-	instr.addr = &mos6502::Addr_REL;
-	instr.code = &mos6502::Op_BVC;
-	InstrTable[0x50] = instr;
+	InstrTable[0xCE] = GENINS(ABS,DEC);
+	InstrTable[0xC6] = GENINS(ZER,DEC);
+	InstrTable[0xD6] = GENINS(ZEX,DEC);
+	InstrTable[0xDE] = GENINS(ABX,DEC);
 	
-	instr.addr = &mos6502::Addr_REL;
-	instr.code = &mos6502::Op_BVS;
-	InstrTable[0x70] = instr;
+	InstrTable[0xCA] = GENINS(IMP,DEX);
+	InstrTable[0x88] = GENINS(IMP,DEY);
 	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_CLC;
-	InstrTable[0x18] = instr;
+	InstrTable[0x49] = GENINS(IMM,EOR);
+	InstrTable[0x4D] = GENINS(ABS,EOR);
+	InstrTable[0x45] = GENINS(ZER,EOR);
+	InstrTable[0x41] = GENINS(INX,EOR);
+	InstrTable[0x51] = GENINS(INY,EOR);
+	InstrTable[0x55] = GENINS(ZEX,EOR);	
+	InstrTable[0x5D] = GENINS(ABX,EOR);
+	InstrTable[0x59] = GENINS(ABY,EOR);
 	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_CLD;
-	InstrTable[0xD8] = instr;
+	InstrTable[0xEE] = GENINS(ABS,INC);
+	InstrTable[0xE6] = GENINS(ZER,INC);
+	InstrTable[0xF6] = GENINS(ZEX,INC);
+	InstrTable[0xFE] = GENINS(ABX,INC);
 	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_CLI;
-	InstrTable[0x58] = instr;
+	InstrTable[0xE8] = GENINS(IMP,INX);
+	InstrTable[0xC8] = GENINS(IMP,INY);
 	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_CLV;
-	InstrTable[0xB8] = instr;
+	InstrTable[0x4C] = GENINS(ABS,JMP);
+	InstrTable[0x6C] = GENINS(ABI,JMP);
+
+	InstrTable[0x20] = GENINS(ABS,JSR);
 	
-	instr.addr = &mos6502::Addr_IMM;
-	instr.code = &mos6502::Op_CMP;
-	InstrTable[0xC9] = instr;
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_CMP;
-	InstrTable[0xCD] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_CMP;
-	InstrTable[0xC5] = instr;
-	instr.addr = &mos6502::Addr_INX;
-	instr.code = &mos6502::Op_CMP;
-	InstrTable[0xC1] = instr;
-	instr.addr = &mos6502::Addr_INY;
-	instr.code = &mos6502::Op_CMP;
-	InstrTable[0xD1] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_CMP;
-	InstrTable[0xD5] = instr;	
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_CMP;
-	InstrTable[0xDD] = instr;
-	instr.addr = &mos6502::Addr_ABY;
-	instr.code = &mos6502::Op_CMP;
-	InstrTable[0xD9] = instr;
+	InstrTable[0xA9] = GENINS(IMM,LDA);
+	InstrTable[0xAD] = GENINS(ABS,LDA);
+	InstrTable[0xA5] = GENINS(ZER,LDA);
+	InstrTable[0xA1] = GENINS(INX,LDA);
+	InstrTable[0xB1] = GENINS(INY,LDA);
+	InstrTable[0xB5] = GENINS(ZEX,LDA);	
+	InstrTable[0xBD] = GENINS(ABX,LDA);
+	InstrTable[0xB9] = GENINS(ABY,LDA);
 	
-	instr.addr = &mos6502::Addr_IMM;
-	instr.code = &mos6502::Op_CPX;
-	InstrTable[0xE0] = instr;
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_CPX;
-	InstrTable[0xEC] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_CPX;
-	InstrTable[0xE4] = instr;
+	InstrTable[0xA2] = GENINS(IMM,LDX);
+	InstrTable[0xAE] = GENINS(ABS,LDX);
+	InstrTable[0xA6] = GENINS(ZER,LDX);
+	InstrTable[0xBE] = GENINS(ABY,LDX);
+	InstrTable[0xB6] = GENINS(ZEY,LDX);
 	
-	instr.addr = &mos6502::Addr_IMM;
-	instr.code = &mos6502::Op_CPY;
-	InstrTable[0xC0] = instr;
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_CPY;
-	InstrTable[0xCC] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_CPY;
-	InstrTable[0xC4] = instr;
+	InstrTable[0xA0] = GENINS(IMM,LDY);
+	InstrTable[0xAC] = GENINS(ABS,LDY);
+	InstrTable[0xA4] = GENINS(ZER,LDY);
+	InstrTable[0xB4] = GENINS(ZEX,LDY);
+	InstrTable[0xBC] = GENINS(ABX,LDY);
 	
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_DEC;
-	InstrTable[0xCE] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_DEC;
-	InstrTable[0xC6] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_DEC;
-	InstrTable[0xD6] = instr;
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_DEC;
-	InstrTable[0xDE] = instr;
+	InstrTable[0x4E] = GENINS(ABS,LSR);
+	InstrTable[0x46] = GENINS(ZER,LSR);
+	InstrTable[0x4A] = GENINS(ACC,LSR_ACC);
+	InstrTable[0x56] = GENINS(ZEX,LSR);
+	InstrTable[0x5E] = GENINS(ABX,LSR);
 	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_DEX;
-	InstrTable[0xCA] = instr;
+	InstrTable[0xEA] = GENINS(IMP,NOP);
 	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_DEY;
-	InstrTable[0x88] = instr;
+	InstrTable[0x09] = GENINS(IMM,ORA);
+	InstrTable[0x0D] = GENINS(ABS,ORA);
+	InstrTable[0x05] = GENINS(ZER,ORA);
+	InstrTable[0x01] = GENINS(INX,ORA);
+	InstrTable[0x11] = GENINS(INY,ORA);
+	InstrTable[0x15] = GENINS(ZEX,ORA);	
+	InstrTable[0x1D] = GENINS(ABX,ORA);
+	InstrTable[0x19] = GENINS(ABY,ORA);
 	
-	instr.addr = &mos6502::Addr_IMM;
-	instr.code = &mos6502::Op_EOR;
-	InstrTable[0x49] = instr;
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_EOR;
-	InstrTable[0x4D] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_EOR;
-	InstrTable[0x45] = instr;
-	instr.addr = &mos6502::Addr_INX;
-	instr.code = &mos6502::Op_EOR;
-	InstrTable[0x41] = instr;
-	instr.addr = &mos6502::Addr_INY;
-	instr.code = &mos6502::Op_EOR;
-	InstrTable[0x51] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_EOR;
-	InstrTable[0x55] = instr;	
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_EOR;
-	InstrTable[0x5D] = instr;
-	instr.addr = &mos6502::Addr_ABY;
-	instr.code = &mos6502::Op_EOR;
-	InstrTable[0x59] = instr;
+	InstrTable[0x48] = GENINS(IMP,PHA);
+	InstrTable[0x08] = GENINS(IMP,PHP);
+	InstrTable[0x68] = GENINS(IMP,PLA);
+	InstrTable[0x28] = GENINS(IMP,PLP);
 	
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_INC;
-	InstrTable[0xEE] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_INC;
-	InstrTable[0xE6] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_INC;
-	InstrTable[0xF6] = instr;
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_INC;
-	InstrTable[0xFE] = instr;
+	InstrTable[0x2E] = GENINS(ABS,ROL);
+	InstrTable[0x26] = GENINS(ZER,ROL);
+	InstrTable[0x2A] = GENINS(ACC,ROL_ACC);
+	InstrTable[0x36] = GENINS(ZEX,ROL);
+	InstrTable[0x3E] = GENINS(ABX,ROL);
 	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_INX;
-	InstrTable[0xE8] = instr;
+	InstrTable[0x6E] = GENINS(ABS,ROR);
+	InstrTable[0x66] = GENINS(ZER,ROR);
+	InstrTable[0x6A] = GENINS(ACC,ROR_ACC);
+	InstrTable[0x76] = GENINS(ZEX,ROR);
+	InstrTable[0x7E] = GENINS(ABX,ROR);
 	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_INY;
-	InstrTable[0xC8] = instr;
+	InstrTable[0x40] = GENINS(IMP,RTI);
+	InstrTable[0x60] = GENINS(IMP,RTS);
 	
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_JMP;
-	InstrTable[0x4C] = instr;
-	instr.addr = &mos6502::Addr_ABI;
-	instr.code = &mos6502::Op_JMP;
-	InstrTable[0x6C] = instr;
+	InstrTable[0xE9] = GENINS(IMM,SBC);
+	InstrTable[0xED] = GENINS(ABS,SBC);
+	InstrTable[0xE5] = GENINS(ZER,SBC);
+	InstrTable[0xE1] = GENINS(INX,SBC);
+	InstrTable[0xF1] = GENINS(INY,SBC);
+	InstrTable[0xF5] = GENINS(ZEX,SBC);
+	InstrTable[0xFD] = GENINS(ABX,SBC);
+	InstrTable[0xF9] = GENINS(ABY,SBC);
 	
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_JSR;
-	InstrTable[0x20] = instr;
+	InstrTable[0x38] = GENINS(IMP,SEC);
+	InstrTable[0xF8] = GENINS(IMP,SED);
+	InstrTable[0x78] = GENINS(IMP,SEI);
 	
-	instr.addr = &mos6502::Addr_IMM;
-	instr.code = &mos6502::Op_LDA;
-	InstrTable[0xA9] = instr;
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_LDA;
-	InstrTable[0xAD] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_LDA;
-	InstrTable[0xA5] = instr;
-	instr.addr = &mos6502::Addr_INX;
-	instr.code = &mos6502::Op_LDA;
-	InstrTable[0xA1] = instr;
-	instr.addr = &mos6502::Addr_INY;
-	instr.code = &mos6502::Op_LDA;
-	InstrTable[0xB1] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_LDA;
-	InstrTable[0xB5] = instr;	
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_LDA;
-	InstrTable[0xBD] = instr;
-	instr.addr = &mos6502::Addr_ABY;
-	instr.code = &mos6502::Op_LDA;
-	InstrTable[0xB9] = instr;
+	InstrTable[0x8D] = GENINS(ABS,STA);
+	InstrTable[0x85] = GENINS(ZER,STA);
+	InstrTable[0x81] = GENINS(INX,STA);
+	InstrTable[0x91] = GENINS(INY,STA);
+	InstrTable[0x95] = GENINS(ZEX,STA);
+	InstrTable[0x9D] = GENINS(ABX,STA);
+	InstrTable[0x99] = GENINS(ABY,STA);
 	
-	instr.addr = &mos6502::Addr_IMM;
-	instr.code = &mos6502::Op_LDX;
-	InstrTable[0xA2] = instr;
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_LDX;
-	InstrTable[0xAE] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_LDX;
-	InstrTable[0xA6] = instr;
-	instr.addr = &mos6502::Addr_ABY;
-	instr.code = &mos6502::Op_LDX;
-	InstrTable[0xBE] = instr;
-	instr.addr = &mos6502::Addr_ZEY;
-	instr.code = &mos6502::Op_LDX;
-	InstrTable[0xB6] = instr;
+	InstrTable[0x8E] = GENINS(ABS,STX);
+	InstrTable[0x86] = GENINS(ZER,STX);
+	InstrTable[0x96] = GENINS(ZEY,STX);
 	
-	instr.addr = &mos6502::Addr_IMM;
-	instr.code = &mos6502::Op_LDY;
-	InstrTable[0xA0] = instr;
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_LDY;
-	InstrTable[0xAC] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_LDY;
-	InstrTable[0xA4] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_LDY;
-	InstrTable[0xB4] = instr;
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_LDY;
-	InstrTable[0xBC] = instr;
+	InstrTable[0x8C] = GENINS(ABS,STY);
+	InstrTable[0x84] = GENINS(ZER,STY);
+	InstrTable[0x94] = GENINS(ZEX,STY);
 	
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_LSR;
-	InstrTable[0x4E] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_LSR;
-	InstrTable[0x46] = instr;
-	instr.addr = &mos6502::Addr_ACC;
-	instr.code = &mos6502::Op_LSR_ACC;
-	InstrTable[0x4A] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_LSR;
-	InstrTable[0x56] = instr;
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_LSR;
-	InstrTable[0x5E] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_NOP;
-	InstrTable[0xEA] = instr;
-	
-	instr.addr = &mos6502::Addr_IMM;
-	instr.code = &mos6502::Op_ORA;
-	InstrTable[0x09] = instr;
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_ORA;
-	InstrTable[0x0D] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_ORA;
-	InstrTable[0x05] = instr;
-	instr.addr = &mos6502::Addr_INX;
-	instr.code = &mos6502::Op_ORA;
-	InstrTable[0x01] = instr;
-	instr.addr = &mos6502::Addr_INY;
-	instr.code = &mos6502::Op_ORA;
-	InstrTable[0x11] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_ORA;
-	InstrTable[0x15] = instr;	
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_ORA;
-	InstrTable[0x1D] = instr;
-	instr.addr = &mos6502::Addr_ABY;
-	instr.code = &mos6502::Op_ORA;
-	InstrTable[0x19] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_PHA;
-	InstrTable[0x48] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_PHP;
-	InstrTable[0x08] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_PLA;
-	InstrTable[0x68] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_PLP;
-	InstrTable[0x28] = instr;
-	
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_ROL;
-	InstrTable[0x2E] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_ROL;
-	InstrTable[0x26] = instr;
-	instr.addr = &mos6502::Addr_ACC;
-	instr.code = &mos6502::Op_ROL_ACC;
-	InstrTable[0x2A] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_ROL;
-	InstrTable[0x36] = instr;
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_ROL;
-	InstrTable[0x3E] = instr;
-	
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_ROR;
-	InstrTable[0x6E] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_ROR;
-	InstrTable[0x66] = instr;
-	instr.addr = &mos6502::Addr_ACC;
-	instr.code = &mos6502::Op_ROR_ACC;
-	InstrTable[0x6A] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_ROR;
-	InstrTable[0x76] = instr;
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_ROR;
-	InstrTable[0x7E] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_RTI;
-	InstrTable[0x40] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_RTS;
-	InstrTable[0x60] = instr;
-	
-	instr.addr = &mos6502::Addr_IMM;
-	instr.code = &mos6502::Op_SBC;
-	InstrTable[0xE9] = instr;
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_SBC;
-	InstrTable[0xED] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_SBC;
-	InstrTable[0xE5] = instr;
-	instr.addr = &mos6502::Addr_INX;
-	instr.code = &mos6502::Op_SBC;
-	InstrTable[0xE1] = instr;
-	instr.addr = &mos6502::Addr_INY;
-	instr.code = &mos6502::Op_SBC;
-	InstrTable[0xF1] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_SBC;
-	InstrTable[0xF5] = instr;
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_SBC;
-	InstrTable[0xFD] = instr;
-	instr.addr = &mos6502::Addr_ABY;
-	instr.code = &mos6502::Op_SBC;
-	InstrTable[0xF9] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_SEC;
-	InstrTable[0x38] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_SED;
-	InstrTable[0xF8] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_SEI;
-	InstrTable[0x78] = instr;
-	
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_STA;
-	InstrTable[0x8D] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_STA;
-	InstrTable[0x85] = instr;
-	instr.addr = &mos6502::Addr_INX;
-	instr.code = &mos6502::Op_STA;
-	InstrTable[0x81] = instr;
-	instr.addr = &mos6502::Addr_INY;
-	instr.code = &mos6502::Op_STA;
-	InstrTable[0x91] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_STA;
-	InstrTable[0x95] = instr;
-	instr.addr = &mos6502::Addr_ABX;
-	instr.code = &mos6502::Op_STA;
-	InstrTable[0x9D] = instr;
-	instr.addr = &mos6502::Addr_ABY;
-	instr.code = &mos6502::Op_STA;
-	InstrTable[0x99] = instr;
-	
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_STX;
-	InstrTable[0x8E] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_STX;
-	InstrTable[0x86] = instr;
-	instr.addr = &mos6502::Addr_ZEY;
-	instr.code = &mos6502::Op_STX;
-	InstrTable[0x96] = instr;
-	
-	instr.addr = &mos6502::Addr_ABS;
-	instr.code = &mos6502::Op_STY;
-	InstrTable[0x8C] = instr;
-	instr.addr = &mos6502::Addr_ZER;
-	instr.code = &mos6502::Op_STY;
-	InstrTable[0x84] = instr;
-	instr.addr = &mos6502::Addr_ZEX;
-	instr.code = &mos6502::Op_STY;
-	InstrTable[0x94] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_TAX;
-	InstrTable[0xAA] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_TAY;
-	InstrTable[0xA8] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_TSX;
-	InstrTable[0xBA] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_TXA;
-	InstrTable[0x8A] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_TXS;
-	InstrTable[0x9A] = instr;
-	
-	instr.addr = &mos6502::Addr_IMP;
-	instr.code = &mos6502::Op_TYA;
-	InstrTable[0x98] = instr;
+	InstrTable[0xAA] = GENINS(IMP,TAX);
+	InstrTable[0xA8] = GENINS(IMP,TAY);
+	InstrTable[0xBA] = GENINS(IMP,TSX);
+	InstrTable[0x8A] = GENINS(IMP,TXA);
+	InstrTable[0x9A] = GENINS(IMP,TXS);
+	InstrTable[0x98] = GENINS(IMP,TYA);
 	
 	Reset();
 	
@@ -708,7 +439,6 @@ void mos6502::IRQ()
 		SET_INTERRUPT(1);
 		pc = (Read(irqVectorH) << 8) + Read(irqVectorL);
 	}
-	return;
 }
 
 void mos6502::NMI()
@@ -719,14 +449,12 @@ void mos6502::NMI()
 	StackPush(status);
 	SET_INTERRUPT(1);
 	pc = (Read(nmiVectorH) << 8) + Read(nmiVectorL);
-	return;
 }
 
 void mos6502::Run(uint32_t n)
 {
 	uint32_t start = cycles;
 	uint8_t opcode;
-	Instr instr;
 
 	while(start + n > cycles && !illegalOpcode)
 	{
@@ -734,19 +462,23 @@ void mos6502::Run(uint32_t n)
 		opcode = Read(pc++);
 		
 		// decode
-		instr = InstrTable[opcode];
+		_curins = InstrTable[opcode];
 		
 		// execute
-		Exec(instr);
+		Exec();
 		
 		cycles++;
 	}
 }
 
-void mos6502::Exec(Instr i)
+void mos6502::Exec()
 {
-	uint16_t src = (this->*i.addr)();
-	(this->*i.code)(src);
+    auto addrmode = _curins.addr;
+    auto addrcalc = addrmode.compute;
+    assert(addrcalc!=nullptr);
+	uint16_t src = (this->*addrcalc)();
+    printf( RESET " %s(%s) " RESET, _curins._name.c_str(), _curins.addr._name.c_str() );
+	(this->*_curins.code)(src);
 	printf( "\n");
 }
 
@@ -759,7 +491,6 @@ void mos6502::Op_ILLEGAL(uint16_t src)
 
 void mos6502::Op_ADC(uint16_t src)
 {
-	ExecLog("ADC %04x", src );
 	uint8_t m = Read(src);
 	unsigned int tmp = m + A + (IF_CARRY() ? 1 : 0);
 	SET_ZERO(!(tmp & 0xFF));
@@ -782,26 +513,22 @@ void mos6502::Op_ADC(uint16_t src)
     }
 	
     A = tmp & 0xFF;
-	return;
 }
 
 
 
 void mos6502::Op_AND(uint16_t src)
 {
-	ExecLog("AND %04x", src );
 	uint8_t m = Read(src);
 	uint8_t res = m & A;
 	SET_NEGATIVE(res & 0x80);
 	SET_ZERO(!res);
 	A = res;
-	return;
 }
 
 
 void mos6502::Op_ASL(uint16_t src)
 {
-	ExecLog("ASL %04x", src );
 	uint8_t m = Read(src);
     SET_CARRY(m & 0x80);
     m <<= 1;
@@ -809,7 +536,6 @@ void mos6502::Op_ASL(uint16_t src)
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
     Write(src, m);
-    return;
 }
 
 void mos6502::Op_ASL_ACC(uint16_t src)
@@ -821,207 +547,149 @@ void mos6502::Op_ASL_ACC(uint16_t src)
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
     A = m;
-    return;
 }
 
 void mos6502::Op_BCC(uint16_t src)
 {
-	ExecLog("BCC %04x", src );
     if (!IF_CARRY())
-    {
     	pc = src;
-    }
-    return;
 }
 
 
 void mos6502::Op_BCS(uint16_t src)
 {
-	ExecLog("BCS %04x", src );
     if (IF_CARRY())
-    {
     	pc = src;
-    }
-    return;
 }
 
 void mos6502::Op_BEQ(uint16_t src)
 {
-	ExecLog("BEQ %04x", src );
     if (IF_ZERO())
-    {
     	pc = src;
-    }
-    return;
 }
 
 void mos6502::Op_BIT(uint16_t src)
 {
-	ExecLog("BIT %04x", src );
 	uint8_t m = Read(src);
 	uint8_t res = m & A;
 	SET_NEGATIVE(res & 0x80);
 	status = (status & 0x3F) | (uint8_t)(m & 0xC0);
 	SET_ZERO(!res);
-	return;
 }
 
 void mos6502::Op_BMI(uint16_t src)
 {
-	ExecLog("BMI %04x", src );
     if (IF_NEGATIVE())
-    {
     	pc = src;
-    }
-    return;
 }
 
 void mos6502::Op_BNE(uint16_t src)
 {
-	ExecLog("BNE %04x", src );
     if (!IF_ZERO())
-    {
     	pc = src;
-    }
-    return;
 }
 
 void mos6502::Op_BPL(uint16_t src)
 {
-	ExecLog("BPL %04x", src );
     if (!IF_NEGATIVE())
-    {
     	pc = src;
-    }
-    return;
 }
 
 void mos6502::Op_BRK(uint16_t src)
 {
-	ExecLog("BRK");
 	pc++;
 	StackPush((pc >> 8) & 0xFF);
 	StackPush(pc & 0xFF);
 	StackPush(status | BREAK);
 	SET_INTERRUPT(1);
 	pc = (Read(irqVectorH) << 8) + Read(irqVectorL);
-	return;
 }
 
 void mos6502::Op_BVC(uint16_t src)
 {
-	ExecLog("BVC %04x", src );
     if (!IF_OVERFLOW())
-    {
     	pc = src;
-    }
-    return;
 }
 
 void mos6502::Op_BVS(uint16_t src)
 {
-	ExecLog("BVS %04x", src );
     if (IF_OVERFLOW())
-    {
     	pc = src;
-    }
-    return;
 }
 
 void mos6502::Op_CLC(uint16_t src)
 {
-	ExecLog("CLC" );
 	SET_CARRY(0);
-	return;
 }
 
 void mos6502::Op_CLD(uint16_t src)
 {
-	ExecLog("CLD");
 	SET_DECIMAL(0);
-	return;
 }
 
 void mos6502::Op_CLI(uint16_t src)
 {
-	ExecLog("CLI");
 	SET_INTERRUPT(0);
-	return;
 }
 
 void mos6502::Op_CLV(uint16_t src)
 {
-	ExecLog("CLV");
 	SET_OVERFLOW(0);
-	return;
 }
 
 void mos6502::Op_CMP(uint16_t src)
 {
-	ExecLog("CMP %04x", src );
 	unsigned int tmp = A - Read(src);
 	SET_CARRY(tmp < 0x100);
 	SET_NEGATIVE(tmp & 0x80);
 	SET_ZERO(!(tmp & 0xFF));
-	return;
 }
 
 void mos6502::Op_CPX(uint16_t src)
 {
-	ExecLog("CPX %04x", src );
 	unsigned int tmp = X - Read(src);
 	SET_CARRY(tmp < 0x100);
 	SET_NEGATIVE(tmp & 0x80);
 	SET_ZERO(!(tmp & 0xFF));
-	return;
 }
 
 void mos6502::Op_CPY(uint16_t src)
 {
-	ExecLog("CPY %04x", src );
 	unsigned int tmp = Y - Read(src);
 	SET_CARRY(tmp < 0x100);
 	SET_NEGATIVE(tmp & 0x80);
 	SET_ZERO(!(tmp & 0xFF));
-	return;
 }
 
 void mos6502::Op_DEC(uint16_t src)
 {
-	ExecLog("DEC %04x", src );
 	uint8_t m = Read(src);
 	m = (m - 1) % 256;
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
     Write(src, m);
-	return;
 }
 
 void mos6502::Op_DEX(uint16_t src)
 {
-	ExecLog("DEX");
 	uint8_t m = X;
 	m = (m - 1) % 256;
 	SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
     X = m;
-    return;
 }
 
 void mos6502::Op_DEY(uint16_t src)
 {
-	ExecLog("DEY");
 	uint8_t m = Y;
 	m = (m - 1) % 256;
 	SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
     Y = m;
-	return;
 }
 
 void mos6502::Op_EOR(uint16_t src)
 {
-	ExecLog("EOR %04x", src );
 	uint8_t m = Read(src);
 	m = A ^ m;
 	SET_NEGATIVE(m & 0x80);
@@ -1031,7 +699,6 @@ void mos6502::Op_EOR(uint16_t src)
 
 void mos6502::Op_INC(uint16_t src)
 {
-	ExecLog("INC %04x", src );
 	uint8_t m = Read(src);
 	m = (m + 1) % 256;
 	SET_NEGATIVE(m & 0x80);
@@ -1041,7 +708,6 @@ void mos6502::Op_INC(uint16_t src)
 
 void mos6502::Op_INX(uint16_t src)
 {
-	ExecLog("INX %04x\n", src );
 	uint8_t m = X;
 	m = (m + 1) % 256;
 	SET_NEGATIVE(m & 0x80);
@@ -1051,7 +717,6 @@ void mos6502::Op_INX(uint16_t src)
 
 void mos6502::Op_INY(uint16_t src)
 {
-	ExecLog("INY %04x", src );
 	uint8_t m = Y;
 	m = (m + 1) % 256;
 	SET_NEGATIVE(m & 0x80);
@@ -1061,13 +726,11 @@ void mos6502::Op_INY(uint16_t src)
 
 void mos6502::Op_JMP(uint16_t src)
 {
-	ExecLog("JMP %04x", src );
 	pc = src;
 }
 
 void mos6502::Op_JSR(uint16_t src)
 {
-	ExecLog("JSR %04x", src );
 	pc--;
 	StackPush((pc >> 8) & 0xFF);
 	StackPush(pc & 0xFF);
@@ -1076,7 +739,6 @@ void mos6502::Op_JSR(uint16_t src)
 
 void mos6502::Op_LDA(uint16_t src)
 {
-	ExecLog("LDA %04x", src );
 	uint8_t m = Read(src);
 	SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
@@ -1085,7 +747,6 @@ void mos6502::Op_LDA(uint16_t src)
 
 void mos6502::Op_LDX(uint16_t src)
 {
-	ExecLog("LDX %04x", src );
 	uint8_t m = Read(src);
 	SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
@@ -1094,7 +755,6 @@ void mos6502::Op_LDX(uint16_t src)
 
 void mos6502::Op_LDY(uint16_t src)
 {
-	ExecLog("LDY %04x", src );
 	uint8_t m = Read(src);
 	SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
@@ -1103,7 +763,6 @@ void mos6502::Op_LDY(uint16_t src)
 
 void mos6502::Op_LSR(uint16_t src)
 {
-	ExecLog("LSR %04x", src );
 	uint8_t m = Read(src);
 	SET_CARRY(m & 0x01);
 	m >>= 1;
@@ -1124,13 +783,11 @@ void mos6502::Op_LSR_ACC(uint16_t src)
 
 void mos6502::Op_NOP(uint16_t src)
 {
-	ExecLog("NOP %04x", src );
 	return;
 }
 
 void mos6502::Op_ORA(uint16_t src)
 {
-	ExecLog("ORA %04x", src );
 	uint8_t m = Read(src);
 	m = A | m;
 	SET_NEGATIVE(m & 0x80);
@@ -1141,13 +798,11 @@ void mos6502::Op_ORA(uint16_t src)
 void mos6502::Op_PHA(uint16_t src)
 {
 	StackPush(A);
-	return;
 }
 
 void mos6502::Op_PHP(uint16_t src)
 {	
 	StackPush(status | BREAK);
-	return;
 }
 
 void mos6502::Op_PLA(uint16_t src)
@@ -1155,19 +810,16 @@ void mos6502::Op_PLA(uint16_t src)
 	A = StackPop();
 	SET_NEGATIVE(A & 0x80);
     SET_ZERO(!A);
-	return;
 }
 
 void mos6502::Op_PLP(uint16_t src)
 {
 	status = StackPop();
 	SET_CONSTANT(1);
-	return;
 }
 
 void mos6502::Op_ROL(uint16_t src)
 {
-	ExecLog("ROL %04x", src );
 	uint16_t m = Read(src);
     m <<= 1;
     if (IF_CARRY()) m |= 0x01;
@@ -1176,7 +828,6 @@ void mos6502::Op_ROL(uint16_t src)
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
     Write(src, m);
-	return;
 }
 
 void mos6502::Op_ROL_ACC(uint16_t src)
@@ -1189,12 +840,10 @@ void mos6502::Op_ROL_ACC(uint16_t src)
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
     A = m;
-	return;
 }
 
 void mos6502::Op_ROR(uint16_t src)
 {
-	ExecLog("ROR %04x", src );
 	uint16_t m = Read(src);
     if (IF_CARRY()) m |= 0x100;
     SET_CARRY(m & 0x01);
@@ -1203,7 +852,6 @@ void mos6502::Op_ROR(uint16_t src)
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
     Write(src, m);
-	return;
 }
 
 void mos6502::Op_ROR_ACC(uint16_t src)
@@ -1216,7 +864,6 @@ void mos6502::Op_ROR_ACC(uint16_t src)
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
     A = m;
-	return;
 }
 
 void mos6502::Op_RTI(uint16_t src)
@@ -1229,25 +876,20 @@ void mos6502::Op_RTI(uint16_t src)
 	hi = StackPop();
 	
 	pc = (hi << 8) | lo;
-	return;
 }
 
 void mos6502::Op_RTS(uint16_t src)
 {
-	ExecLog("RTS");
-
 	uint8_t lo, hi;
 	
 	lo = StackPop();
 	hi = StackPop();
 	
 	pc = ((hi << 8) | lo) + 1;
-	return;
 }
 
 void mos6502::Op_SBC(uint16_t src)
 {
-	ExecLog("SBC %04x", src );
 	uint8_t m = Read(src);
 	unsigned int tmp = A - m - (IF_CARRY() ? 0 : 1);
 	SET_NEGATIVE(tmp & 0x80);
@@ -1264,105 +906,81 @@ void mos6502::Op_SBC(uint16_t src)
     }
     SET_CARRY(tmp < 0x100);
     A = (tmp & 0xFF);
-	return;
 }
 
 void mos6502::Op_SEC(uint16_t src)
 {
-	ExecLog("SEC" );
 	SET_CARRY(1);
-	return;
 }
 
 void mos6502::Op_SED(uint16_t src)
 {
 	SET_DECIMAL(1);
-	return;
 }
 
 void mos6502::Op_SEI(uint16_t src)
 {
 	SET_INTERRUPT(1);
-	return;
 }
 
 void mos6502::Op_STA(uint16_t src)
 {
-	ExecLog("STA %04x", src );
 	Write(src, A);
-	return;
 }
 
 void mos6502::Op_STX(uint16_t src)
 {
-	ExecLog("STX %04x", src );
 	Write(src, X);
-	return;
 }
 
 void mos6502::Op_STY(uint16_t src)
 {
-	ExecLog("STY %04x", src );
 	Write(src, Y);
-	return;
 }
 
 void mos6502::Op_TAX(uint16_t src)
 {
-	ExecLog("TAX %04x", src );
 	uint8_t m = A;
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
 	X = m;
-	return;
 }
 
 void mos6502::Op_TAY(uint16_t src)
 {
-	ExecLog("TAY %04x", src );
 	uint8_t m = A;
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
 	Y = m;
-	return;
 }
 
 void mos6502::Op_TSX(uint16_t src)
 {
-	ExecLog("TSX %04x", src );
 	uint8_t m = sp;
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
 	X = m;
-	return;
 }
 
 void mos6502::Op_TXA(uint16_t src)
 {
-	ExecLog("TXA %04x", src );
 	uint8_t m = X;
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
 	A = m;
-	return;
 }
 
 void mos6502::Op_TXS(uint16_t src)
 {
-	ExecLog("TXS %04x", src );
 	sp = X;
-	return;
 }
 
 void mos6502::Op_TYA(uint16_t src)
 {
-	ExecLog("TYA %04x", src );
-
 	uint8_t m = Y;
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
 	A = m;
-	return;
 }
 
 std::string Format( const char* formatstring, ... )
@@ -1385,6 +1003,6 @@ void ExecLog( const char* formatstring, ... )
 	    va_start(args, formatstring);
 	    vsnprintf( &formatbuffer[0], sizeof(formatbuffer), formatstring, args );
 	    va_end(args);
-	    printf( GREEN "\n%s " RESET, formatbuffer );
+	    printf( HIL "  %s  " RESET, formatbuffer );
 	}
 }

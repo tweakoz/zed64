@@ -199,6 +199,7 @@ elif sys.argv[1]=="prep":
     os.system("rm -rf zed64/rtl/gen")
     os.system("mkdir -p isedir/isim")
     os.system("mkdir -p zed64/rtl/gen/")
+    os.system("mkdir -p zed64/testprogs/gen/")
     os.system("wget http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c64/characters.901225-01.bin -O ./roms/chargen.bin")
     os.system("ln -s isedir/isim isim" )
     os.system("./make.py synver")
