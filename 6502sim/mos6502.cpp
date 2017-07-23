@@ -580,10 +580,12 @@ void mos6502::Exec()
     //printf( "%s", status.c_str() );
     std::string insstr;
     auto insMODE = _curins.addr._name;
+    auto insNAME = _curins._name;
+
     if(insMODE == "IMP")
     {
         insstr = Format( "  %s%s          ", EXECCOLOR.c_str()
-                                   , _curins._name.c_str() );
+                                   , insNAME.c_str() );
 
     }
     else if(insMODE=="REL")
@@ -593,7 +595,7 @@ void mos6502::Exec()
         auto addr = pc + 1 + (int16_t)offset;
 
         insstr = Format( "  %s%s $%04X          ", EXECCOLOR.c_str()
-                                       , _curins._name.c_str()
+                                       , insNAME.c_str()
                                        , addr );
     }
     else if(insMODE=="ABS")
@@ -603,7 +605,7 @@ void mos6502::Exec()
         uint16_t addr = uint16_t(lo)|uint16_t(hi)<<8;
 
         insstr = Format( "  %s%s $%04X          ", EXECCOLOR.c_str()
-                                       , _curins._name.c_str()
+                                       , insNAME.c_str()
                                        , addr );
     }
     else if(insMODE=="ABX")
@@ -613,7 +615,7 @@ void mos6502::Exec()
         uint16_t addr = uint16_t(lo)|uint16_t(hi)<<8;
 
         insstr = Format( "  %s%s $%04X,x          ", EXECCOLOR.c_str()
-                                       , _curins._name.c_str()
+                                       , insNAME.c_str()
                                        , addr );
     }
     else if(insMODE=="ABY")
@@ -623,19 +625,19 @@ void mos6502::Exec()
         uint16_t addr = uint16_t(lo)|uint16_t(hi)<<8;
 
         insstr = Format( "  %s%s $%04X,y          ", EXECCOLOR.c_str()
-                                       , _curins._name.c_str()
+                                       , insNAME.c_str()
                                        , addr );
     }
     else if(insMODE=="INX") // Indexed Indirect (x)
     {
         insstr = Format( "  %s%s ($%02X),x            ", EXECCOLOR.c_str()
-                                       , _curins._name.c_str()
+                                       , insNAME.c_str()
                                        , _read(pc));
     }
     else if(insMODE=="INY") // Indirect Indexed (y)
     {
         insstr = Format( "  %s%s ($%02X),y            ", EXECCOLOR.c_str()
-                                       , _curins._name.c_str()
+                                       , insNAME.c_str()
                                        , _read(pc));
     }
     else if(insMODE=="IMM")
@@ -643,7 +645,7 @@ void mos6502::Exec()
         auto immval = _read(pc);
 
         insstr = Format( "  %s%s #$%02X          ", EXECCOLOR.c_str()
-                                       , _curins._name.c_str()
+                                       , insNAME.c_str()
                                        , immval );
     }
     else if(insMODE=="ZER")
@@ -651,13 +653,13 @@ void mos6502::Exec()
         auto zerval = _read(pc);
 
         insstr = Format( "  %s%s $%02X          ", EXECCOLOR.c_str()
-                                       , _curins._name.c_str()
+                                       , insNAME.c_str()
                                        , zerval );
     }
     else
     {
         insstr = Format( "  %s%s(%s)          ", EXECCOLOR.c_str()
-                                               , _curins._name.c_str()
+                                               , insNAME.c_str()
                                                , insMODE.c_str() );
     }
     int len = 24-(insstr.length()-12);
@@ -674,9 +676,15 @@ void mos6502::Exec()
     if( nas.length() )
         outline += rgb256(255,255,0)+" | " + nas;
 
-    std::string bgcolor = (cycles&1) ? rgb256bg(0,0,64)
+    std::string bgcolor = (cycles==1) ? rgb256bg(64,64,64)
                                      : rgb256bg(0,0,0);
-    if( _pcCHG)
+    if(insNAME=="JMP")
+        bgcolor = rgb256bg(0,0,64);
+    else if(insNAME=="JSR")
+        bgcolor = rgb256bg(128,0,128);
+    else if(insNAME=="RTS")
+        bgcolor = rgb256bg(64,0,64);
+    else if( _pcCHG)
         bgcolor = rgb256bg(0,64,0);
     else if(_braNOCHG)
         bgcolor = rgb256bg(64,0,0);
