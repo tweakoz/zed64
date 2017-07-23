@@ -193,14 +193,25 @@ struct mos6502
 	// read/write callbacks
 	typedef void (*BusWrite)(uint16_t, uint8_t);
 	typedef uint8_t (*BusRead)(uint16_t);
-	BusRead Read;
-	BusWrite Write;
+
+    uint8_t Read(uint16_t addr);
+    void Write(uint16_t addr,uint8_t data);
+
+	BusRead _read;
+	BusWrite _write;
 	
 	// stack operations
 	inline void StackPush(uint8_t byte);
 	inline uint8_t StackPop();
 	
+    std::string compstatline();
+    std::string _accstring;
 
+    std::string getAccString();
+
+    bool _pcCHG;
+    bool _braNOCHG;
+    void setPC(uint16_t npc);
 
 public:
 	
@@ -211,17 +222,8 @@ public:
 	void Run(uint32_t n);
 };
 
-void ExecLog( const char* formatstring, ... );
 std::string Format( const char* formatstring, ... );
+std::string rgb256(int r,int g,int b);
+std::string rgb256bg(int r,int g,int b);
 
-#define RED     "\x1b[31m"
-#define GREEN   "\x1b[32m"
-#define YELLOW  "\x1b[33m"
-#define BLUE    "\x1b[34m"
-#define MAGENTA "\x1b[35m"
-#define CYAN    "\x1b[36m"
-#define HIL    "\x1b[37m"
-#define RESET   "\x1b[0m"
-
-#define NUMCOL "\x1b[36m"
-#define CHGCOL "\x1b[35m"
+#define RESETX "\033[m"

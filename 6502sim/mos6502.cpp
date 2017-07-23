@@ -7,8 +7,8 @@
 
 mos6502::mos6502(BusRead r, BusWrite w)
 {
-	Write = (BusWrite)w;
-	Read = (BusRead)r;
+	_write = (BusWrite)w;
+	_read = (BusRead)r;
 	Instr instr;
 		
     _amACC = {
@@ -76,6 +76,7 @@ mos6502::mos6502(BusRead r, BusWrite w)
 	InstrTable[0x65] = GENINS(ZER,ADC);
 	InstrTable[0x61] = GENINS(INX,ADC);
 	InstrTable[0x71] = GENINS(INY,ADC);
+    InstrTable[0x72] = GENINS(ZER,ADC);
 	InstrTable[0x75] = GENINS(ZEX,ADC);	
 	InstrTable[0x7D] = GENINS(ABX,ADC);
 	InstrTable[0x79] = GENINS(ABY,ADC);
@@ -133,6 +134,7 @@ mos6502::mos6502(BusRead r, BusWrite w)
 	InstrTable[0xCC] = GENINS(ABS,CPY);
 	InstrTable[0xC4] = GENINS(ZER,CPY);
 	
+    InstrTable[0x3A] = GENINS(IMP,DEC);
 	InstrTable[0xCE] = GENINS(ABS,DEC);
 	InstrTable[0xC6] = GENINS(ZER,DEC);
 	InstrTable[0xD6] = GENINS(ZEX,DEC);
@@ -150,6 +152,7 @@ mos6502::mos6502(BusRead r, BusWrite w)
 	InstrTable[0x5D] = GENINS(ABX,EOR);
 	InstrTable[0x59] = GENINS(ABY,EOR);
 	
+    InstrTable[0x1A] = GENINS(IMP,INC);
 	InstrTable[0xEE] = GENINS(ABS,INC);
 	InstrTable[0xE6] = GENINS(ZER,INC);
 	InstrTable[0xF6] = GENINS(ZEX,INC);
@@ -168,6 +171,7 @@ mos6502::mos6502(BusRead r, BusWrite w)
 	InstrTable[0xA5] = GENINS(ZER,LDA);
 	InstrTable[0xA1] = GENINS(INX,LDA);
 	InstrTable[0xB1] = GENINS(INY,LDA);
+    InstrTable[0xB2] = GENINS(ZER,LDA); //65c02 ZP
 	InstrTable[0xB5] = GENINS(ZEX,LDA);	
 	InstrTable[0xBD] = GENINS(ABX,LDA);
 	InstrTable[0xB9] = GENINS(ABY,LDA);
@@ -410,6 +414,8 @@ void mos6502::Reset()
 
 	illegalOpcode = false;
 	
+    printf( "%s%s", getAccString().c_str(),RESETX);
+
 	return;
 }
 
@@ -451,6 +457,96 @@ void mos6502::NMI()
 	pc = (Read(nmiVectorH) << 8) + Read(nmiVectorL);
 }
 
+auto RED = rgb256(255,0,0);
+auto GRN = rgb256(0,255,0);
+
+uint8_t mos6502::Read(uint16_t addr)
+{
+    auto data = _read(addr);
+    _accstring += Format( "%s(%04x:%02x)", GRN.c_str(),addr, data );
+    return data;
+}
+void mos6502::Write(uint16_t addr,uint8_t data)
+{
+    _accstring += Format( "%s(%04x:%02x)", RED.c_str(), addr, data );
+    _write(addr,data);
+}
+
+static std::string statusstring(uint8_t st)
+{
+    std::string rval = "";
+    if(st&1)
+        rval += "C";
+    if(st&2)
+        rval += "Z";
+    if(st&4)
+        rval += "I";
+    if(st&8)
+        rval += "D";
+    if(st&16)
+        rval += "B";
+    if(st&64)
+        rval += "V";
+    if(st&128)
+        rval += "S";
+    return rval;
+}
+
+std::string mos6502::compstatline()
+{
+    static auto CW = rgb256(255,255,255);
+    static auto CG = rgb256(128,128,128);
+    static auto NCH = rgb256(128,128,160);
+    static auto CH1 = rgb256(255,128,128);
+    static auto CH2 = rgb256(255,128,255);
+    static auto C1 = rgb256(128,128,224);
+    static auto C2 = rgb256(255,100,100);
+    static auto C3 = rgb256(0,160,160);
+    static auto CGX= rgb256(128,128,128);
+
+    auto PC = this->pc-1;
+    auto SP = this->sp;
+    auto X = this->X;
+    auto Y = this->Y;
+    auto A = this->A;
+    auto ST = statusstring(this->status);
+
+    static uint8_t LSP = SP;
+    static auto LST = ST;
+    static uint8_t LX = X;
+    static uint8_t LY = Y;
+    static uint8_t LA = A;
+
+    bool chg_sp = LSP!=SP;
+    bool chg_st = LST!=ST;
+    bool chg_a = LA!=A;
+    bool chg_x = LX!=X;
+    bool chg_y = LY!=Y;
+
+
+    LST = ST;
+    LSP = SP;
+    LA = A;
+    LX = X;
+    LY = Y;
+
+    std::string statusline = "";
+
+    statusline += CG+" pc:"+(_pcCHG?rgb256(255,255,0):CW)+Format( "%04X", PC );
+
+    statusline += (chg_sp?CH1:NCH)+" sp:"+(chg_sp?C2:C1)+Format("%02X",SP);
+    statusline += (chg_a?CH1:NCH)+" a:"+(chg_a?C2:C1)+Format("%02X",A);
+    statusline += (chg_x?CH1:NCH)+" x:"+(chg_x?C2:C1)+Format("%02X",X);
+    statusline += (chg_y?CH1:NCH)+" y:"+(chg_y?C2:C1)+Format("%02X",Y);
+    statusline += (chg_st?CH1:NCH)+" st:"+(chg_st?C2:C1)+Format("[%s]",ST.c_str());
+
+    int sizeline = statusline.length()-11*12;
+    int space = 38-sizeline;
+    statusline += "  ";
+
+    return Format( "%-*s", (int)statusline.length()+space, statusline.c_str() );
+}
+
 void mos6502::Run(uint32_t n)
 {
 	uint32_t start = cycles;
@@ -466,20 +562,141 @@ void mos6502::Run(uint32_t n)
 		
 		// execute
 		Exec();
-		
+
 		cycles++;
 	}
 }
 
+auto EXECCOLOR = rgb256(255,255,128);
+
 void mos6502::Exec()
 {
+
+    auto outline = compstatline();
+
+    _pcCHG = false;
+    _braNOCHG = false;
+
+    //printf( "%s", status.c_str() );
+    std::string insstr;
+    auto insMODE = _curins.addr._name;
+    if(insMODE == "IMP")
+    {
+        insstr = Format( "  %s%s          ", EXECCOLOR.c_str()
+                                   , _curins._name.c_str() );
+
+    }
+    else if(insMODE=="REL")
+    {        
+        auto offset = (uint16_t)_read(pc);
+        if (offset & 0x80) offset |= 0xFF00;    
+        auto addr = pc + 1 + (int16_t)offset;
+
+        insstr = Format( "  %s%s $%04X          ", EXECCOLOR.c_str()
+                                       , _curins._name.c_str()
+                                       , addr );
+    }
+    else if(insMODE=="ABS")
+    {
+        auto lo = _read(pc);
+        auto hi = _read(pc+1);
+        uint16_t addr = uint16_t(lo)|uint16_t(hi)<<8;
+
+        insstr = Format( "  %s%s $%04X          ", EXECCOLOR.c_str()
+                                       , _curins._name.c_str()
+                                       , addr );
+    }
+    else if(insMODE=="ABX")
+    {
+        auto lo = _read(pc);
+        auto hi = _read(pc+1);
+        uint16_t addr = uint16_t(lo)|uint16_t(hi)<<8;
+
+        insstr = Format( "  %s%s $%04X,x          ", EXECCOLOR.c_str()
+                                       , _curins._name.c_str()
+                                       , addr );
+    }
+    else if(insMODE=="ABY")
+    {
+        auto lo = _read(pc);
+        auto hi = _read(pc+1);
+        uint16_t addr = uint16_t(lo)|uint16_t(hi)<<8;
+
+        insstr = Format( "  %s%s $%04X,y          ", EXECCOLOR.c_str()
+                                       , _curins._name.c_str()
+                                       , addr );
+    }
+    else if(insMODE=="INX") // Indexed Indirect (x)
+    {
+        insstr = Format( "  %s%s ($%02X),x            ", EXECCOLOR.c_str()
+                                       , _curins._name.c_str()
+                                       , _read(pc));
+    }
+    else if(insMODE=="INY") // Indirect Indexed (y)
+    {
+        insstr = Format( "  %s%s ($%02X),y            ", EXECCOLOR.c_str()
+                                       , _curins._name.c_str()
+                                       , _read(pc));
+    }
+    else if(insMODE=="IMM")
+    {
+        auto immval = _read(pc);
+
+        insstr = Format( "  %s%s #$%02X          ", EXECCOLOR.c_str()
+                                       , _curins._name.c_str()
+                                       , immval );
+    }
+    else if(insMODE=="ZER")
+    {
+        auto zerval = _read(pc);
+
+        insstr = Format( "  %s%s $%02X          ", EXECCOLOR.c_str()
+                                       , _curins._name.c_str()
+                                       , zerval );
+    }
+    else
+    {
+        insstr = Format( "  %s%s(%s)          ", EXECCOLOR.c_str()
+                                               , _curins._name.c_str()
+                                               , insMODE.c_str() );
+    }
+    int len = 24-(insstr.length()-12);
+    outline += Format("%-*s", insstr.length()+len, insstr.c_str());
+
     auto addrmode = _curins.addr;
     auto addrcalc = addrmode.compute;
     assert(addrcalc!=nullptr);
 	uint16_t src = (this->*addrcalc)();
-    printf( RESET " %s(%s) " RESET, _curins._name.c_str(), _curins.addr._name.c_str() );
+
+    outline += getAccString();
 	(this->*_curins.code)(src);
-	printf( "\n");
+    auto nas = getAccString();
+    if( nas.length() )
+        outline += rgb256(255,255,0)+" | " + nas;
+
+    std::string bgcolor = (cycles&1) ? rgb256bg(0,0,64)
+                                     : rgb256bg(0,0,0);
+    if( _pcCHG)
+        bgcolor = rgb256bg(0,64,0);
+    else if(_braNOCHG)
+        bgcolor = rgb256bg(64,0,0);
+
+    outline = bgcolor+outline;
+
+	printf( "%s%s\n", outline.c_str(),RESETX);
+
+    if( illegalOpcode )
+    {
+        printf( "\n(ILLEGAL INSTRUCTION) exiting...\n");
+        exit(0);        
+    }
+}
+
+std::string mos6502::getAccString()
+{
+    auto rval = _accstring;
+    _accstring = "";
+    return rval;
 }
 
 
@@ -549,23 +766,35 @@ void mos6502::Op_ASL_ACC(uint16_t src)
     A = m;
 }
 
+void mos6502::setPC(uint16_t npc)
+{
+    pc = npc;
+    _pcCHG = true;
+}
+
 void mos6502::Op_BCC(uint16_t src)
 {
     if (!IF_CARRY())
-    	pc = src;
+    	setPC(src);
+    else
+        _braNOCHG = true;
 }
 
 
 void mos6502::Op_BCS(uint16_t src)
 {
     if (IF_CARRY())
-    	pc = src;
+        setPC(src);
+    else
+        _braNOCHG = true;
 }
 
 void mos6502::Op_BEQ(uint16_t src)
 {
     if (IF_ZERO())
-    	pc = src;
+        setPC(src);
+    else
+        _braNOCHG = true;
 }
 
 void mos6502::Op_BIT(uint16_t src)
@@ -580,19 +809,25 @@ void mos6502::Op_BIT(uint16_t src)
 void mos6502::Op_BMI(uint16_t src)
 {
     if (IF_NEGATIVE())
-    	pc = src;
+        setPC(src);
+    else
+        _braNOCHG = true;
 }
 
 void mos6502::Op_BNE(uint16_t src)
 {
     if (!IF_ZERO())
-    	pc = src;
+        setPC(src);
+    else
+        _braNOCHG = true;
 }
 
 void mos6502::Op_BPL(uint16_t src)
 {
     if (!IF_NEGATIVE())
-    	pc = src;
+        setPC(src);
+    else
+        _braNOCHG = true;
 }
 
 void mos6502::Op_BRK(uint16_t src)
@@ -602,19 +837,23 @@ void mos6502::Op_BRK(uint16_t src)
 	StackPush(pc & 0xFF);
 	StackPush(status | BREAK);
 	SET_INTERRUPT(1);
-	pc = (Read(irqVectorH) << 8) + Read(irqVectorL);
+    setPC((Read(irqVectorH) << 8) + Read(irqVectorL));
 }
 
 void mos6502::Op_BVC(uint16_t src)
 {
     if (!IF_OVERFLOW())
-    	pc = src;
+        setPC(src);
+    else
+        _braNOCHG = true;
 }
 
 void mos6502::Op_BVS(uint16_t src)
 {
     if (IF_OVERFLOW())
-    	pc = src;
+        setPC(src);
+    else
+        _braNOCHG = true;
 }
 
 void mos6502::Op_CLC(uint16_t src)
@@ -663,11 +902,22 @@ void mos6502::Op_CPY(uint16_t src)
 
 void mos6502::Op_DEC(uint16_t src)
 {
-	uint8_t m = Read(src);
-	m = (m - 1) % 256;
-    SET_NEGATIVE(m & 0x80);
-    SET_ZERO(!m);
-    Write(src, m);
+    if( _curins.addr._name=="IMP" )
+    {
+        uint8_t m = A;
+        m = (m - 1) % 256;
+        SET_NEGATIVE(m & 0x80);
+        SET_ZERO(!m);
+        A = m;
+    }
+    else
+    {
+    	uint8_t m = Read(src);
+    	m = (m - 1) % 256;
+        SET_NEGATIVE(m & 0x80);
+        SET_ZERO(!m);
+        Write(src, m);
+    }
 }
 
 void mos6502::Op_DEX(uint16_t src)
@@ -699,11 +949,22 @@ void mos6502::Op_EOR(uint16_t src)
 
 void mos6502::Op_INC(uint16_t src)
 {
-	uint8_t m = Read(src);
-	m = (m + 1) % 256;
-	SET_NEGATIVE(m & 0x80);
-    SET_ZERO(!m);
-    Write(src, m);
+    if( _curins.addr._name=="IMP" )
+    {
+        uint8_t m = A;
+        m = (m + 1) % 256;
+        SET_NEGATIVE(m & 0x80);
+        SET_ZERO(!m);
+        A=m;
+    }
+    else
+    {
+        uint8_t m = Read(src);
+        m = (m + 1) % 256;
+        SET_NEGATIVE(m & 0x80);
+        SET_ZERO(!m);
+        Write(src, m);
+    }
 }
 
 void mos6502::Op_INX(uint16_t src)
@@ -726,7 +987,7 @@ void mos6502::Op_INY(uint16_t src)
 
 void mos6502::Op_JMP(uint16_t src)
 {
-	pc = src;
+    setPC(src);
 }
 
 void mos6502::Op_JSR(uint16_t src)
@@ -734,7 +995,7 @@ void mos6502::Op_JSR(uint16_t src)
 	pc--;
 	StackPush((pc >> 8) & 0xFF);
 	StackPush(pc & 0xFF);
-	pc = src;
+    setPC(src);
 }
 
 void mos6502::Op_LDA(uint16_t src)
@@ -875,7 +1136,7 @@ void mos6502::Op_RTI(uint16_t src)
 	lo = StackPop();
 	hi = StackPop();
 	
-	pc = (hi << 8) | lo;
+   setPC((hi << 8) | lo);
 }
 
 void mos6502::Op_RTS(uint16_t src)
@@ -885,7 +1146,7 @@ void mos6502::Op_RTS(uint16_t src)
 	lo = StackPop();
 	hi = StackPop();
 	
-	pc = ((hi << 8) | lo) + 1;
+	setPC(((hi << 8) | lo) + 1);
 }
 
 void mos6502::Op_SBC(uint16_t src)
@@ -994,15 +1255,22 @@ std::string Format( const char* formatstring, ... )
     rval = formatbuffer;
     return rval;
 }
-void ExecLog( const char* formatstring, ... )
-{
-	if( 1 )
-	{
-	    char formatbuffer[512];
-	    va_list args;
-	    va_start(args, formatstring);
-	    vsnprintf( &formatbuffer[0], sizeof(formatbuffer), formatstring, args );
-	    va_end(args);
-	    printf( HIL "  %s  " RESET, formatbuffer );
-	}
+
+std::string rgb256(int r,int g,int b)
+{ 
+    int xr = int((r*5)/255);
+    int xg = int((g*5)/255);
+    int xb = int((b*5)/255);
+    int color = 16 + 36 * xr + 6 * xg + xb;
+    std::string rval = Format("\033[38;5;%03dm",color);
+    return rval;
+}
+std::string rgb256bg(int r,int g,int b)
+{ 
+    int xr = int((r*5)/255);
+    int xg = int((g*5)/255);
+    int xb = int((b*5)/255);
+    int color = 16 + 36 * xr + 6 * xg + xb;
+    std::string rval = Format("\033[48;5;%03dm",color);
+    return rval;
 }

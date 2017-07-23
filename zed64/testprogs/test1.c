@@ -5,10 +5,12 @@ int main()
 
 	char* dest = (char*) 0x4000;
 
-	int addr = 0;
+	int index = 0;
+    char value = 0;
+
 	while(1)
 	{
-		addr = (addr+11)%1000;
+        dest[index++] = value++;
 	}
 	return 0;
 }
