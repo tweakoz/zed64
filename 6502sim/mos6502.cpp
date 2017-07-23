@@ -747,6 +747,7 @@ void mos6502::Exec(Instr i)
 {
 	uint16_t src = (this->*i.addr)();
 	(this->*i.code)(src);
+	printf( "\n");
 }
 
 
@@ -758,6 +759,7 @@ void mos6502::Op_ILLEGAL(uint16_t src)
 
 void mos6502::Op_ADC(uint16_t src)
 {
+	ExecLog("ADC %04x", src );
 	uint8_t m = Read(src);
 	unsigned int tmp = m + A + (IF_CARRY() ? 1 : 0);
 	SET_ZERO(!(tmp & 0xFF));
@@ -787,6 +789,7 @@ void mos6502::Op_ADC(uint16_t src)
 
 void mos6502::Op_AND(uint16_t src)
 {
+	ExecLog("AND %04x", src );
 	uint8_t m = Read(src);
 	uint8_t res = m & A;
 	SET_NEGATIVE(res & 0x80);
@@ -798,6 +801,7 @@ void mos6502::Op_AND(uint16_t src)
 
 void mos6502::Op_ASL(uint16_t src)
 {
+	ExecLog("ASL %04x", src );
 	uint8_t m = Read(src);
     SET_CARRY(m & 0x80);
     m <<= 1;
@@ -822,6 +826,7 @@ void mos6502::Op_ASL_ACC(uint16_t src)
 
 void mos6502::Op_BCC(uint16_t src)
 {
+	ExecLog("BCC %04x", src );
     if (!IF_CARRY())
     {
     	pc = src;
@@ -832,6 +837,7 @@ void mos6502::Op_BCC(uint16_t src)
 
 void mos6502::Op_BCS(uint16_t src)
 {
+	ExecLog("BCS %04x", src );
     if (IF_CARRY())
     {
     	pc = src;
@@ -841,6 +847,7 @@ void mos6502::Op_BCS(uint16_t src)
 
 void mos6502::Op_BEQ(uint16_t src)
 {
+	ExecLog("BEQ %04x", src );
     if (IF_ZERO())
     {
     	pc = src;
@@ -850,6 +857,7 @@ void mos6502::Op_BEQ(uint16_t src)
 
 void mos6502::Op_BIT(uint16_t src)
 {
+	ExecLog("BIT %04x", src );
 	uint8_t m = Read(src);
 	uint8_t res = m & A;
 	SET_NEGATIVE(res & 0x80);
@@ -860,6 +868,7 @@ void mos6502::Op_BIT(uint16_t src)
 
 void mos6502::Op_BMI(uint16_t src)
 {
+	ExecLog("BMI %04x", src );
     if (IF_NEGATIVE())
     {
     	pc = src;
@@ -869,6 +878,7 @@ void mos6502::Op_BMI(uint16_t src)
 
 void mos6502::Op_BNE(uint16_t src)
 {
+	ExecLog("BNE %04x", src );
     if (!IF_ZERO())
     {
     	pc = src;
@@ -878,6 +888,7 @@ void mos6502::Op_BNE(uint16_t src)
 
 void mos6502::Op_BPL(uint16_t src)
 {
+	ExecLog("BPL %04x", src );
     if (!IF_NEGATIVE())
     {
     	pc = src;
@@ -887,6 +898,7 @@ void mos6502::Op_BPL(uint16_t src)
 
 void mos6502::Op_BRK(uint16_t src)
 {
+	ExecLog("BRK");
 	pc++;
 	StackPush((pc >> 8) & 0xFF);
 	StackPush(pc & 0xFF);
@@ -898,6 +910,7 @@ void mos6502::Op_BRK(uint16_t src)
 
 void mos6502::Op_BVC(uint16_t src)
 {
+	ExecLog("BVC %04x", src );
     if (!IF_OVERFLOW())
     {
     	pc = src;
@@ -907,6 +920,7 @@ void mos6502::Op_BVC(uint16_t src)
 
 void mos6502::Op_BVS(uint16_t src)
 {
+	ExecLog("BVS %04x", src );
     if (IF_OVERFLOW())
     {
     	pc = src;
@@ -916,30 +930,35 @@ void mos6502::Op_BVS(uint16_t src)
 
 void mos6502::Op_CLC(uint16_t src)
 {
+	ExecLog("CLC" );
 	SET_CARRY(0);
 	return;
 }
 
 void mos6502::Op_CLD(uint16_t src)
 {
+	ExecLog("CLD");
 	SET_DECIMAL(0);
 	return;
 }
 
 void mos6502::Op_CLI(uint16_t src)
 {
+	ExecLog("CLI");
 	SET_INTERRUPT(0);
 	return;
 }
 
 void mos6502::Op_CLV(uint16_t src)
 {
+	ExecLog("CLV");
 	SET_OVERFLOW(0);
 	return;
 }
 
 void mos6502::Op_CMP(uint16_t src)
 {
+	ExecLog("CMP %04x", src );
 	unsigned int tmp = A - Read(src);
 	SET_CARRY(tmp < 0x100);
 	SET_NEGATIVE(tmp & 0x80);
@@ -949,6 +968,7 @@ void mos6502::Op_CMP(uint16_t src)
 
 void mos6502::Op_CPX(uint16_t src)
 {
+	ExecLog("CPX %04x", src );
 	unsigned int tmp = X - Read(src);
 	SET_CARRY(tmp < 0x100);
 	SET_NEGATIVE(tmp & 0x80);
@@ -958,6 +978,7 @@ void mos6502::Op_CPX(uint16_t src)
 
 void mos6502::Op_CPY(uint16_t src)
 {
+	ExecLog("CPY %04x", src );
 	unsigned int tmp = Y - Read(src);
 	SET_CARRY(tmp < 0x100);
 	SET_NEGATIVE(tmp & 0x80);
@@ -967,6 +988,7 @@ void mos6502::Op_CPY(uint16_t src)
 
 void mos6502::Op_DEC(uint16_t src)
 {
+	ExecLog("DEC %04x", src );
 	uint8_t m = Read(src);
 	m = (m - 1) % 256;
     SET_NEGATIVE(m & 0x80);
@@ -977,6 +999,7 @@ void mos6502::Op_DEC(uint16_t src)
 
 void mos6502::Op_DEX(uint16_t src)
 {
+	ExecLog("DEX");
 	uint8_t m = X;
 	m = (m - 1) % 256;
 	SET_NEGATIVE(m & 0x80);
@@ -987,6 +1010,7 @@ void mos6502::Op_DEX(uint16_t src)
 
 void mos6502::Op_DEY(uint16_t src)
 {
+	ExecLog("DEY");
 	uint8_t m = Y;
 	m = (m - 1) % 256;
 	SET_NEGATIVE(m & 0x80);
@@ -997,6 +1021,7 @@ void mos6502::Op_DEY(uint16_t src)
 
 void mos6502::Op_EOR(uint16_t src)
 {
+	ExecLog("EOR %04x", src );
 	uint8_t m = Read(src);
 	m = A ^ m;
 	SET_NEGATIVE(m & 0x80);
@@ -1006,6 +1031,7 @@ void mos6502::Op_EOR(uint16_t src)
 
 void mos6502::Op_INC(uint16_t src)
 {
+	ExecLog("INC %04x", src );
 	uint8_t m = Read(src);
 	m = (m + 1) % 256;
 	SET_NEGATIVE(m & 0x80);
@@ -1015,6 +1041,7 @@ void mos6502::Op_INC(uint16_t src)
 
 void mos6502::Op_INX(uint16_t src)
 {
+	ExecLog("INX %04x\n", src );
 	uint8_t m = X;
 	m = (m + 1) % 256;
 	SET_NEGATIVE(m & 0x80);
@@ -1024,6 +1051,7 @@ void mos6502::Op_INX(uint16_t src)
 
 void mos6502::Op_INY(uint16_t src)
 {
+	ExecLog("INY %04x", src );
 	uint8_t m = Y;
 	m = (m + 1) % 256;
 	SET_NEGATIVE(m & 0x80);
@@ -1033,11 +1061,13 @@ void mos6502::Op_INY(uint16_t src)
 
 void mos6502::Op_JMP(uint16_t src)
 {
+	ExecLog("JMP %04x", src );
 	pc = src;
 }
 
 void mos6502::Op_JSR(uint16_t src)
 {
+	ExecLog("JSR %04x", src );
 	pc--;
 	StackPush((pc >> 8) & 0xFF);
 	StackPush(pc & 0xFF);
@@ -1046,6 +1076,7 @@ void mos6502::Op_JSR(uint16_t src)
 
 void mos6502::Op_LDA(uint16_t src)
 {
+	ExecLog("LDA %04x", src );
 	uint8_t m = Read(src);
 	SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
@@ -1054,6 +1085,7 @@ void mos6502::Op_LDA(uint16_t src)
 
 void mos6502::Op_LDX(uint16_t src)
 {
+	ExecLog("LDX %04x", src );
 	uint8_t m = Read(src);
 	SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
@@ -1062,6 +1094,7 @@ void mos6502::Op_LDX(uint16_t src)
 
 void mos6502::Op_LDY(uint16_t src)
 {
+	ExecLog("LDY %04x", src );
 	uint8_t m = Read(src);
 	SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
@@ -1070,6 +1103,7 @@ void mos6502::Op_LDY(uint16_t src)
 
 void mos6502::Op_LSR(uint16_t src)
 {
+	ExecLog("LSR %04x", src );
 	uint8_t m = Read(src);
 	SET_CARRY(m & 0x01);
 	m >>= 1;
@@ -1090,11 +1124,13 @@ void mos6502::Op_LSR_ACC(uint16_t src)
 
 void mos6502::Op_NOP(uint16_t src)
 {
+	ExecLog("NOP %04x", src );
 	return;
 }
 
 void mos6502::Op_ORA(uint16_t src)
 {
+	ExecLog("ORA %04x", src );
 	uint8_t m = Read(src);
 	m = A | m;
 	SET_NEGATIVE(m & 0x80);
@@ -1131,6 +1167,7 @@ void mos6502::Op_PLP(uint16_t src)
 
 void mos6502::Op_ROL(uint16_t src)
 {
+	ExecLog("ROL %04x", src );
 	uint16_t m = Read(src);
     m <<= 1;
     if (IF_CARRY()) m |= 0x01;
@@ -1157,6 +1194,7 @@ void mos6502::Op_ROL_ACC(uint16_t src)
 
 void mos6502::Op_ROR(uint16_t src)
 {
+	ExecLog("ROR %04x", src );
 	uint16_t m = Read(src);
     if (IF_CARRY()) m |= 0x100;
     SET_CARRY(m & 0x01);
@@ -1196,6 +1234,8 @@ void mos6502::Op_RTI(uint16_t src)
 
 void mos6502::Op_RTS(uint16_t src)
 {
+	ExecLog("RTS");
+
 	uint8_t lo, hi;
 	
 	lo = StackPop();
@@ -1207,6 +1247,7 @@ void mos6502::Op_RTS(uint16_t src)
 
 void mos6502::Op_SBC(uint16_t src)
 {
+	ExecLog("SBC %04x", src );
 	uint8_t m = Read(src);
 	unsigned int tmp = A - m - (IF_CARRY() ? 0 : 1);
 	SET_NEGATIVE(tmp & 0x80);
@@ -1228,6 +1269,7 @@ void mos6502::Op_SBC(uint16_t src)
 
 void mos6502::Op_SEC(uint16_t src)
 {
+	ExecLog("SEC" );
 	SET_CARRY(1);
 	return;
 }
@@ -1246,24 +1288,28 @@ void mos6502::Op_SEI(uint16_t src)
 
 void mos6502::Op_STA(uint16_t src)
 {
+	ExecLog("STA %04x", src );
 	Write(src, A);
 	return;
 }
 
 void mos6502::Op_STX(uint16_t src)
 {
+	ExecLog("STX %04x", src );
 	Write(src, X);
 	return;
 }
 
 void mos6502::Op_STY(uint16_t src)
 {
+	ExecLog("STY %04x", src );
 	Write(src, Y);
 	return;
 }
 
 void mos6502::Op_TAX(uint16_t src)
 {
+	ExecLog("TAX %04x", src );
 	uint8_t m = A;
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
@@ -1273,6 +1319,7 @@ void mos6502::Op_TAX(uint16_t src)
 
 void mos6502::Op_TAY(uint16_t src)
 {
+	ExecLog("TAY %04x", src );
 	uint8_t m = A;
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
@@ -1282,6 +1329,7 @@ void mos6502::Op_TAY(uint16_t src)
 
 void mos6502::Op_TSX(uint16_t src)
 {
+	ExecLog("TSX %04x", src );
 	uint8_t m = sp;
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
@@ -1291,6 +1339,7 @@ void mos6502::Op_TSX(uint16_t src)
 
 void mos6502::Op_TXA(uint16_t src)
 {
+	ExecLog("TXA %04x", src );
 	uint8_t m = X;
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
@@ -1300,12 +1349,15 @@ void mos6502::Op_TXA(uint16_t src)
 
 void mos6502::Op_TXS(uint16_t src)
 {
+	ExecLog("TXS %04x", src );
 	sp = X;
 	return;
 }
 
 void mos6502::Op_TYA(uint16_t src)
 {
+	ExecLog("TYA %04x", src );
+
 	uint8_t m = Y;
     SET_NEGATIVE(m & 0x80);
     SET_ZERO(!m);
@@ -1313,3 +1365,26 @@ void mos6502::Op_TYA(uint16_t src)
 	return;
 }
 
+std::string Format( const char* formatstring, ... )
+{
+	std::string rval;
+    char formatbuffer[512];
+    va_list args;
+    va_start(args, formatstring);
+    vsnprintf( &formatbuffer[0], sizeof(formatbuffer), formatstring, args );
+    va_end(args);
+    rval = formatbuffer;
+    return rval;
+}
+void ExecLog( const char* formatstring, ... )
+{
+	if( 1 )
+	{
+	    char formatbuffer[512];
+	    va_list args;
+	    va_start(args, formatstring);
+	    vsnprintf( &formatbuffer[0], sizeof(formatbuffer), formatstring, args );
+	    va_end(args);
+	    printf( GREEN "\n%s " RESET, formatbuffer );
+	}
+}

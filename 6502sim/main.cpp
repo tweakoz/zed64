@@ -10,13 +10,13 @@ uint8_t memory[65536];
 
 void busWrite( uint16_t addr, uint8_t data )
 {
-	printf( "write<%04x> : %02x\n", addr, data );
+	printf( RED "w(%04x:%02x) " RESET, addr, data );
 	memory[addr] = data;
 }
 uint8_t busRead( uint16_t addr )
 {
 	uint8_t data = memory[addr];
-	printf( "read<%04x> : %02x\n", addr, data );
+	printf( YELLOW "r(%04x:%02x) " RESET, addr, data );
 	return data;
 }
 
@@ -67,7 +67,17 @@ int main( int argc, const char** argv )
 		auto Y = cpu.Y;
 		auto A = cpu.A;
 		auto ST = cpu.status;
-		printf( "PC<%04x> SP<%04x> A<%02x> X<%02x> Y<%02x> ST<%02x>\n", PC, SP, A, X, Y, ST );
+
+		std::string statusline;
+
+
+		statusline += Format( HIL "PC<" NUMCOL "%04x" HIL "> ", PC );
+		statusline += Format( HIL " SP<" NUMCOL "%02x" HIL "> ", SP );
+		statusline += Format( HIL " A<" NUMCOL "%02x" HIL "> ", A );
+		statusline += Format( HIL " X<" NUMCOL "%02x" HIL "> ", X );
+		statusline += Format( HIL " Y<" NUMCOL "%02x" HIL "> ", Y );
+		statusline += Format( HIL " ST<" NUMCOL "%02x" HIL "> ", ST );
+		printf( "%s", statusline.c_str() );
 		cpu.Run(1);
 	}
 	return 0;
