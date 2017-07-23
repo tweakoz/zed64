@@ -630,7 +630,7 @@ void mos6502::Exec()
     }
     else if(insMODE=="INX") // Indexed Indirect (x)
     {
-        insstr = Format( "  %s%s ($%02X),x            ", EXECCOLOR.c_str()
+        insstr = Format( "  %s%s ($%02X,x)            ", EXECCOLOR.c_str()
                                        , insNAME.c_str()
                                        , _read(pc));
     }
