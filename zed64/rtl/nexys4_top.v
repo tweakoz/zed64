@@ -175,25 +175,25 @@ assign vgaHout = vgaH;
 ///////////////////////////////////
 
 wire cpu_clk = sys_clk;
-wire cpu_cs = 0;
 wire cpu_wr = 0;
-wire cpu_memrdy = 1;
-wire cpu_datavalid = 1;
 reg [7:0] cpu_datar;
 wire [7:0] cpu_dataw;
+wire cpu_rdy = 1;
+wire cpu_nmi = 0;
+wire cpu_irq = 0;
 
-m6502 CPU(  cpu_clk,
-            sys_reset,
-            cpu_cs,
-            cpu_wr,
-            cpu_addr,
-            cpu_memrdy,
-            cpu_datavalid,
-            cpu_datar,
-            cpu_dataw );
+cpu6502 CPU(  cpu_clk,
+              act_reset,
+              cpu_addr,
+              cpu_datar,
+              cpu_dataw,
+              cpu_wr,
+              cpu_irq,
+              cpu_nmi,
+              cpu_rdy );
 
 always @ (posedge cpu_clk,posedge act_reset) begin: latchmem
-    cpu_datar <= act_reset ? 0 : cpu_data;
+    cpu_datar <= sys_reset ? 0 : cpu_data;
 end // mem_io_update
 
 ///////////////////////////////////
