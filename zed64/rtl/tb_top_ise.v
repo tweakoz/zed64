@@ -76,30 +76,29 @@ initial begin
 
     $display("begin vidcon sim");
 
-    
-    n4t.dpa.mem[0] <= 8'ha2; // ldx
-    n4t.dpa.mem[1] <= 8'h00; // #$00
-    n4t.dpa.mem[2] <= 8'ha9; // lda
-    n4t.dpa.mem[3] <= 8'h00; // #$00
-    n4t.dpa.mem[4] <= 8'hc6; // dec
-    n4t.dpa.mem[5] <= 8'hff; // $ff
-    n4t.dpa.mem[6] <= 8'h4c; // jmp
-    n4t.dpa.mem[7] <= 8'h00; // $00
-    n4t.dpa.mem[8] <= 8'h00; //  00
-    n4t.dpa.mem[9] <= 23; // w
-    n4t.dpa.mem[10] <= 15; // o
-    n4t.dpa.mem[11] <= 18; // r
-    n4t.dpa.mem[12] <= 12; // l
-    n4t.dpa.mem[13] <= 4; // d
+    n4t.dpa.mem[16'h0200] <= 8'ha2; // ldx
+    n4t.dpa.mem[16'h0201] <= 8'h00; // #$00
+    n4t.dpa.mem[16'h0202] <= 8'ha9; // lda
+    n4t.dpa.mem[16'h0203] <= 8'h00; // #$00
+    n4t.dpa.mem[16'h0204] <= 8'hc6; // dec
+    n4t.dpa.mem[16'h0205] <= 8'hff; // $ff
+    n4t.dpa.mem[16'h0206] <= 8'h4c; // jmp
+    n4t.dpa.mem[16'h0207] <= 8'h00; // $00
+    n4t.dpa.mem[16'h0208] <= 8'h02; //  00
+    n4t.dpa.mem[16'h0100] <= 23; // w
+    n4t.dpa.mem[16'h0111] <= 15; // o
+    n4t.dpa.mem[16'h0112] <= 18; // r
+    n4t.dpa.mem[16'h0113] <= 12; // l
+    n4t.dpa.mem[16'h0114] <= 4; // d
 
-    n4t.dpa.mem[12'h0ff] <= 8'hff; // d
+    n4t.dpa.mem[16'h00ff] <= 8'h80; // d
 
-    n4t.dpa.mem[12'hffa] <= 0; // NMI
-    n4t.dpa.mem[12'hffb] <= 0; // NMI
-    n4t.dpa.mem[12'hffc] <= 0; // RESET
-    n4t.dpa.mem[12'hffd] <= 0; // RESET
-    n4t.dpa.mem[12'hffe] <= 0; // IRQ/BRK
-    n4t.dpa.mem[12'hfff] <= 3; // IRQ/BRK
+    n4t.dpa.mem[16'hfffa] <= 0; // NMI
+    n4t.dpa.mem[16'hfffb] <= 0; // NMI
+    n4t.dpa.mem[16'hfffc] <= 8'h00; // RESET
+    n4t.dpa.mem[16'hfffd] <= 8'h02; // RESET
+    n4t.dpa.mem[16'hfffe] <= 8'h00; // IRQ/BRK
+    n4t.dpa.mem[16'hffff] <= 8'h04; // IRQ/BRK
 
     #40
     sys_reset = 0;

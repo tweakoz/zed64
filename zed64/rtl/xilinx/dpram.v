@@ -8,17 +8,17 @@
 module DualPortRam (
     input a_clk,
     input a_wena,
-    input [11:0] a_addr,
+    input [15:0] a_addr,
     inout [7:0] a_data,
     input b_clk,
     input b_wena,
-    input [11:0] b_addr,
+    input [15:0] b_addr,
     inout [7:0] b_data
 );
 
 ///////////////////////////////////////////////////////////////////////////////
 
-reg [7:0] mem [0:4095];
+reg [7:0] mem [0:65535];
 reg [7:0] aout, bout;
 
 always @(negedge a_clk) begin: DPRAM_A_WRITE

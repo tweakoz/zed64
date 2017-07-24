@@ -140,8 +140,9 @@ end
 ///////////////////////////////////
 
 wire [15:0] cpu_addr;
+wire [15:0] chip_addr;
+
 wire [7:0] cpu_data;
-wire [12:0] chip_addr;
 wire [7:0] char_data;
 wire [7:0] rom2_data;
 wire [7:0] dpa_data;
@@ -204,11 +205,11 @@ assign cpu_data = cpu_wr ? cpu_dataw : 8'bz;
 
 DualPortRam dpa(  cpu_clk,
                   cpu_wr, //a_wena,
-                  cpu_addr[11:0], //a_addr
+                  cpu_addr[15:0], //a_addr
                   cpu_data, //a_data,
                   clkmux, //b_clk,
                   1'b0, //b_wena,
-                  chip_addr[11:0], //b_addr,
+                  chip_addr[15:0], //b_addr,
                   dpa_data ); //b_data );
 
 ///////////////////////////////////

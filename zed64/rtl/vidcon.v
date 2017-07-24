@@ -18,7 +18,7 @@ module vidcon (
     input [11:0] vsyncend,
     input [11:0] vtotal,
     input vsyncinvert,
-    output reg [12:0] vram_adr_out,
+    output reg [15:0] vram_adr_out,
     input [7:0] vram_dat_in,
     output [3:0] out_red,
     output [3:0] out_grn,
@@ -117,8 +117,8 @@ wire p5edge = phase5 | phase7;
 
 always @(posedge p5edge, posedge reset) begin: CHARCELL_ADDROUT
     vram_adr_out <= reset ? 0 
-                          : fphase5 ? {1'b1,charcell_addr}
-                                    : {1'b0,charcell[7:0], cell_row};
+                          : fphase5 ? {4'b1000,charcell_addr}
+                                    : {5'b01110,charcell[7:0], cell_row};
 end
 always @(negedge phase6, posedge reset) begin: CHARCELL_READ
     charcell <= (reset|hwrap) ? 0 : vram_dat_in;
