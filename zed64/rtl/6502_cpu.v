@@ -30,7 +30,7 @@ input IRQ;              // interrupt request
 input NMI;              // non-maskable interrupt request
 input RDY;              // Ready signal. Pauses CPU when RDY=0 
 
-cpu6502_inc INC();
+cpu6502_inc FSMSTATE();
 
 /*
  * internal signals
@@ -177,23 +177,23 @@ parameter
  */
 always @*
     case( state )
-        INC.DECODE:         if( (~I & IRQ) | NMI_edge )
+        FSMSTATE.DECODE:         if( (~I & IRQ) | NMI_edge )
                             PC_temp = { ABH, ABL };
                         else
                             PC_temp = PC;
 
 
-        INC.JMP1,
-        INC.JMPI1,
-        INC.JSR3,
-        INC.RTS3,           
-        INC.RTI4:           PC_temp = { DIMUX, ADD };
+        FSMSTATE.JMP1,
+        FSMSTATE.JMPI1,
+        FSMSTATE.JSR3,
+        FSMSTATE.RTS3,           
+        FSMSTATE.RTI4:           PC_temp = { DIMUX, ADD };
                         
-        INC.BRA1:           PC_temp = { ABH, ADD };
+        FSMSTATE.BRA1:           PC_temp = { ABH, ADD };
 
-        INC.BRA2:           PC_temp = { ADD, PCL };
+        FSMSTATE.BRA2:           PC_temp = { ADD, PCL };
 
-        INC.BRK2:           PC_temp =      res ? 16'hfffc : 
+        FSMSTATE.BRK2:           PC_temp =      res ? 16'hfffc : 
                                   NMI_edge ? 16'hfffa : 16'hfffe;
 
         default:        PC_temp = PC;
@@ -204,23 +204,23 @@ always @*
  */
 always @*
     case( state )
-        INC.DECODE:         if( (~I & IRQ) | NMI_edge )
+        FSMSTATE.DECODE:         if( (~I & IRQ) | NMI_edge )
                             PC_inc = 0;
                         else
                             PC_inc = 1;
 
-        INC.ABS0,
-        INC.ABSX0,
-        INC.FETCH,
-        INC.BRA0,
-        INC.BRA2,
-        INC.BRK3,
-        INC.JMPI1,
-        INC.JMP1,
-        INC.RTI4,
-        INC.RTS3:           PC_inc = 1;
+        FSMSTATE.ABS0,
+        FSMSTATE.ABSX0,
+        FSMSTATE.FETCH,
+        FSMSTATE.BRA0,
+        FSMSTATE.BRA2,
+        FSMSTATE.BRK3,
+        FSMSTATE.JMPI1,
+        FSMSTATE.JMP1,
+        FSMSTATE.RTI4,
+        FSMSTATE.RTS3:           PC_inc = 1;
 
-        INC.BRA1:           PC_inc = CO ^~ backwards;
+        FSMSTATE.BRA1:           PC_inc = CO ^~ backwards;
 
         default:        PC_inc = 0;
     endcase
@@ -242,47 +242,47 @@ parameter
 
 always @*
     case( state )
-        INC.ABSX1,
-        INC.INDX3,
-        INC.INDY2,
-        INC.JMP1,
-        INC.JMPI1,
-        INC.RTI4,
-        INC.ABS1:           AB = { DIMUX, ADD };
+        FSMSTATE.ABSX1,
+        FSMSTATE.INDX3,
+        FSMSTATE.INDY2,
+        FSMSTATE.JMP1,
+        FSMSTATE.JMPI1,
+        FSMSTATE.RTI4,
+        FSMSTATE.ABS1:           AB = { DIMUX, ADD };
 
-        INC.BRA2,
-        INC.INDY3,
-        INC.ABSX2:          AB = { ADD, ABL };
+        FSMSTATE.BRA2,
+        FSMSTATE.INDY3,
+        FSMSTATE.ABSX2:          AB = { ADD, ABL };
 
-        INC.BRA1:           AB = { ABH, ADD };
+        FSMSTATE.BRA1:           AB = { ABH, ADD };
 
-        INC.JSR0,
-        INC.PUSH1,
-        INC.RTS0,
-        INC.RTI0,
-        INC.BRK0:           AB = { STACKPAGE, regfile };
+        FSMSTATE.JSR0,
+        FSMSTATE.PUSH1,
+        FSMSTATE.RTS0,
+        FSMSTATE.RTI0,
+        FSMSTATE.BRK0:           AB = { STACKPAGE, regfile };
 
-        INC.BRK1,
-        INC.JSR1,
-        INC.PULL1,
-        INC.RTS1,
-        INC.RTS2,
-        INC.RTI1,
-        INC.RTI2,
-        INC.RTI3,
-        INC.BRK2:           AB = { STACKPAGE, ADD };
+        FSMSTATE.BRK1,
+        FSMSTATE.JSR1,
+        FSMSTATE.PULL1,
+        FSMSTATE.RTS1,
+        FSMSTATE.RTS2,
+        FSMSTATE.RTI1,
+        FSMSTATE.RTI2,
+        FSMSTATE.RTI3,
+        FSMSTATE.BRK2:           AB = { STACKPAGE, ADD };
         
-        INC.INDY1,
-        INC.INDX1,
-        INC.ZPX1,
-        INC.INDX2:          AB = { ZEROPAGE, ADD };
+        FSMSTATE.INDY1,
+        FSMSTATE.INDX1,
+        FSMSTATE.ZPX1,
+        FSMSTATE.INDX2:          AB = { ZEROPAGE, ADD };
 
-        INC.ZP0,
-        INC.INDY0:          AB = { ZEROPAGE, DIMUX };
+        FSMSTATE.ZP0,
+        FSMSTATE.INDY0:          AB = { ZEROPAGE, DIMUX };
 
-        INC.REG,
-        INC.READ,
-        INC.WRITE:          AB = { ABH, ABL };
+        FSMSTATE.REG,
+        FSMSTATE.READ,
+        FSMSTATE.WRITE:          AB = { ABH, ABL };
 
         default:        AB = PC;
     endcase
@@ -293,8 +293,8 @@ always @*
  * source of the address, such as the ALU or DI.
  */
 always @(posedge clk)
-    if( state != INC.PUSH0 && state != INC.PUSH1 && RDY && 
-        state != INC.PULL0 && state != INC.PULL1 && state != INC.PULL2 )
+    if( state != FSMSTATE.PUSH0 && state != FSMSTATE.PUSH1 && RDY && 
+        state != FSMSTATE.PULL0 && state != FSMSTATE.PULL1 && state != FSMSTATE.PULL2 )
     begin
         ABL <= AB[7:0];
         ABH <= AB[15:8];
@@ -305,17 +305,17 @@ always @(posedge clk)
  */
 always @*
     case( state )
-        INC.WRITE:   DO <= ADD;
+        FSMSTATE.WRITE:   DO <= ADD;
 
-        INC.JSR0,
-        INC.BRK0:    DO <= PCH;
+        FSMSTATE.JSR0,
+        FSMSTATE.BRK0:    DO <= PCH;
 
-        INC.JSR1,
-        INC.BRK1:    DO <= PCL;
+        FSMSTATE.JSR1,
+        FSMSTATE.BRK1:    DO <= PCL;
 
-        INC.PUSH1:   DO <= php ? P : ADD;
+        FSMSTATE.PUSH1:   DO <= php ? P : ADD;
 
-        INC.BRK2:    DO <= (IRQ | NMI_edge) ? (P & 8'b1110_1111) : P;
+        FSMSTATE.BRK2:    DO <= (IRQ | NMI_edge) ? (P & 8'b1110_1111) : P;
 
         default: DO <= regfile;
     endcase
@@ -326,20 +326,20 @@ always @*
 
 always @*
     case( state )
-        INC.BRK0,   // writing to stack or memory
-        INC.BRK1,
-        INC.BRK2,
-        INC.JSR0,
-        INC.JSR1,
-        INC.PUSH1,
-        INC.WRITE:   WE = 1;
+        FSMSTATE.BRK0,   // writing to stack or memory
+        FSMSTATE.BRK1,
+        FSMSTATE.BRK2,
+        FSMSTATE.JSR0,
+        FSMSTATE.JSR1,
+        FSMSTATE.PUSH1,
+        FSMSTATE.WRITE:   WE = 1;
 
-        INC.INDX3,  // only if doing a STA, STX or STY
-        INC.INDY3,
-        INC.ABSX2,
-        INC.ABS1,
-        INC.ZPX1,
-        INC.ZP0:     WE = store;
+        FSMSTATE.INDX3,  // only if doing a STA, STX or STY
+        FSMSTATE.INDY3,
+        FSMSTATE.ABSX2,
+        FSMSTATE.ABS1,
+        FSMSTATE.ZPX1,
+        FSMSTATE.ZP0:     WE = store;
 
         default: WE = 0;
     endcase
@@ -354,14 +354,14 @@ reg write_register;             // set when register file is written
 
 always @*
     case( state )
-        INC.DECODE: write_register = load_reg & ~plp;
+        FSMSTATE.DECODE: write_register = load_reg & ~plp;
 
-        INC.PULL1, 
-         INC.RTS2, 
-         INC.RTI3,
-         INC.BRK3,
-         INC.JSR0,
-         INC.JSR2 : write_register = 1;
+        FSMSTATE.PULL1, 
+         FSMSTATE.RTS2, 
+         FSMSTATE.RTI3,
+         FSMSTATE.BRK3,
+         FSMSTATE.JSR0,
+         FSMSTATE.JSR2 : write_register = 1;
 
        default: write_register = 0;
     endcase
@@ -406,13 +406,13 @@ end
 
 /*
  * write to a register. Usually this is the (BCD corrected) output of the
- * ALU, but in case of the INC.JSR0 we use the S register to temporarily store
+ * ALU, but in case of the FSMSTATE.JSR0 we use the S register to temporarily store
  * the PCL. This is possible, because the S register itself is stored in
  * the ALU during those cycles.
  */
 always @(posedge clk)
     if( write_register & RDY )
-        AXYS[regsel] <= (state == INC.JSR0) ? DIMUX : { ADD[7:4] + ADJH, ADD[3:0] + ADJL };
+        AXYS[regsel] <= (state == FSMSTATE.JSR0) ? DIMUX : { ADD[7:4] + ADJH, ADD[3:0] + ADJL };
 
 /*
  * register select logic. This determines which of the A, X, Y or
@@ -421,25 +421,25 @@ always @(posedge clk)
 
 always @*  
     case( state )
-        INC.INDY1,
-        INC.INDX0,
-        INC.ZPX0,
-        INC.ABSX0  : regsel = index_y ? SEL_Y : SEL_X;
+        FSMSTATE.INDY1,
+        FSMSTATE.INDX0,
+        FSMSTATE.ZPX0,
+        FSMSTATE.ABSX0  : regsel = index_y ? SEL_Y : SEL_X;
 
 
-        INC.DECODE : regsel = dst_reg; 
+        FSMSTATE.DECODE : regsel = dst_reg; 
 
-        INC.BRK0,
-        INC.BRK3,
-        INC.JSR0,
-        INC.JSR2,
-        INC.PULL0,
-        INC.PULL1,
-        INC.PUSH1,
-        INC.RTI0,
-        INC.RTI3,
-        INC.RTS0,
-        INC.RTS2   : regsel = SEL_S;
+        FSMSTATE.BRK0,
+        FSMSTATE.BRK3,
+        FSMSTATE.JSR0,
+        FSMSTATE.JSR2,
+        FSMSTATE.PULL0,
+        FSMSTATE.PULL1,
+        FSMSTATE.PUSH1,
+        FSMSTATE.RTI0,
+        FSMSTATE.RTI3,
+        FSMSTATE.RTS0,
+        FSMSTATE.RTS2   : regsel = SEL_S;
         
         default: regsel = src_reg; 
     endcase
@@ -454,7 +454,7 @@ ALU ALU( .clk(clk),
          .AI(AI),
          .BI(BI),
          .CI(CI),
-         .BCD(adc_bcd & (state == INC.FETCH)),
+         .BCD(adc_bcd & (state == FSMSTATE.FETCH)),
          .CO(CO),
          .OUT(ADD),
          .V(AV),
@@ -469,22 +469,22 @@ ALU ALU( .clk(clk),
 
 always @*
     case( state )
-        INC.READ:   alu_op = op;
+        FSMSTATE.READ:   alu_op = op;
 
-        INC.BRA1:   alu_op = backwards ? OP_SUB : OP_ADD; 
+        FSMSTATE.BRA1:   alu_op = backwards ? OP_SUB : OP_ADD; 
 
-        INC.FETCH,
-        INC.REG :   alu_op = op; 
+        FSMSTATE.FETCH,
+        FSMSTATE.REG :   alu_op = op; 
 
-        INC.DECODE,
-        INC.ABS1:   alu_op = 1'bx;
+        FSMSTATE.DECODE,
+        FSMSTATE.ABS1:   alu_op = 1'bx;
 
-        INC.PUSH1,
-        INC.BRK0,
-        INC.BRK1,
-        INC.BRK2,
-        INC.JSR0,
-        INC.JSR1:   alu_op = OP_SUB;
+        FSMSTATE.PUSH1,
+        FSMSTATE.BRK0,
+        FSMSTATE.BRK1,
+        FSMSTATE.BRK2,
+        FSMSTATE.JSR0,
+        FSMSTATE.JSR1:   alu_op = OP_SUB;
 
      default:   alu_op = OP_ADD;
     endcase
@@ -494,7 +494,7 @@ always @*
  */
 
 always @*
-    if( state == INC.FETCH || state == INC.REG || state == INC.READ )
+    if( state == FSMSTATE.FETCH || state == FSMSTATE.REG || state == FSMSTATE.READ )
         alu_shift_right = shift_right;
     else
         alu_shift_right = 0;
@@ -513,37 +513,37 @@ always @(posedge clk)
 
 always @*
     case( state )
-        INC.JSR1,
-        INC.RTS1,
-        INC.RTI1,
-        INC.RTI2,
-        INC.BRK1,
-        INC.BRK2,
-        INC.INDX1:  AI = ADD;
+        FSMSTATE.JSR1,
+        FSMSTATE.RTS1,
+        FSMSTATE.RTI1,
+        FSMSTATE.RTI2,
+        FSMSTATE.BRK1,
+        FSMSTATE.BRK2,
+        FSMSTATE.INDX1:  AI = ADD;
 
-        INC.REG,
-        INC.ZPX0,
-        INC.INDX0,
-        INC.ABSX0,
-        INC.RTI0,
-        INC.RTS0,
-        INC.JSR0,
-        INC.JSR2,
-        INC.BRK0,
-        INC.PULL0,
-        INC.INDY1,
-        INC.PUSH0,
-        INC.PUSH1:  AI = regfile;
+        FSMSTATE.REG,
+        FSMSTATE.ZPX0,
+        FSMSTATE.INDX0,
+        FSMSTATE.ABSX0,
+        FSMSTATE.RTI0,
+        FSMSTATE.RTS0,
+        FSMSTATE.JSR0,
+        FSMSTATE.JSR2,
+        FSMSTATE.BRK0,
+        FSMSTATE.PULL0,
+        FSMSTATE.INDY1,
+        FSMSTATE.PUSH0,
+        FSMSTATE.PUSH1:  AI = regfile;
 
-        INC.BRA0,
-        INC.READ:   AI = DIMUX;
+        FSMSTATE.BRA0,
+        FSMSTATE.READ:   AI = DIMUX;
 
-        INC.BRA1:   AI = ABH;       // don't use PCH in case we're 
+        FSMSTATE.BRA1:   AI = ABH;       // don't use PCH in case we're 
 
-        INC.FETCH:  AI = load_only ? 0 : regfile;
+        FSMSTATE.FETCH:  AI = load_only ? 0 : regfile;
 
-        INC.DECODE,
-        INC.ABS1:   AI = 8'hxx;     // don't care
+        FSMSTATE.DECODE,
+        FSMSTATE.ABS1:   AI = 8'hxx;     // don't care
 
         default:  AI = 0;
     endcase
@@ -555,29 +555,29 @@ always @*
 
 always @*
     case( state )
-         INC.BRA1,
-         INC.RTS1,
-         INC.RTI0,
-         INC.RTI1,
-         INC.RTI2,
-         INC.INDX1,
-         INC.READ,
-         INC.REG,
-         INC.JSR0,
-         INC.JSR1,
-         INC.JSR2,
-         INC.BRK0,
-         INC.BRK1,
-         INC.BRK2,
-         INC.PUSH0, 
-         INC.PUSH1,
-         INC.PULL0,
-         INC.RTS0:  BI = 8'h00;
+         FSMSTATE.BRA1,
+         FSMSTATE.RTS1,
+         FSMSTATE.RTI0,
+         FSMSTATE.RTI1,
+         FSMSTATE.RTI2,
+         FSMSTATE.INDX1,
+         FSMSTATE.READ,
+         FSMSTATE.REG,
+         FSMSTATE.JSR0,
+         FSMSTATE.JSR1,
+         FSMSTATE.JSR2,
+         FSMSTATE.BRK0,
+         FSMSTATE.BRK1,
+         FSMSTATE.BRK2,
+         FSMSTATE.PUSH0, 
+         FSMSTATE.PUSH1,
+         FSMSTATE.PULL0,
+         FSMSTATE.RTS0:  BI = 8'h00;
         
-         INC.BRA0:  BI = PCL;
+         FSMSTATE.BRA0:  BI = PCL;
 
-         INC.DECODE,
-         INC.ABS1:  BI = 8'hxx;
+         FSMSTATE.DECODE,
+         FSMSTATE.ABS1:  BI = 8'hxx;
 
          default:       BI = DIMUX;
     endcase
@@ -588,29 +588,29 @@ always @*
 
 always @*
     case( state )
-        INC.INDY2,
-        INC.BRA1,
-        INC.ABSX1:  CI = CO;
+        FSMSTATE.INDY2,
+        FSMSTATE.BRA1,
+        FSMSTATE.ABSX1:  CI = CO;
 
-        INC.DECODE,
-        INC.ABS1:   CI = 1'bx;
+        FSMSTATE.DECODE,
+        FSMSTATE.ABS1:   CI = 1'bx;
 
-        INC.READ,
-        INC.REG:    CI = rotate ? C :
+        FSMSTATE.READ,
+        FSMSTATE.REG:    CI = rotate ? C :
                      shift ? 0 : inc;
 
-        INC.FETCH:  CI = rotate  ? C : 
+        FSMSTATE.FETCH:  CI = rotate  ? C : 
                      compare ? 1 : 
                      (shift | load_only) ? 0 : C;
 
-        INC.PULL0,
-        INC.RTI0,
-        INC.RTI1,
-        INC.RTI2,
-        INC.RTS0,
-        INC.RTS1,
-        INC.INDY0,
-        INC.INDX1:  CI = 1; 
+        FSMSTATE.PULL0,
+        FSMSTATE.RTI0,
+        FSMSTATE.RTI1,
+        FSMSTATE.RTI2,
+        FSMSTATE.RTS0,
+        FSMSTATE.RTS1,
+        FSMSTATE.INDY0,
+        FSMSTATE.INDX1:  CI = 1; 
 
         default:        CI = 0;
     endcase
@@ -624,11 +624,11 @@ always @*
  * Update C flag when doing ADC/SBC, shift/rotate, compare
  */
 always @(posedge clk )
-    if( shift && state == INC.WRITE ) 
+    if( shift && state == FSMSTATE.WRITE ) 
         C <= CO;
-    else if( state == INC.RTI2 )
+    else if( state == FSMSTATE.RTI2 )
         C <= DIMUX[0];
-    else if( ~write_back && state == INC.DECODE ) begin
+    else if( ~write_back && state == FSMSTATE.DECODE ) begin
         if( adc_sbc | shift | compare )
             C <= CO;
         else if( plp )
@@ -644,11 +644,11 @@ always @(posedge clk )
  */
 
 always @(posedge clk) 
-    if( state == INC.WRITE ) 
+    if( state == FSMSTATE.WRITE ) 
         Z <= AZ;
-    else if( state == INC.RTI2 )
+    else if( state == FSMSTATE.RTI2 )
         Z <= DIMUX[1];
-    else if( state == INC.DECODE ) begin
+    else if( state == FSMSTATE.DECODE ) begin
         if( plp )
             Z <= ADD[1];
         else if( (load_reg & (regsel != SEL_S)) | compare | bit_ins )
@@ -656,16 +656,16 @@ always @(posedge clk)
     end
 
 always @(posedge clk)
-    if( state == INC.WRITE )
+    if( state == FSMSTATE.WRITE )
         N <= AN;
-    else if( state == INC.RTI2 )
+    else if( state == FSMSTATE.RTI2 )
         N <= DIMUX[7];
-    else if( state == INC.DECODE ) begin
+    else if( state == FSMSTATE.DECODE ) begin
         if( plp )
             N <= ADD[7];
         else if( (load_reg & (regsel != SEL_S)) | compare )
             N <= AN;
-    end else if( state == INC.FETCH && bit_ins ) 
+    end else if( state == FSMSTATE.FETCH && bit_ins ) 
         N <= DIMUX[7];
 
 /*
@@ -673,23 +673,23 @@ always @(posedge clk)
  */
 
 always @(posedge clk)
-    if( state == INC.BRK3 )
+    if( state == FSMSTATE.BRK3 )
         I <= 1;
-    else if( state == INC.RTI2 )
+    else if( state == FSMSTATE.RTI2 )
         I <= DIMUX[2];
-    else if( state == INC.REG ) begin
+    else if( state == FSMSTATE.REG ) begin
         if( sei ) I <= 1;
         if( cli ) I <= 0;
-    end else if( state == INC.DECODE )
+    end else if( state == FSMSTATE.DECODE )
         if( plp ) I <= ADD[2];
 
 /*
  * Update D flag
  */
 always @(posedge clk ) 
-    if( state == INC.RTI2 )
+    if( state == FSMSTATE.RTI2 )
         D <= DIMUX[3];
-    else if( state == INC.DECODE ) begin
+    else if( state == FSMSTATE.DECODE ) begin
         if( sed ) D <= 1;
         if( cld ) D <= 0;
         if( plp ) D <= ADD[3];
@@ -699,13 +699,13 @@ always @(posedge clk )
  * Update V flag
  */
 always @(posedge clk )
-    if( state == INC.RTI2 ) 
+    if( state == FSMSTATE.RTI2 ) 
         V <= DIMUX[6];
-    else if( state == INC.DECODE ) begin
+    else if( state == FSMSTATE.DECODE ) begin
         if( adc_sbc ) V <= AV;
         if( clv )     V <= 0;
         if( plp )     V <= ADD[6];
-    end else if( state == INC.FETCH && bit_ins ) 
+    end else if( state == FSMSTATE.FETCH && bit_ins ) 
         V <= DIMUX[6];
 
 /*
@@ -713,7 +713,7 @@ always @(posedge clk )
  */
 
 /*
- * IR register/mux. Hold previous DI value in IRHOLD in INC.PULL0 and INC.PUSH0
+ * IR register/mux. Hold previous DI value in IRHOLD in FSMSTATE.PULL0 and FSMSTATE.PUSH0
  * states. In these states, the IR has been prefetched, and there is no
  * time to read the IR again before the next decode.
  */
@@ -722,10 +722,10 @@ always @(posedge clk )
     if( reset )
         IRHOLD_valid <= 0;
     else if( RDY ) begin
-        if( state == INC.PULL0 || state == INC.PUSH0 ) begin
+        if( state == FSMSTATE.PULL0 || state == FSMSTATE.PUSH0 ) begin
             IRHOLD <= DIMUX;
             IRHOLD_valid <= 1;
-        end else if( state == INC.DECODE )
+        end else if( state == FSMSTATE.DECODE )
             IRHOLD_valid <= 0;
     end
 
@@ -746,11 +746,11 @@ assign DIMUX = ~RDY ? DIHOLD : DI;
 always @(posedge clk)
      if( reset )
          res <= 1;
-     else if( state == INC.DECODE )
+     else if( state == FSMSTATE.DECODE )
          res <= 0;
 
 always @(posedge clk)
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b0xx01010,    // ASLA, ROLA, LSRA, RORA
                 8'b0xxxxx01,    // ORA, AND, EOR, ADC
@@ -767,7 +767,7 @@ always @(posedge clk)
         endcase
 
 always @(posedge clk)
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b1110_1000,   // INX
                 8'b1100_1010,   // DEX
@@ -787,7 +787,7 @@ always @(posedge clk)
         endcase
 
 always @(posedge clk)
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b1011_1010:   // TSX 
                                 src_reg <= SEL_S; 
@@ -808,7 +808,7 @@ always @(posedge clk)
         endcase
 
 always @(posedge clk) 
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'bxxx1_0001,   // INDY
                 8'b10x1_x110,   // LDX/STX zpg/abs, Y
@@ -820,7 +820,7 @@ always @(posedge clk)
 
 
 always @(posedge clk)
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b100x_x1x0,   // STX, STY
                 8'b100x_xx01:   // STA
@@ -831,7 +831,7 @@ always @(posedge clk)
         endcase
 
 always @(posedge clk )
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b0xxx_x110,   // ASL, ROL, LSR, ROR
                 8'b11xx_x110:   // DEC/INC 
@@ -842,7 +842,7 @@ always @(posedge clk )
 
 
 always @(posedge clk )
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b101x_xxxx:   // LDA, LDX, LDY
                                 load_only <= 1;
@@ -850,7 +850,7 @@ always @(posedge clk )
         endcase
 
 always @(posedge clk )
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b111x_x110,   // INC 
                 8'b11x0_1000:   // INX, INY
@@ -860,7 +860,7 @@ always @(posedge clk )
         endcase
 
 always @(posedge clk )
-     if( (state == INC.DECODE || state == INC.BRK0) && RDY )
+     if( (state == FSMSTATE.DECODE || state == FSMSTATE.BRK0) && RDY )
         casex( IR )
                 8'bx11x_xx01:   // SBC, ADC
                                 adc_sbc <= 1;
@@ -869,7 +869,7 @@ always @(posedge clk )
         endcase
 
 always @(posedge clk )
-     if( (state == INC.DECODE || state == INC.BRK0) && RDY )
+     if( (state == FSMSTATE.DECODE || state == FSMSTATE.BRK0) && RDY )
         casex( IR )
                 8'b011x_xx01:   // ADC
                                 adc_bcd <= D;
@@ -878,7 +878,7 @@ always @(posedge clk )
         endcase
 
 always @(posedge clk )
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b0xxx_x110,   // ASL, ROL, LSR, ROR (abs, absx, zpg, zpgx)
                 8'b0xxx_1010:   // ASL, ROL, LSR, ROR (acc)
@@ -888,7 +888,7 @@ always @(posedge clk )
         endcase
 
 always @(posedge clk )
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b11x0_0x00,   // CPX, CPY (imm/zp)
                 8'b11x0_1100,   // CPX, CPY (abs)
@@ -899,7 +899,7 @@ always @(posedge clk )
         endcase
 
 always @(posedge clk )
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b01xx_xx10:   // ROR, LSR
                                 shift_right <= 1;
@@ -908,7 +908,7 @@ always @(posedge clk )
         endcase
 
 always @(posedge clk )
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b0x1x_1010,   // ROL A, ROR A
                 8'b0x1x_x110:   // ROR, ROL 
@@ -918,7 +918,7 @@ always @(posedge clk )
         endcase
 
 always @(posedge clk )
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b00xx_xx10:   // ROL, ASL
                                 op <= OP_ROL;
@@ -944,7 +944,7 @@ always @(posedge clk )
         endcase
 
 always @(posedge clk )
-     if( state == INC.DECODE && RDY )
+     if( state == FSMSTATE.DECODE && RDY )
         casex( IR )
                 8'b0010_x100:   // BIT zp/abs   
                                 bit_ins <= 1;
@@ -956,7 +956,7 @@ always @(posedge clk )
  * special instructions
  */
 always @(posedge clk )
-     if( state == INC.DECODE && RDY ) begin
+     if( state == FSMSTATE.DECODE && RDY ) begin
         php <= (IR == 8'h08);
         clc <= (IR == 8'h18);
         plp <= (IR == 8'h28);
@@ -992,7 +992,7 @@ always @(posedge clk)
     NMI_1 <= NMI;
 
 always @(posedge clk )
-    if( NMI_edge && state == INC.BRK3 )
+    if( NMI_edge && state == FSMSTATE.BRK3 )
         NMI_edge <= 0;
     else if( NMI & ~NMI_1 )
         NMI_edge <= 1;

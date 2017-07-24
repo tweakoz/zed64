@@ -17,108 +17,108 @@ module cpu6502_fsm( input clk,
 `endif
                      );
 
-cpu6502_inc INC();
+cpu6502_inc FSMSTATE();
 
 reg [5:0] state;
 assign outstate = state;
 
 always @(posedge clk or posedge reset)
     if( reset )
-        state <= INC.BRK0;
+        state <= FSMSTATE.BRK0;
     else if( RDY ) case( state )
-        INC.DECODE  : 
+        FSMSTATE.DECODE  : 
             casex ( IR )
-                8'b0000_0000:   state <= INC.BRK0;
-                8'b0010_0000:   state <= INC.JSR0;
-                8'b0010_1100:   state <= INC.ABS0;  // BIT abs
-                8'b0100_0000:   state <= INC.RTI0;  // 
-                8'b0100_1100:   state <= INC.JMP0;
-                8'b0110_0000:   state <= INC.RTS0;
-                8'b0110_1100:   state <= INC.JMPI0;
-                8'b0x00_1000:   state <= INC.PUSH0;
-                8'b0x10_1000:   state <= INC.PULL0;
-                8'b0xx1_1000:   state <= INC.REG;   // CLC, SEC, CLI, SEI 
-                8'b1xx0_00x0:   state <= INC.FETCH; // IMM
-                8'b1xx0_1100:   state <= INC.ABS0;  // X/Y abs
-                8'b1xxx_1000:   state <= INC.REG;   // DEY, TYA, ... 
-                8'bxxx0_0001:   state <= INC.INDX0;
-                8'bxxx0_01xx:   state <= INC.ZP0;
-                8'bxxx0_1001:   state <= INC.FETCH; // IMM
-                8'bxxx0_1101:   state <= INC.ABS0;  // even E column
-                8'bxxx0_1110:   state <= INC.ABS0;  // even E column
-                8'bxxx1_0000:   state <= INC.BRA0;  // odd 0 column
-                8'bxxx1_0001:   state <= INC.INDY0; // odd 1 column
-                8'bxxx1_01xx:   state <= INC.ZPX0;  // odd 4,5,6,7 columns
-                8'bxxx1_1001:   state <= INC.ABSX0; // odd 9 column
-                8'bxxx1_11xx:   state <= INC.ABSX0; // odd C, D, E, F columns
-                8'bxxxx_1010:   state <= INC.REG;   // <shift> A, TXA, ...  NOP
+                8'b0000_0000:   state <= FSMSTATE.BRK0;
+                8'b0010_0000:   state <= FSMSTATE.JSR0;
+                8'b0010_1100:   state <= FSMSTATE.ABS0;  // BIT abs
+                8'b0100_0000:   state <= FSMSTATE.RTI0;  // 
+                8'b0100_1100:   state <= FSMSTATE.JMP0;
+                8'b0110_0000:   state <= FSMSTATE.RTS0;
+                8'b0110_1100:   state <= FSMSTATE.JMPI0;
+                8'b0x00_1000:   state <= FSMSTATE.PUSH0;
+                8'b0x10_1000:   state <= FSMSTATE.PULL0;
+                8'b0xx1_1000:   state <= FSMSTATE.REG;   // CLC, SEC, CLI, SEI 
+                8'b1xx0_00x0:   state <= FSMSTATE.FETCH; // IMM
+                8'b1xx0_1100:   state <= FSMSTATE.ABS0;  // X/Y abs
+                8'b1xxx_1000:   state <= FSMSTATE.REG;   // DEY, TYA, ... 
+                8'bxxx0_0001:   state <= FSMSTATE.INDX0;
+                8'bxxx0_01xx:   state <= FSMSTATE.ZP0;
+                8'bxxx0_1001:   state <= FSMSTATE.FETCH; // IMM
+                8'bxxx0_1101:   state <= FSMSTATE.ABS0;  // even E column
+                8'bxxx0_1110:   state <= FSMSTATE.ABS0;  // even E column
+                8'bxxx1_0000:   state <= FSMSTATE.BRA0;  // odd 0 column
+                8'bxxx1_0001:   state <= FSMSTATE.INDY0; // odd 1 column
+                8'bxxx1_01xx:   state <= FSMSTATE.ZPX0;  // odd 4,5,6,7 columns
+                8'bxxx1_1001:   state <= FSMSTATE.ABSX0; // odd 9 column
+                8'bxxx1_11xx:   state <= FSMSTATE.ABSX0; // odd C, D, E, F columns
+                8'bxxxx_1010:   state <= FSMSTATE.REG;   // <shift> A, TXA, ...  NOP
             endcase
 
-        INC.ZP0     : state <= write_back ? INC.READ : INC.FETCH;
+        FSMSTATE.ZP0     : state <= write_back ? FSMSTATE.READ : FSMSTATE.FETCH;
 
-        INC.ZPX0    : state <= INC.ZPX1;
-        INC.ZPX1    : state <= write_back ? INC.READ : INC.FETCH;
+        FSMSTATE.ZPX0    : state <= FSMSTATE.ZPX1;
+        FSMSTATE.ZPX1    : state <= write_back ? FSMSTATE.READ : FSMSTATE.FETCH;
 
-        INC.ABS0    : state <= INC.ABS1;
-        INC.ABS1    : state <= write_back ? INC.READ : INC.FETCH;
+        FSMSTATE.ABS0    : state <= FSMSTATE.ABS1;
+        FSMSTATE.ABS1    : state <= write_back ? FSMSTATE.READ : FSMSTATE.FETCH;
 
-        INC.ABSX0   : state <= INC.ABSX1;
-        INC.ABSX1   : state <= (CO | store | write_back) ? INC.ABSX2 : INC.FETCH;
-        INC.ABSX2   : state <= write_back ? INC.READ : INC.FETCH;
+        FSMSTATE.ABSX0   : state <= FSMSTATE.ABSX1;
+        FSMSTATE.ABSX1   : state <= (CO | store | write_back) ? FSMSTATE.ABSX2 : FSMSTATE.FETCH;
+        FSMSTATE.ABSX2   : state <= write_back ? FSMSTATE.READ : FSMSTATE.FETCH;
 
-        INC.INDX0   : state <= INC.INDX1;
-        INC.INDX1   : state <= INC.INDX2;
-        INC.INDX2   : state <= INC.INDX3;
-        INC.INDX3   : state <= INC.FETCH;
+        FSMSTATE.INDX0   : state <= FSMSTATE.INDX1;
+        FSMSTATE.INDX1   : state <= FSMSTATE.INDX2;
+        FSMSTATE.INDX2   : state <= FSMSTATE.INDX3;
+        FSMSTATE.INDX3   : state <= FSMSTATE.FETCH;
 
-        INC.INDY0   : state <= INC.INDY1;
-        INC.INDY1   : state <= INC.INDY2;
-        INC.INDY2   : state <= (CO | store) ? INC.INDY3 : INC.FETCH;
-        INC.INDY3   : state <= INC.FETCH;
+        FSMSTATE.INDY0   : state <= FSMSTATE.INDY1;
+        FSMSTATE.INDY1   : state <= FSMSTATE.INDY2;
+        FSMSTATE.INDY2   : state <= (CO | store) ? FSMSTATE.INDY3 : FSMSTATE.FETCH;
+        FSMSTATE.INDY3   : state <= FSMSTATE.FETCH;
 
-        INC.READ    : state <= INC.WRITE;
-        INC.WRITE   : state <= INC.FETCH;
-        INC.FETCH   : state <= INC.DECODE;
+        FSMSTATE.READ    : state <= FSMSTATE.WRITE;
+        FSMSTATE.WRITE   : state <= FSMSTATE.FETCH;
+        FSMSTATE.FETCH   : state <= FSMSTATE.DECODE;
 
-        INC.REG     : state <= INC.DECODE;
+        FSMSTATE.REG     : state <= FSMSTATE.DECODE;
         
-        INC.PUSH0   : state <= INC.PUSH1;
-        INC.PUSH1   : state <= INC.DECODE;
+        FSMSTATE.PUSH0   : state <= FSMSTATE.PUSH1;
+        FSMSTATE.PUSH1   : state <= FSMSTATE.DECODE;
 
-        INC.PULL0   : state <= INC.PULL1;
-        INC.PULL1   : state <= INC.PULL2; 
-        INC.PULL2   : state <= INC.DECODE;
+        FSMSTATE.PULL0   : state <= FSMSTATE.PULL1;
+        FSMSTATE.PULL1   : state <= FSMSTATE.PULL2; 
+        FSMSTATE.PULL2   : state <= FSMSTATE.DECODE;
 
-        INC.JSR0    : state <= INC.JSR1;
-        INC.JSR1    : state <= INC.JSR2;
-        INC.JSR2    : state <= INC.JSR3;
-        INC.JSR3    : state <= INC.FETCH; 
+        FSMSTATE.JSR0    : state <= FSMSTATE.JSR1;
+        FSMSTATE.JSR1    : state <= FSMSTATE.JSR2;
+        FSMSTATE.JSR2    : state <= FSMSTATE.JSR3;
+        FSMSTATE.JSR3    : state <= FSMSTATE.FETCH; 
 
-        INC.RTI0    : state <= INC.RTI1;
-        INC.RTI1    : state <= INC.RTI2;
-        INC.RTI2    : state <= INC.RTI3;
-        INC.RTI3    : state <= INC.RTI4;
-        INC.RTI4    : state <= INC.DECODE;
+        FSMSTATE.RTI0    : state <= FSMSTATE.RTI1;
+        FSMSTATE.RTI1    : state <= FSMSTATE.RTI2;
+        FSMSTATE.RTI2    : state <= FSMSTATE.RTI3;
+        FSMSTATE.RTI3    : state <= FSMSTATE.RTI4;
+        FSMSTATE.RTI4    : state <= FSMSTATE.DECODE;
 
-        INC.RTS0    : state <= INC.RTS1;
-        INC.RTS1    : state <= INC.RTS2;
-        INC.RTS2    : state <= INC.RTS3;
-        INC.RTS3    : state <= INC.FETCH;
+        FSMSTATE.RTS0    : state <= FSMSTATE.RTS1;
+        FSMSTATE.RTS1    : state <= FSMSTATE.RTS2;
+        FSMSTATE.RTS2    : state <= FSMSTATE.RTS3;
+        FSMSTATE.RTS3    : state <= FSMSTATE.FETCH;
 
-        INC.BRA0    : state <= cond_true ? INC.BRA1 : INC.DECODE;
-        INC.BRA1    : state <= (CO ^ backwards) ? INC.BRA2 : INC.DECODE;
-        INC.BRA2    : state <= INC.DECODE;
+        FSMSTATE.BRA0    : state <= cond_true ? FSMSTATE.BRA1 : FSMSTATE.DECODE;
+        FSMSTATE.BRA1    : state <= (CO ^ backwards) ? FSMSTATE.BRA2 : FSMSTATE.DECODE;
+        FSMSTATE.BRA2    : state <= FSMSTATE.DECODE;
 
-        INC.JMP0    : state <= INC.JMP1;
-        INC.JMP1    : state <= INC.DECODE; 
+        FSMSTATE.JMP0    : state <= FSMSTATE.JMP1;
+        FSMSTATE.JMP1    : state <= FSMSTATE.DECODE; 
 
-        INC.JMPI0   : state <= INC.JMPI1;
-        INC.JMPI1   : state <= INC.JMP0;
+        FSMSTATE.JMPI0   : state <= FSMSTATE.JMPI1;
+        FSMSTATE.JMPI1   : state <= FSMSTATE.JMP0;
 
-        INC.BRK0    : state <= INC.BRK1;
-        INC.BRK1    : state <= INC.BRK2;
-        INC.BRK2    : state <= INC.BRK3;
-        INC.BRK3    : state <= INC.JMP0;
+        FSMSTATE.BRK0    : state <= FSMSTATE.BRK1;
+        FSMSTATE.BRK1    : state <= FSMSTATE.BRK2;
+        FSMSTATE.BRK2    : state <= FSMSTATE.BRK3;
+        FSMSTATE.BRK3    : state <= FSMSTATE.JMP0;
 
     endcase
 
@@ -133,56 +133,56 @@ assign outstatename = statename;
 
 always @*
     case( state )
-            INC.DECODE: statename = "DECODE";
-            INC.REG:    statename = "REG";
-            INC.ZP0:    statename = "ZP0";
-            INC.ZPX0:   statename = "ZPX0";
-            INC.ZPX1:   statename = "ZPX1";
-            INC.ABS0:   statename = "ABS0";
-            INC.ABS1:   statename = "ABS1";
-            INC.ABSX0:  statename = "ABSX0";
-            INC.ABSX1:  statename = "ABSX1";
-            INC.ABSX2:  statename = "ABSX2";
-            INC.INDX0:  statename = "INDX0";
-            INC.INDX1:  statename = "INDX1";
-            INC.INDX2:  statename = "INDX2";
-            INC.INDX3:  statename = "INDX3";
-            INC.INDY0:  statename = "INDY0";
-            INC.INDY1:  statename = "INDY1";
-            INC.INDY2:  statename = "INDY2";
-            INC.INDY3:  statename = "INDY3";
-            INC.READ:  statename = "READ";
-            INC.WRITE:  statename = "WRITE";
-            INC.FETCH:  statename = "FETCH";
-            INC.PUSH0:  statename = "PUSH0";
-            INC.PUSH1:  statename = "PUSH1";
-            INC.PULL0:  statename = "PULL0";
-            INC.PULL1:  statename = "PULL1";
-            INC.PULL2:  statename = "PULL2";
-            INC.JSR0:   statename = "JSR0";
-            INC.JSR1:   statename = "JSR1";
-            INC.JSR2:   statename = "JSR2";
-            INC.JSR3:   statename = "JSR3";
-            INC.RTI0:   statename = "RTI0";
-            INC.RTI1:   statename = "RTI1";
-            INC.RTI2:   statename = "RTI2";
-            INC.RTI3:   statename = "RTI3";
-            INC.RTI4:   statename = "RTI4";
-            INC.RTS0:   statename = "RTS0";
-            INC.RTS1:   statename = "RTS1";
-            INC.RTS2:   statename = "RTS2";
-            INC.RTS3:   statename = "RTS3";
-            INC.BRK0:   statename = "BRK0";
-            INC.BRK1:   statename = "BRK1";
-            INC.BRK2:   statename = "BRK2";
-            INC.BRK3:   statename = "BRK3";
-            INC.BRA0:   statename = "BRA0";
-            INC.BRA1:   statename = "BRA1";
-            INC.BRA2:   statename = "BRA2";
-            INC.JMP0:   statename = "JMP0";
-            INC.JMP1:   statename = "JMP1";
-            INC.JMPI0:  statename = "JMPI0";
-            INC.JMPI1:  statename = "JMPI1";
+            FSMSTATE.DECODE: statename = "DECODE";
+            FSMSTATE.REG:    statename = "REG";
+            FSMSTATE.ZP0:    statename = "ZP0";
+            FSMSTATE.ZPX0:   statename = "ZPX0";
+            FSMSTATE.ZPX1:   statename = "ZPX1";
+            FSMSTATE.ABS0:   statename = "ABS0";
+            FSMSTATE.ABS1:   statename = "ABS1";
+            FSMSTATE.ABSX0:  statename = "ABSX0";
+            FSMSTATE.ABSX1:  statename = "ABSX1";
+            FSMSTATE.ABSX2:  statename = "ABSX2";
+            FSMSTATE.INDX0:  statename = "INDX0";
+            FSMSTATE.INDX1:  statename = "INDX1";
+            FSMSTATE.INDX2:  statename = "INDX2";
+            FSMSTATE.INDX3:  statename = "INDX3";
+            FSMSTATE.INDY0:  statename = "INDY0";
+            FSMSTATE.INDY1:  statename = "INDY1";
+            FSMSTATE.INDY2:  statename = "INDY2";
+            FSMSTATE.INDY3:  statename = "INDY3";
+            FSMSTATE.READ:  statename = "READ";
+            FSMSTATE.WRITE:  statename = "WRITE";
+            FSMSTATE.FETCH:  statename = "FETCH";
+            FSMSTATE.PUSH0:  statename = "PUSH0";
+            FSMSTATE.PUSH1:  statename = "PUSH1";
+            FSMSTATE.PULL0:  statename = "PULL0";
+            FSMSTATE.PULL1:  statename = "PULL1";
+            FSMSTATE.PULL2:  statename = "PULL2";
+            FSMSTATE.JSR0:   statename = "JSR0";
+            FSMSTATE.JSR1:   statename = "JSR1";
+            FSMSTATE.JSR2:   statename = "JSR2";
+            FSMSTATE.JSR3:   statename = "JSR3";
+            FSMSTATE.RTI0:   statename = "RTI0";
+            FSMSTATE.RTI1:   statename = "RTI1";
+            FSMSTATE.RTI2:   statename = "RTI2";
+            FSMSTATE.RTI3:   statename = "RTI3";
+            FSMSTATE.RTI4:   statename = "RTI4";
+            FSMSTATE.RTS0:   statename = "RTS0";
+            FSMSTATE.RTS1:   statename = "RTS1";
+            FSMSTATE.RTS2:   statename = "RTS2";
+            FSMSTATE.RTS3:   statename = "RTS3";
+            FSMSTATE.BRK0:   statename = "BRK0";
+            FSMSTATE.BRK1:   statename = "BRK1";
+            FSMSTATE.BRK2:   statename = "BRK2";
+            FSMSTATE.BRK3:   statename = "BRK3";
+            FSMSTATE.BRA0:   statename = "BRA0";
+            FSMSTATE.BRA1:   statename = "BRA1";
+            FSMSTATE.BRA2:   statename = "BRA2";
+            FSMSTATE.JMP0:   statename = "JMP0";
+            FSMSTATE.JMP1:   statename = "JMP1";
+            FSMSTATE.JMPI0:  statename = "JMPI0";
+            FSMSTATE.JMPI1:  statename = "JMPI1";
     endcase
 
 //always @( PC )
