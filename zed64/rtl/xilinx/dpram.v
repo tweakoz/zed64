@@ -21,7 +21,7 @@ module DualPortRam (
 reg [7:0] mem [0:4095];
 reg [7:0] aout, bout;
 
-always @(posedge a_clk) begin: DPRAM_A_WRITE
+always @(negedge a_clk) begin: DPRAM_A_WRITE
     if (a_wena) begin
         mem[a_addr] <= a_data;
     end

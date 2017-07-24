@@ -175,9 +175,9 @@ assign vgaHout = vgaH;
 ///////////////////////////////////
 
 wire cpu_clk = sys_clk;
-wire cpu_wr = 0;
 reg [7:0] cpu_datar;
 wire [7:0] cpu_dataw;
+wire cpu_wr;
 wire cpu_rdy = 1;
 wire cpu_nmi = 0;
 wire cpu_irq = 0;
@@ -192,16 +192,18 @@ cpu6502 CPU(  cpu_clk,
               cpu_nmi,
               cpu_rdy );
 
-always @ (posedge cpu_clk,posedge act_reset) begin: latchmem
-    cpu_datar <= sys_reset ? 0 : cpu_data;
+always @ (posedge cpu_clk,posedge sys_reset) begin: latchmem
+    cpu_datar <= sys_reset ? cpu_data : 0;
 end // mem_io_update
+
+assign cpu_data = cpu_wr ? cpu_dataw : 8'bz;
 
 ///////////////////////////////////
 // DPRAM ports (a: cpu b: hw)
 ///////////////////////////////////
 
 DualPortRam dpa(  cpu_clk,
-                  1'b0, //a_wena,
+                  cpu_wr, //a_wena,
                   cpu_addr[11:0], //a_addr
                   cpu_data, //a_data,
                   clkmux, //b_clk,

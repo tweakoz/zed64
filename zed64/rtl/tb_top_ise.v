@@ -54,6 +54,9 @@ initial begin
     $dumpvars(0,n4t.CPU.PC_temp);
     $dumpvars(0,n4t.CPU.PC_inc);
     $dumpvars(0,n4t.CPU.IR);
+    $dumpvars(0,n4t.CPU.IRHOLD);
+    $dumpvars(0,n4t.CPU.DI);
+    $dumpvars(0,n4t.CPU.DIMUX);
     $dumpvars(0,n4t.CPU.A);
     $dumpvars(0,n4t.CPU.X);
     $dumpvars(0,n4t.CPU.Y);
@@ -74,16 +77,29 @@ initial begin
     $display("begin vidcon sim");
 
     
-    n4t.dpa.mem[0] <= 8'hc6; // dec
-    n4t.dpa.mem[1] <= 8'hff; // $ff
-    n4t.dpa.mem[2] <= 8'h4c; // jmp
-    n4t.dpa.mem[3] <= 8'h00; // $00
-    n4t.dpa.mem[4] <= 8'h00; //  00
-    n4t.dpa.mem[5] <= 23; // w
-    n4t.dpa.mem[6] <= 15; // o
-    n4t.dpa.mem[7] <= 18; // r
-    n4t.dpa.mem[8] <= 12; // l
-    n4t.dpa.mem[9] <= 4; // d
+    n4t.dpa.mem[0] <= 8'ha2; // ldx
+    n4t.dpa.mem[1] <= 8'h00; // #$00
+    n4t.dpa.mem[2] <= 8'ha9; // lda
+    n4t.dpa.mem[3] <= 8'h00; // #$00
+    n4t.dpa.mem[4] <= 8'hc6; // dec
+    n4t.dpa.mem[5] <= 8'hff; // $ff
+    n4t.dpa.mem[6] <= 8'h4c; // jmp
+    n4t.dpa.mem[7] <= 8'h00; // $00
+    n4t.dpa.mem[8] <= 8'h00; //  00
+    n4t.dpa.mem[9] <= 23; // w
+    n4t.dpa.mem[10] <= 15; // o
+    n4t.dpa.mem[11] <= 18; // r
+    n4t.dpa.mem[12] <= 12; // l
+    n4t.dpa.mem[13] <= 4; // d
+
+    n4t.dpa.mem[12'h0ff] <= 8'hff; // d
+
+    n4t.dpa.mem[12'hffa] <= 0; // NMI
+    n4t.dpa.mem[12'hffb] <= 0; // NMI
+    n4t.dpa.mem[12'hffc] <= 0; // RESET
+    n4t.dpa.mem[12'hffd] <= 0; // RESET
+    n4t.dpa.mem[12'hffe] <= 0; // IRQ/BRK
+    n4t.dpa.mem[12'hfff] <= 3; // IRQ/BRK
 
     #40
     sys_reset = 0;

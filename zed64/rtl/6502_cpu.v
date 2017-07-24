@@ -423,19 +423,19 @@ always @(posedge clk)
  */
 always @*
     case( state )
-        WRITE:   DO = ADD;
+        WRITE:   DO <= ADD;
 
         JSR0,
-        BRK0:    DO = PCH;
+        BRK0:    DO <= PCH;
 
         JSR1,
-        BRK1:    DO = PCL;
+        BRK1:    DO <= PCL;
 
-        PUSH1:   DO = php ? P : ADD;
+        PUSH1:   DO <= php ? P : ADD;
 
-        BRK2:    DO = (IRQ | NMI_edge) ? (P & 8'b1110_1111) : P;
+        BRK2:    DO <= (IRQ | NMI_edge) ? (P & 8'b1110_1111) : P;
 
-        default: DO = regfile;
+        default: DO <= regfile;
     endcase
 
 /*
@@ -847,8 +847,9 @@ always @(posedge clk )
             IRHOLD_valid <= 0;
     end
 
-assign IR = (IRQ & ~I) | NMI_edge ? 8'h00 :
-                     IRHOLD_valid ? IRHOLD : DIMUX;
+assign IR = (IRQ & ~I) | NMI_edge
+          ? 8'h00 
+          : IRHOLD_valid ? IRHOLD : DIMUX;
 
 always @(posedge clk )
     if( RDY )
