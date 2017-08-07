@@ -23,7 +23,7 @@ NX4ROOT = Z64ROOT+"/zed64"
 timescale = "1ns/1ns"
 
 def usage():
-    print "usage make.py prep|synver|synvhd|ise|sidasm"
+    print "usage make.py prep|synver|synvhd|ise|sidasm|sim|simv|compile|cc65test"
     sys.exit(0)
 
 ################################################33

@@ -1,0 +1,5 @@
+*.avr
+*.lst
+*.tok
+*.out
+parsetab.py
