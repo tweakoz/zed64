@@ -82,6 +82,31 @@ def getTokensOnLine(tok):
     return toks
 
 ###############################################################################
+# reassembler context data
+###############################################################################
+
+identifiers = {}
+labels = {}
+avr_opcodes = []
+avr_pc = 0
+MOS_OPC = 0
+
+###############################################################################
+# identifier (assignments)
+###############################################################################
+
+def onIdentifierAssignment(toklist):
+    tok = toklist[0].value
+    equ = toklist[1].value
+    val = toklist[2].value
+    numtok = len(toklist)
+    assert(numtok==3)
+    assert(equ=="=")
+    identifiers[tok]=val
+    print "%s = %s ; assign identifier" % (tok, val)
+
+
+###############################################################################
 # directives
 ###############################################################################
 
@@ -112,7 +137,9 @@ def onDirective(toklist):
 # opcodes
 ###############################################################################
 
+
 def onOpcode(toklist):
+    global avr_pc
     tok = toklist[0]
     outstr = None
     numtok = len(toklist)
@@ -182,19 +209,14 @@ def onOpcode(toklist):
     elif tok.value=="brne":
         assert(numtok == 2)
         dest = toklist[1].value
-        outstr = "BRNE %s ; branch if not equal" % (dest)
+        fi = labels[dest]
+        outstr = "BRNE %s (0x%04x) ; branch if not equal" % (dest,fi)
     #else:
     #    print "opcode(%s)" % tok.value
     if outstr:
-        print "\t%s ; <%d>" % (outstr,numtok)
-
-###############################################################################
-# identifier (assignments)
-###############################################################################
-
-def onIdentifier(toklist):
-    tok = toklist[0]
-    #print "identifier(%s)" % tok.value
+        print "[%04x]\t%s ; <%d>" % (avr_pc,outstr,numtok)
+    avr_opcodes.append(outstr)
+    avr_pc += 1
 
 ###############################################################################
 # run lexer
@@ -218,11 +240,13 @@ with open("test.tok","w") as fo:
             elif tok.type == "DIRECTIVE":
                 onDirective(getTokensOnLine(tok))
             elif tok.type == "IDENTIFIER":
-                onIdentifier(getTokensOnLine(tok))
+                onIdentifierAssignment(getTokensOnLine(tok))
             elif tok.type == "COMMENT":
                 print "%s" % tok.value
             elif tok.type == "LABELDEF":
-                print "%s" % tok.value
+                label = tok.value.replace(":","")
+                print "\n%s: ; label (avr_pc: 0x%04x)" % (label,avr_pc)
+                labels[label] = avr_pc
             else:
                 print "parse error: token<%s>" % tok
                 assert(False)
