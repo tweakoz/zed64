@@ -16,19 +16,19 @@ os.system("avr-objdump -t -S -d test.o > test.lst")
 import ply.lex as lex
 
 tokens = (
-   'LABELDEF',
    'IDENTIFIER',
    'DIRECTIVE',
    'HEXNUMBER',
    'NUMBER',
    "COMMENT",
    "OPCODE",
-   'STRING'
+   'STRING',
+   'NEWLINE'
 )
 
 literals = "+-*/()=:;,.@"
 
-t_LABELDEF= r'[_.]?[_a-zA-Z][_a-zA-Z0-9]*:'
+#t_LABELDEF= r'[_.]?[_a-zA-Z][_a-zA-Z0-9]*:'
 t_IDENTIFIER = r'[_.a-zA-Z][_.a-zA-Z0-9]*'
 t_DIRECTIVE = r'\.(stabn|stabs|stabd|stabn|file|text|global|type|section|startup|data|size|word|ident)'
 t_COMMENT = r'/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/'
@@ -38,9 +38,10 @@ t_HEXNUMBER = r'0[xX][\da-f]+'
 t_NUMBER = r'[\d]+'
 
 # Define a rule so we can track line numbers
-def t_newline(t):
+def t_NEWLINE(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
+    t.type = "NEWLINE"
 
 # A string containing ignored characters (spaces and tabs)
 t_ignore  = ' \t'
@@ -57,7 +58,8 @@ lexer = lex.lex() # Build the lexer
 # scan a lines worth of tokens
 ###############################################################################
 
-def getTokensOnLine(tok):
+def getTokensOnLine():
+    tok = lexer.token()
     toks = list()
     lex2 = lexer.clone()
     if tok==None:
@@ -82,7 +84,7 @@ def getTokensOnLine(tok):
     return toks
 
 ###############################################################################
-# reassembler context data
+# reassembler contextual data
 ###############################################################################
 
 identifiers = {}
@@ -112,26 +114,24 @@ def onIdentifierAssignment(toklist):
 
 def onDirective(toklist):
     tok = toklist[0]
-    '''
-    if tok.value == ".file":
-        print "file(%s)" % tok.value
-    if tok.value == ".global":
-        print "global(%s)" % tok.value
-    if tok.value == ".type":
-        print "type(%s)" % tok.value
-    if tok.value == ".size":
-        print "size(%s)" % tok.value
-    if tok.value == ".stabd":
-        print "stabd(%s)" % tok.value
-    if tok.value == ".stabn":
-        print "stabn(%s)" % tok.value
-    if tok.value == ".stabs":
-        print "stabs(%s)" % tok.value
-    if tok.value == ".section":
-        print "section(%s)" % tok.value
     if tok.value == ".word":
-        print "word(%s)" % tok.value
-    '''
+       print "word(%s) : %s" % (tok.value,toklist[1].value)
+
+###############################################################################
+
+_regmap = {
+    "r26": "XL",
+    "r27": "XH",
+    "r28": "YL",
+    "r29": "YH",
+    "r30": "ZL",
+    "r31": "ZH"
+}
+
+def mapreg(reg):
+    if reg in _regmap:
+        reg = _regmap[reg]
+    return reg
 
 ###############################################################################
 # opcodes
@@ -145,7 +145,7 @@ def onOpcode(toklist):
     numtok = len(toklist)
     this_avr_pc = avr_pc
     if tok.value=="ldi": #load immediate
-        reg = toklist[1].value
+        reg = mapreg(toklist[1].value)
         if numtok == 4:
             imm = toklist[3].value
             outstr = "LDI %s, %s ; load immediate" % (reg, imm)
@@ -165,7 +165,7 @@ def onOpcode(toklist):
         #for item in toklist:
         #    print item
     elif tok.value=="lds": # Load Direct from data space
-        reg = toklist[1].value
+        reg = mapreg(toklist[1].value)
         if numtok == 4:
             val = toklist[3].value
             outstr = "LDS %s, %s ; Load Direct from data space" % (reg, val)
@@ -177,40 +177,43 @@ def onOpcode(toklist):
             assert(false)
         avr_pc += 4
     elif tok.value=="add":
-        reg = toklist[1].value
+        reg = mapreg(toklist[1].value)
         assert(numtok == 4)
         val = toklist[3].value
         outstr = "ADD %s, %s ; add without carry" % (reg, val)
         avr_pc += 2
     elif tok.value=="adc":
-        reg = toklist[1].value
+        reg = mapreg(toklist[1].value)
         assert(numtok == 4)
         val = toklist[3].value
         outstr = "ADC %s, %s ; add witho carry" % (reg, val)
         avr_pc += 2
     elif tok.value=="adiw":
         assert(numtok == 4)
-        reg = toklist[1].value
+        reg = mapreg(toklist[1].value)
         assert(numtok == 4)
         val = toklist[3].value
         outstr = "ADIW %s, %s ; add immed w/ word" % (reg, val)
         avr_pc += 2
     elif tok.value=="st":
-        reg = toklist[1].value
+        reg = mapreg(toklist[1].value)
         assert(numtok == 4)
         val = toklist[3].value
-        outstr = "ST %s, %s ; Store Indirect From Register to data space using Index" % (reg, val)
+        if reg=="Z":
+            outstr = "ST %s, %s ; Store Indirect From Register to data space using Index Z" % (reg, val)
+        else:
+            assert(False)
         avr_pc += 2
     elif tok.value=="cpi":
         assert(numtok == 4)
-        reg = toklist[1].value
+        reg = mapreg(toklist[1].value)
         assert(numtok == 4)
         val = toklist[3].value
         outstr = "CPI %s, %s ; compare w/ immed" % (reg, val)
         avr_pc += 2
     elif tok.value=="cpc":
         assert(numtok == 4)
-        reg = toklist[1].value
+        reg = mapreg(toklist[1].value)
         assert(numtok == 4)
         val = toklist[3].value
         outstr = "CPC %s, %s ; compare w/ carry" % (reg, val)
@@ -228,37 +231,149 @@ def onOpcode(toklist):
     avr_opcodes.append(outstr)
 
 ###############################################################################
-# run lexer
+# Parsing rules
 ###############################################################################
 
+precedence = (
+    ('left', '+', '-'),
+    ('left', '*', '/'),
+    ('right', 'UMINUS'),
+)
+
+#######################################
+
+def p_directiveitem(p):
+    '''directiveitem : STRING 
+                     | IDENTIFIER
+                     | DIRECTIVE
+                     | ","
+                     | "@"
+                     | NUMBER
+                     | HEXNUMBER'''
+    print("diri <%s>" % p[1])
+
+def p_directiveitems(p):
+    '''directiveitems : directiveitem directiveitems
+       directiveitems : directiveitem'''
+    #print("diris <%s>" % p[1])
+
+#######################################
+
+def p_opcodeitem(p):
+    '''opcodeitem : expression 
+                  | "," '''
+
+def p_opcodeitems(p):
+    '''opcodeitems : opcodeitem opcodeitems
+       opcodeitems : opcodeitem'''
+
+#######################################
+
+def p_expression_binop(p):
+    '''expression : expression '+' expression
+                  | expression '-' expression
+                  | expression '*' expression
+                  | expression '/' expression'''
+    print("expbin <%s>" % p[1])
+    #if p[2] == '+':
+    #    p[0] = p[1] + p[3]
+    #elif p[2] == '-':
+    #    p[0] = p[1] - p[3]
+    #elif p[2] == '*':
+    #    p[0] = p[1] * p[3]
+    #elif p[2] == '/':
+    #    p[0] = p[1] / p[3]
+
+
+def p_expression_uminus(p):
+    "expression : '-' expression %prec UMINUS"
+    print("expumi <%s>" % p[1])
+    #p[0] = -p[2]
+
+
+def p_expression_group(p):
+    "expression : '(' expression ')'"
+    print("expgrp <%s>" % p[1])
+    #p[0] = p[2]
+
+
+def p_expression_number(p):
+    '''expression : NUMBER
+                  | HEXNUMBER'''
+    print("expnum <%s>" % p[1])
+    #p[0] = p[1]
+
+
+def p_expression_name(p):
+    "expression : IDENTIFIER"
+    print("expid <%s>" % p[1])
+    #try:
+    #    p[0] = identifiers[p[1]]
+    #except LookupError:
+    #    pass
+        #print("Undefined identifier '%s'" % p[1])
+        #p[0] = 0
+
+#######################################
+
+def p_statement_las(p):
+    'statement : IDENTIFIER ":"'
+    print("st_las <%s>" % p[1])
+    #print(p[1])
+
+def p_statement_assign(p):
+    'statement : IDENTIFIER "=" expression'
+    print("st_assign <%s>" % p[1])
+    #identifiers[p[1]] = p[3]
+
+def p_statement_expr(p):
+    'statement : expression'
+    print("st_expr <%s>" % p[1])
+    #print(p[1])
+
+def p_statement_opc(p):
+    'statement : OPCODE opcodeitems'
+    print("st_opc <%s>" % p[1])
+
+def p_statement_dir(p):
+    '''statement : DIRECTIVE directiveitems
+       statement : DIRECTIVE'''
+    print("st_dir <%s>" % p[1])
+
+def p_statement_com(p):
+    'statement : COMMENT'
+    print("st_com <%s>" % p[1])
+
+def p_statements(p):
+    '''statements : statement statements
+       statements : statement'''
+    #print("statements <%s>" % p[0])
+
+#######################################
+
+def p_compilationunit(p):
+    "compilationunit : statements"
+    #print("comu <%s>" % p[1])
+
+#######################################
+
+def p_error(p):
+    if p:
+        print("Syntax error at '%s'" % p.value)
+    else:
+        print("Syntax error at EOF")
+
+###############################################################################
+# run parser
+###############################################################################
+
+start = 'compilationunit'
+
+import ply.yacc as yacc
+yacc.yacc()
+
 with open("test.tok","w") as fo:
-  with open("test.avr","r") as f:
-    lines = f.readlines()
-    for l in lines:
-        lexer.input(l)
-        fo.write("############################\n")
-        fo.write(l)
-        fo.write("\n")
-        items = list()
-        while True:
-            tok = lexer.token()
-            if tok == None: 
-                break 
-            if tok.type == "OPCODE":
-                onOpcode(getTokensOnLine(tok))
-            elif tok.type == "DIRECTIVE":
-                onDirective(getTokensOnLine(tok))
-            elif tok.type == "IDENTIFIER":
-                onIdentifierAssignment(getTokensOnLine(tok))
-            elif tok.type == "COMMENT":
-                print "%s" % tok.value
-            elif tok.type == "LABELDEF":
-                label = tok.value.replace(":","")
-                print "\n%s: ; label (avr_pc: 0x%04x)" % (label,avr_pc)
-                labels[label] = avr_pc
-            else:
-                print "parse error: token<%s>" % tok
-                assert(False)
-            fo.write(str(tok))
-            fo.write("\n")
-            #yacc.parse(l)
+  with open("test.avr","r") as fin:
+    for line in fin:
+        yacc.parse(line,debug=False)
+    #yacc.parse(input)
