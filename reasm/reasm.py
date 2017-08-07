@@ -143,6 +143,7 @@ def onOpcode(toklist):
     tok = toklist[0]
     outstr = None
     numtok = len(toklist)
+    this_avr_pc = avr_pc
     if tok.value=="ldi": #load immediate
         reg = toklist[1].value
         if numtok == 4:
@@ -160,6 +161,7 @@ def onOpcode(toklist):
         else:
             outstr = "LDI %s, tokl<%d>" % (reg,numtok)
             assert(false)
+        avr_pc += 2
         #for item in toklist:
         #    print item
     elif tok.value=="lds": # Load Direct from data space
@@ -173,50 +175,57 @@ def onOpcode(toklist):
         else:
             outstr = "LDS %s, tokl<%d>" % (reg,numtok)
             assert(false)
+        avr_pc += 4
     elif tok.value=="add":
         reg = toklist[1].value
         assert(numtok == 4)
         val = toklist[3].value
         outstr = "ADD %s, %s ; add without carry" % (reg, val)
+        avr_pc += 2
     elif tok.value=="adc":
         reg = toklist[1].value
         assert(numtok == 4)
         val = toklist[3].value
         outstr = "ADC %s, %s ; add witho carry" % (reg, val)
+        avr_pc += 2
     elif tok.value=="adiw":
         assert(numtok == 4)
         reg = toklist[1].value
         assert(numtok == 4)
         val = toklist[3].value
         outstr = "ADIW %s, %s ; add immed w/ word" % (reg, val)
+        avr_pc += 2
     elif tok.value=="st":
         reg = toklist[1].value
         assert(numtok == 4)
         val = toklist[3].value
         outstr = "ST %s, %s ; Store Indirect From Register to data space using Index" % (reg, val)
+        avr_pc += 2
     elif tok.value=="cpi":
         assert(numtok == 4)
         reg = toklist[1].value
         assert(numtok == 4)
         val = toklist[3].value
         outstr = "CPI %s, %s ; compare w/ immed" % (reg, val)
+        avr_pc += 2
     elif tok.value=="cpc":
         assert(numtok == 4)
         reg = toklist[1].value
         assert(numtok == 4)
         val = toklist[3].value
         outstr = "CPC %s, %s ; compare w/ carry" % (reg, val)
+        avr_pc += 2
     elif tok.value=="brne":
         assert(numtok == 2)
         dest = toklist[1].value
         fi = labels[dest]
         outstr = "BRNE %s (0x%04x) ; branch if not equal" % (dest,fi)
+        avr_pc += 2
     #else:
     #    print "opcode(%s)" % tok.value
     if outstr:
-        print "[%04x]\t%s ; <%d>" % (avr_pc,outstr,numtok)
+        print "[%04x]\t%s ; <%d>" % (this_avr_pc,outstr,numtok)
     avr_opcodes.append(outstr)
-    avr_pc += 1
 
 ###############################################################################
 # run lexer
