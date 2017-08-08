@@ -303,8 +303,11 @@ def gen_6502_opcode_LDS(item):
         print addr, addrtype
         assert(False)
 
-    rval =  "lda $%04x\t; %s\n" % (addr,comment)
-    rval += "sta $%02x\t; %s" % (regno,comment)
+    if addr<256:
+        rval =  "lda  $%2x\t; %s\n" % (addr,comment)
+    else:
+        rval =  "lda  $%04x\t; %s\n" % (addr,comment)
+    rval += "sta  $%02x\t; %s" % (regno,comment)
     return rval;
 
 #############################
