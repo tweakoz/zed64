@@ -88,34 +88,10 @@ def getTokensOnLine():
 ###############################################################################
 
 identifiers = {}
-labels = {}
+_labels = {}
 avr_opcodes = []
 avr_pc = 0
 MOS_OPC = 0
-
-###############################################################################
-# identifier (assignments)
-###############################################################################
-
-def onIdentifierAssignment(toklist):
-    tok = toklist[0].value
-    equ = toklist[1].value
-    val = toklist[2].value
-    numtok = len(toklist)
-    assert(numtok==3)
-    assert(equ=="=")
-    identifiers[tok]=val
-    print "%s = %s ; assign identifier" % (tok, val)
-
-
-###############################################################################
-# directives
-###############################################################################
-
-def onDirective(toklist):
-    tok = toklist[0]
-    if tok.value == ".word":
-       print "word(%s) : %s" % (tok.value,toklist[1].value)
 
 ###############################################################################
 
@@ -128,107 +104,29 @@ _regmap = {
     "r31": "ZH"
 }
 
-def mapreg(reg):
-    if reg in _regmap:
-        reg = _regmap[reg]
-    return reg
+def mapitem(item):
+    if item in _regmap:
+        item = _regmap[item]
+    elif item in _labels:
+        item = "%s /* $%04x */" % (item,_labels[item])
+    return item
 
 ###############################################################################
 # opcodes
 ###############################################################################
 
-
-def onOpcode(toklist):
-    global avr_pc
-    tok = toklist[0]
-    outstr = None
-    numtok = len(toklist)
-    this_avr_pc = avr_pc
-    if tok.value=="ldi": #load immediate
-        reg = mapreg(toklist[1].value)
-        if numtok == 4:
-            imm = toklist[3].value
-            outstr = "LDI %s, %s ; load immediate" % (reg, imm)
-        elif numtok == 7:
-            assert(toklist[4].value=="(")
-            assert(toklist[6].value==")")
-            mod = toklist[3].value # lo8 - bits 0..7 
-                                   # hi8 - bits 8..15
-                                   # hh8 - bits 16..23
-                                   # hhi8 -bits 24..31
-            val = toklist[5].value
-            outstr = "LDI %s, %s(%s) ; load immediate(sub)" % (reg,mod,val)
-        else:
-            outstr = "LDI %s, tokl<%d>" % (reg,numtok)
-            assert(false)
-        avr_pc += 2
-        #for item in toklist:
-        #    print item
-    elif tok.value=="lds": # Load Direct from data space
-        reg = mapreg(toklist[1].value)
-        if numtok == 4:
-            val = toklist[3].value
-            outstr = "LDS %s, %s ; Load Direct from data space" % (reg, val)
-        elif numtok == 6:
-            val = toklist[3].value+toklist[4].value+toklist[5].value
-            outstr = "LDS %s, %s ; Load Direct from data space" % (reg, val)
-        else:
-            outstr = "LDS %s, tokl<%d>" % (reg,numtok)
-            assert(false)
-        avr_pc += 4
-    elif tok.value=="add":
-        reg = mapreg(toklist[1].value)
-        assert(numtok == 4)
-        val = toklist[3].value
-        outstr = "ADD %s, %s ; add without carry" % (reg, val)
-        avr_pc += 2
-    elif tok.value=="adc":
-        reg = mapreg(toklist[1].value)
-        assert(numtok == 4)
-        val = toklist[3].value
-        outstr = "ADC %s, %s ; add witho carry" % (reg, val)
-        avr_pc += 2
-    elif tok.value=="adiw":
-        assert(numtok == 4)
-        reg = mapreg(toklist[1].value)
-        assert(numtok == 4)
-        val = toklist[3].value
-        outstr = "ADIW %s, %s ; add immed w/ word" % (reg, val)
-        avr_pc += 2
-    elif tok.value=="st":
-        reg = mapreg(toklist[1].value)
-        assert(numtok == 4)
-        val = toklist[3].value
-        if reg=="Z":
-            outstr = "ST %s, %s ; Store Indirect From Register to data space using Index Z" % (reg, val)
-        else:
-            assert(False)
-        avr_pc += 2
-    elif tok.value=="cpi":
-        assert(numtok == 4)
-        reg = mapreg(toklist[1].value)
-        assert(numtok == 4)
-        val = toklist[3].value
-        outstr = "CPI %s, %s ; compare w/ immed" % (reg, val)
-        avr_pc += 2
-    elif tok.value=="cpc":
-        assert(numtok == 4)
-        reg = mapreg(toklist[1].value)
-        assert(numtok == 4)
-        val = toklist[3].value
-        outstr = "CPC %s, %s ; compare w/ carry" % (reg, val)
-        avr_pc += 2
-    elif tok.value=="brne":
-        assert(numtok == 2)
-        dest = toklist[1].value
-        fi = labels[dest]
-        outstr = "BRNE %s (0x%04x) ; branch if not equal" % (dest,fi)
-        avr_pc += 2
-    #else:
-    #    print "opcode(%s)" % tok.value
-    if outstr:
-        print "[%04x]\t%s ; <%d>" % (this_avr_pc,outstr,numtok)
-    avr_opcodes.append(outstr)
+opcode_table = {
+    "ldi":  {"adv": 2},    
+    "lds":  {"adv": 4},    
+    "add":  {"adv": 2},    
+    "adc":  {"adv": 2},    
+    "adiw": {"adv": 2},    
+    "st":   {"adv": 2},    
+    "cpi":  {"adv": 2},    
+    "cpc":  {"adv": 2},    
+    "brne": {"adv": 2},    
+    "ret": {"adv": 1},    
+}
 
 ###############################################################################
 # Parsing rules
@@ -285,9 +183,12 @@ class expr_node:
         self._b = b
     def __str__(self):
         if self._op:
-            return "expr_node( %s %s %s )" % (self._a,self._op,self._b)
+            a = mapitem(self._a)
+            b = mapitem(self._b)
+            return "expr_node( %s %s %s )" % (a,self._op,b)
         else:
-            return "expr_node( %s )" % (self._a)
+            a = mapitem(self._a)
+            return "expr_node( %s )" % (a)
 
 def p_expression_binop(p):
     '''expression : expression '+' expression
@@ -328,32 +229,50 @@ def p_expression_name(p):
 
 def p_statement_las(p):
     'statement : IDENTIFIER ":"'
-    def gen(v):
-        return "\n%s:\n" % v[1]
-    output_list.append([gen,p[:]])
+    def gen(data):
+        label = data[0]
+        pc = data[1]
+        return "\n%s: /* $%04x */\n" % (label,pc)
+    global avr_pc
+    label = p[1]
+    data = [label,avr_pc]
+    _labels[label] = avr_pc
+    output_list.append([gen,data])
 
 def p_statement_assign(p):
     'statement : IDENTIFIER "=" expression'
-    def gen(v):
-        return "  %s = %s\n" % (v[1],v[3])
+    def gen(data):
+        v = data
+        return "\t%s = %s" % (v[1],v[3])
     output_list.append([gen,p[:]])
+
 
 def p_statement_opc(p):
     '''statement : OPCODE opcodeitems
        statement : OPCODE'''
 
+
     def gen(data):
         c_p = data[0]
         c_o = data[1]
+        pc = data[2]
         outstr = ""
         for item in c_o:
-            outstr += "%s " % item
-        return "\t%s [ %s]" % (c_p[1],outstr )
+            mapped = mapitem(item)
+            outstr += "%s " % mapped
+        return "/* $%04x */ %s [ %s]" % (pc,c_p[1],outstr )
 
     global opcitems
-    data = [ p[:], opcitems[:] ]
+    global avr_pc
+    data = [ p[:], opcitems[:], avr_pc ]
     output_list.append( [gen,data] )
     opcitems = []
+
+    opcode_name = p[1]
+    assert(opcode_name in opcode_table)
+    opcode_data = opcode_table[opcode_name]
+    opcode_adv = opcode_data["adv"]
+    avr_pc += opcode_adv
 
 def p_statement_dir(p):
     '''statement : DIRECTIVE directiveitems
@@ -364,13 +283,18 @@ def p_statement_dir(p):
         c_o = data[1]
         outstr = ""
         for item in c_o:
-            outstr += "%s " % item
+            mapped = mapitem(item)
+            outstr += "%s " % mapped
         return "  %s [ %s]" % (c_p[1],outstr )
 
     global diritems
     data = [ p[:], diritems[:] ]
     output_list.append( [gen,data] )
     diritems = []
+    directive = p[1]
+    if directive == ".word":
+        global avr_pc
+        avr_pc += 2
 
 def p_statement_com(p):
     'statement : COMMENT'
