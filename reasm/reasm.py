@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 ###############################################################################
 
-import os
-import sys
-sys.path.insert(0, "../..")
+import os, sys
+from copy import deepcopy
 
 ###############################################################################
 
-os.system("avr-g++ -g -O3 test.cpp -S -o test.avr")
+os.system("avr-g++ -O3 test.cpp -S -o test.avr")
 os.system("avr-g++ -g -O3 test.cpp -o test.o")
 os.system("avr-objdump -t -S -d test.o > test.lst")
 
+###############################################################################
+# LEXER
 ###############################################################################
 
 import ply.lex as lex
@@ -28,7 +29,6 @@ tokens = (
 
 literals = "+-*/()=:;,.@"
 
-#t_LABELDEF= r'[_.]?[_a-zA-Z][_a-zA-Z0-9]*:'
 t_IDENTIFIER = r'[_.a-zA-Z][_.a-zA-Z0-9]*'
 t_DIRECTIVE = r'\.(stabn|stabs|stabd|stabn|file|text|global|type|section|startup|data|size|word|ident)'
 t_COMMENT = r'/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/'
@@ -55,45 +55,21 @@ def t_error(t):
 lexer = lex.lex() # Build the lexer
 
 ###############################################################################
-# scan a lines worth of tokens
-###############################################################################
-
-def getTokensOnLine():
-    tok = lexer.token()
-    toks = list()
-    lex2 = lexer.clone()
-    if tok==None:
-        return None
-    toks.append(tok)
-    done = False
-    count = 0
-    while False==done:
-        ntok = lex2.token()
-        #print ntok, tok
-        if ntok == None:
-            done = True 
-        else:
-          if ntok.lineno != tok.lineno:
-            done = True
-          else:
-            count+=1
-          for i in range(0,count):
-            tokx = lexer.token()
-            if tokx!=None:
-                toks.append(tokx)
-    return toks
-
-###############################################################################
 # reassembler contextual data
 ###############################################################################
 
-identifiers = {}
-_labels = {}
-avr_opcodes = []
-avr_pc = 0
-MOS_OPC = 0
-
-###############################################################################
+_opcode_table = {
+    "ldi":  {"adv": 2},    
+    "lds":  {"adv": 4},    
+    "add":  {"adv": 2},    
+    "adc":  {"adv": 2},    
+    "adiw": {"adv": 2},    
+    "st":   {"adv": 2},    
+    "cpi":  {"adv": 2},    
+    "cpc":  {"adv": 2},    
+    "brne": {"adv": 2},    
+    "ret":  {"adv": 1},    
+}
 
 _regmap = {
     "r26": "XL",
@@ -104,35 +80,36 @@ _regmap = {
     "r31": "ZH"
 }
 
-def mapitem(item):
+class context:
+  def __init__(self):
+    self._identifiers = {}
+    self._labels = {}
+    self._avr_pc = 0
+  def mapitem(self,item,rev=False):
     if item in _regmap:
         item = _regmap[item]
-    elif item in _labels:
-        item = "%s /* $%04x */" % (item,_labels[item])
+    elif item in self._labels:
+        if rev:
+            item = "%s /* $%04x */" % (item,self._labels[item])
+        else:
+            item = "$%04x /* %s */" % (self._labels[item],item)
+    elif item in self._identifiers:
+        if rev:
+            item = "%s /* %s */" % (item,self._identifiers[item])
+        else:
+            item = "%s /* %s */" % (self._identifiers[item],item)
+    elif item == ".":
+        if rev:
+            item = ". /* $%04x */" % (self._avr_pc)
+        else:
+            item = "$%04x /* . */" % (self._avr_pc)
     return item
 
-###############################################################################
-# opcodes
-###############################################################################
-
-opcode_table = {
-    "ldi":  {"adv": 2},    
-    "lds":  {"adv": 4},    
-    "add":  {"adv": 2},    
-    "adc":  {"adv": 2},    
-    "adiw": {"adv": 2},    
-    "st":   {"adv": 2},    
-    "cpi":  {"adv": 2},    
-    "cpc":  {"adv": 2},    
-    "brne": {"adv": 2},    
-    "ret": {"adv": 1},    
-}
+main_ctx = context()
 
 ###############################################################################
-# Parsing rules
+# PARSER
 ###############################################################################
-
-output_list = []
 
 precedence = (
     ('left', '+', '-'),
@@ -153,13 +130,11 @@ def p_directiveitem(p):
                      | "-"
                      | NUMBER
                      | HEXNUMBER'''
-    #print("diri <%s>" % p[1])
     diritems.append(p[1])
 
 def p_directiveitems(p):
     '''directiveitems : directiveitem directiveitems
        directiveitems : directiveitem'''
-    #print("diris <%s>" % p[1])
 
 #######################################
 
@@ -174,7 +149,7 @@ def p_opcodeitems(p):
     '''opcodeitems : opcodeitem opcodeitems
        opcodeitems : opcodeitem'''
 
-#######################################
+###############################################################################
 
 class expr_node:
     def __init__(self,a,op,b):
@@ -183,13 +158,13 @@ class expr_node:
         self._b = b
     def __str__(self):
         if self._op:
-            a = mapitem(self._a)
-            b = mapitem(self._b)
+            a = main_ctx.mapitem(self._a)
+            b = main_ctx.mapitem(self._b)
             return "expr_node( %s %s %s )" % (a,self._op,b)
         else:
-            a = mapitem(self._a)
+            a = main_ctx.mapitem(self._a)
             return "expr_node( %s )" % (a)
-
+###################
 def p_expression_binop(p):
     '''expression : expression '+' expression
                   | expression '-' expression
@@ -203,115 +178,173 @@ def p_expression_binop(p):
         p[0] = expr_node(p[1],"*",p[3])
     elif p[2] == '/':
         p[0] = expr_node(p[1],"/",p[3])
-
-
+###################
 def p_expression_uminus(p):
     "expression : '-' expression"
-    p[0] = expr_node(None,"-",p[2])
-
-
+    p[0] = expr_node(0,"-",p[2])
+###################
 def p_expression_group(p):
     "expression : '(' expression ')'"
     p[0] = p[2]
-
-
+###################
 def p_expression_number(p):
     '''expression : NUMBER
                   | HEXNUMBER'''
     p[0] = p[1]
-
-
+###################
 def p_expression_name(p):
     "expression : IDENTIFIER"
     p[0] = p[1]
 
-#######################################
+###############################################################################
+# label assignment
+###########################################################
 
-def p_statement_las(p):
+_output_items = []
+
+def p_statement_ASSIGNLABEL(p):
     'statement : IDENTIFIER ":"'
-    def gen(data):
+    ###################
+    def dump(item):
+        data = item["data"]
         label = data[0]
         pc = data[1]
         return "\n%s: /* $%04x */\n" % (label,pc)
-    global avr_pc
+    ###################
+    global main_ctx
     label = p[1]
-    data = [label,avr_pc]
-    _labels[label] = avr_pc
-    output_list.append([gen,data])
+    data = [label,main_ctx._avr_pc]
+    main_ctx._labels[label] = main_ctx._avr_pc
+    _output_items.append({"dump":dump,
+                          "data":data,
+                          "ctx":deepcopy(main_ctx)})
 
-def p_statement_assign(p):
+###########################################################
+# identifier assignment
+###########################################################
+
+def p_statement_ASSIGNIDENTIFIER(p):
     'statement : IDENTIFIER "=" expression'
-    def gen(data):
-        v = data
-        return "\t%s = %s" % (v[1],v[3])
-    output_list.append([gen,p[:]])
+    ###################
+    def dump(item):
+        data = item["data"]
+        return "%s = %s" % (data[0],data[1])
+    ###################
+    data = [p[1],p[3]]
+    main_ctx._identifiers[p[1]]=p[3]
+    _output_items.append({"dump":dump,
+                          "data":data,
+                          "ctx":deepcopy(main_ctx)})
 
+###########################################################
+# opcode
+###########################################################
 
-def p_statement_opc(p):
+def gen_6502_opcode(item):
+    ctx = item["ctx"]
+    opcitems = item["opcitems"]
+    pc = item["PC"]
+    avropcode = item["opcode"]
+    rval = None
+    if avropcode == "ldi":
+        dest = opcitems[0]
+        imm = opcitems[2]
+        if len(opcitems)==4:
+            immv = opcitems[3]
+            comment = "LDI %s, %s(#%s)" % (dest,imm,immv)
+            rval =  "lda #$%02x\t; %s\n" % (int(immv),comment)
+            regno = int(dest[1:])
+            rval += "sta  $%02x\t; %s" % (regno,comment)
+        elif len(opcitems)==3:
+            comment = "LDI %s, %s" % (dest,imm)
+            rval =  "lda #$%02x\t; %s\n" % (int(imm),comment)
+            regno = int(dest[1:])
+            rval += "sta  $%02x\t; %s" % (regno,comment)
+    return rval
+
+def p_statement_OPCODE(p):
     '''statement : OPCODE opcodeitems
        statement : OPCODE'''
-
-
-    def gen(data):
-        c_p = data[0]
-        c_o = data[1]
-        pc = data[2]
+    ###################
+    def dump(item):
+        ctx = item["ctx"]
+        avropc = item["opcode"]
+        opcitems = item["opcitems"]
+        pc = item["PC"]
         outstr = ""
-        for item in c_o:
-            mapped = mapitem(item)
+        for item in opcitems:
+            mapped = ctx.mapitem(item)
             outstr += "%s " % mapped
-        return "/* $%04x */ %s [ %s]" % (pc,c_p[1],outstr )
+        return "/* $%04x */ %s [ %s]" % (pc,avropc,outstr )
+    ###################
+    global opcitems, main_ctx
 
-    global opcitems
-    global avr_pc
-    data = [ p[:], opcitems[:], avr_pc ]
-    output_list.append( [gen,data] )
+    _output_items.append({"dump":dump,
+                          "gen6502":gen_6502_opcode,
+                          "opcode":p[1],
+                          "opcitems":opcitems[:],
+                          "PC":main_ctx._avr_pc,
+                          "ctx":main_ctx})
     opcitems = []
 
     opcode_name = p[1]
-    assert(opcode_name in opcode_table)
-    opcode_data = opcode_table[opcode_name]
+    assert(opcode_name in _opcode_table)
+    opcode_data = _opcode_table[opcode_name]
     opcode_adv = opcode_data["adv"]
-    avr_pc += opcode_adv
+    main_ctx._avr_pc += opcode_adv
 
-def p_statement_dir(p):
+###########################################################
+# directive
+###########################################################
+
+def p_statement_DIRECTIVE(p):
     '''statement : DIRECTIVE directiveitems
        statement : DIRECTIVE'''
-
-    def gen(data):
+    ###################
+    def dump(item):
+        data = item["data"]
+        ctx = item["ctx"]
         c_p = data[0]
         c_o = data[1]
+        directive = c_p[1]
         outstr = ""
-        for item in c_o:
-            mapped = mapitem(item)
+        for coitem in c_o:
+            mapped = ctx.mapitem(coitem,rev=True)
             outstr += "%s " % mapped
-        return "  %s [ %s]" % (c_p[1],outstr )
-
+        return "%s [ %s]" % (directive,outstr )
+    ###################
     global diritems
     data = [ p[:], diritems[:] ]
-    output_list.append( [gen,data] )
+    _output_items.append( {"dump":dump,"data":data,"ctx":deepcopy(main_ctx)} )
     diritems = []
     directive = p[1]
     if directive == ".word":
-        global avr_pc
-        avr_pc += 2
+        global main_ctx
+        main_ctx._avr_pc += 2
 
-def p_statement_com(p):
+###########################################################
+# comment
+###########################################################
+
+def p_statement_COMMENT(p):
     'statement : COMMENT'
-    def gen(v):
-        return "\n%s\n" % v[1]
-    output_list.append([gen,p[:]])
+    ###################
+    def gen(item):
+        data = item["data"]
+        return "%s" % data
+    ###################
+    _output_items.append({"dump":gen,"data":p[1]})
+
+###############################################################################
+# parser top level
+###############################################################################
 
 def p_statements(p):
     '''statements : statement statements
        statements : statement'''
 
-#######################################
-
 def p_compilationunit(p):
     "compilationunit : statements"
-
-#######################################
 
 def p_error(p):
     if p:
@@ -323,20 +356,44 @@ def p_error(p):
 # run parser
 ###############################################################################
 
-start = 'compilationunit'
+start = 'compilationunit' # parser root
 
 import ply.yacc as yacc
 yacc.yacc()
 
-with open("test.tok","w") as fo:
-  with open("test.avr","r") as fin:
-    output_list = []
-    for line in fin:
-        yacc.parse(line,debug=False)
-    for item in output_list:
-        gen = item[0]
-        p = item[1]
-        #print gen, p
-        str = gen(p)
-        print str
-    #yacc.parse(input)
+with open("test.avr","r") as fin:
+  ###########################################
+  # parse input, filling in _output_items
+  ###########################################
+  _output_items = []
+  for line in fin:
+    yacc.parse(line,debug=False)
+  ###########################################
+  # generate dump (from _output_items)
+  ###########################################
+  dump_strings = []
+  for item in _output_items:
+    dump = item["dump"]
+    str = dump(item)
+    dump_strings.append(str)
+  # write dump
+  with open("test.dump","w") as fout:
+    for item in dump_strings:
+        fout.write(item+"\n")
+        print item
+  ###########################################
+  # generate dump 6502 (from _output_items)
+  ###########################################
+  dump_strings = []
+  for item in _output_items:
+    if "gen6502" in item:
+      dump = item["gen6502"]
+      str = dump(item)
+      if str:
+          dump_strings.append(str)
+  # write dump6502
+  with open("test.dump6502","w") as fout:
+    for item in dump_strings:
+        fout.write(item+"\n")
+  ###########################################
+      

@@ -1,0 +1,10 @@
+lda #$00	; LDI r25, 0
+sta  $19	; LDI r25, 0
+lda #$00	; LDI r24, 0
+sta  $18	; LDI r24, 0
+lda #$01	; LDI r18, lo8(#1)
+sta  $12	; LDI r18, lo8(#1)
+lda #$00	; LDI r25, 0
+sta  $19	; LDI r25, 0
+lda #$00	; LDI r24, 0
+sta  $18	; LDI r24, 0
