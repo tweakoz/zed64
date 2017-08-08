@@ -1,10 +1,22 @@
-lda #$00	; LDI r25, 0
-sta  $19	; LDI r25, 0
-lda #$00	; LDI r24, 0
-sta  $18	; LDI r24, 0
-lda #$01	; LDI r18, lo8(#1)
-sta  $12	; LDI r18, lo8(#1)
-lda #$00	; LDI r25, 0
-sta  $19	; LDI r25, 0
-lda #$00	; LDI r24, 0
-sta  $18	; LDI r24, 0
+lda #$00	; /* $0000 */ ldi [ r25 , 0 ]
+sta  $19	; /* $0000 */ ldi [ r25 , 0 ]
+lda #$00	; /* $0002 */ ldi [ r24 , 0 ]
+sta  $18	; /* $0002 */ ldi [ r24 , 0 ]
+lda #$01	; /* $0004 */ ldi [ r18 , lo8 1 ]
+sta  $12	; /* $0004 */ ldi [ r18 , lo8 1 ]
+lda $0021	; /* $0006 */ lds [ ZL , $0021 /* TEST_PTR */ ]
+sta $1e	; /* $0006 */ lds [ ZL , $0021 /* TEST_PTR */ ]
+lda $0022	; /* $000a */ lds [ ZH , expr_node( $0021 /* TEST_PTR */ + 1 ) ]
+sta $1f	; /* $000a */ lds [ ZH , expr_node( $0021 /* TEST_PTR */ + 1 ) ]
+; /* $000e */ add [ ZL , r24 ]
+; /* $0010 */ adc [ ZH , r25 ]
+; /* $0012 */ st [ Z , r18 ]
+; /* $0014 */ adiw [ r24 , 1 ]
+; /* $0016 */ cpi [ r24 , 40 ]
+; /* $0018 */ cpc [ r25 , 1 /* __zero_reg__ */ ]
+; /* $001a */ brne [ $0006 /* .L2 */ ]
+lda #$00	; /* $001c */ ldi [ r25 , 0 ]
+sta  $19	; /* $001c */ ldi [ r25 , 0 ]
+lda #$00	; /* $001e */ ldi [ r24 , 0 ]
+sta  $18	; /* $001e */ ldi [ r24 , 0 ]
+rts         ; RET

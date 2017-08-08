@@ -85,24 +85,33 @@ class context:
     self._identifiers = {}
     self._labels = {}
     self._avr_pc = 0
-  def mapitem(self,item,rev=False):
+  def mapitem(self,item,rev=False,comment=True):
     if item in _regmap:
         item = _regmap[item]
     elif item in self._labels:
-        if rev:
+        if comment:
+          if rev:
             item = "%s /* $%04x */" % (item,self._labels[item])
-        else:
+          else:
             item = "$%04x /* %s */" % (self._labels[item],item)
+        else:
+            item = "%d" % (self._labels[item])
     elif item in self._identifiers:
-        if rev:
+        if comment:
+          if rev:
             item = "%s /* %s */" % (item,self._identifiers[item])
-        else:
+          else:
             item = "%s /* %s */" % (self._identifiers[item],item)
-    elif item == ".":
-        if rev:
-            item = ". /* $%04x */" % (self._avr_pc)
         else:
+            item = "%d" % (self._identifiers[item])
+    elif item == ".":
+        if comment:
+          if rev:
+            item = ". /* $%04x */" % (self._avr_pc)
+          else:
             item = "$%04x /* . */" % (self._avr_pc)
+        else:
+            item = "%d" % (self._avr_pc)
     return item
 
 main_ctx = context()
@@ -164,6 +173,15 @@ class expr_node:
         else:
             a = main_ctx.mapitem(self._a)
             return "expr_node( %s )" % (a)
+    def eval(self):
+        a = main_ctx.mapitem(self._a,comment=False)
+        b = main_ctx.mapitem(self._b,comment=False)
+        op = self._op
+        rval = None
+        if op == "+":
+            rval = int(a)+int(b)
+        return rval
+
 ###################
 def p_expression_binop(p):
     '''expression : expression '+' expression
@@ -240,27 +258,142 @@ def p_statement_ASSIGNIDENTIFIER(p):
 # opcode
 ###########################################################
 
-def gen_6502_opcode(item):
+def gen_6502_opcode_LDI(item):
     ctx = item["ctx"]
+    dump = item["dump"]
     opcitems = item["opcitems"]
     pc = item["PC"]
-    avropcode = item["opcode"]
     rval = None
-    if avropcode == "ldi":
-        dest = opcitems[0]
-        imm = opcitems[2]
-        if len(opcitems)==4:
-            immv = opcitems[3]
-            comment = "LDI %s, %s(#%s)" % (dest,imm,immv)
-            rval =  "lda #$%02x\t; %s\n" % (int(immv),comment)
-            regno = int(dest[1:])
-            rval += "sta  $%02x\t; %s" % (regno,comment)
-        elif len(opcitems)==3:
-            comment = "LDI %s, %s" % (dest,imm)
-            rval =  "lda #$%02x\t; %s\n" % (int(imm),comment)
-            regno = int(dest[1:])
-            rval += "sta  $%02x\t; %s" % (regno,comment)
+    dest = opcitems[0]
+    imm = opcitems[2]
+    comment = dump(item)
+    if len(opcitems)==4:
+        immv = opcitems[3]
+        rval =  "lda #$%02x\t; %s\n" % (int(immv),comment)
+        regno = int(dest[1:])
+        rval += "sta  $%02x\t; %s" % (regno,comment)
+    elif len(opcitems)==3:
+        rval =  "lda #$%02x\t; %s\n" % (int(imm),comment)
+        regno = int(dest[1:])
+        rval += "sta  $%02x\t; %s" % (regno,comment)
     return rval
+
+#############################
+
+def gen_6502_opcode_LDS(item):
+    ctx = item["ctx"]
+    dump = item["dump"]
+    opcitems = item["opcitems"]
+    dest = opcitems[0]
+    regno = int(dest[1:])
+    pc = item["PC"]
+    comment = dump(item)
+    
+    addr = ctx.mapitem(opcitems[2],comment=False)
+    
+    addrtype = type(addr)
+
+    if addrtype == type(str):
+        addr = int(addr)
+    elif addrtype == type(int):
+        addr = addr
+    elif isinstance(addr,expr_node):
+        addr = addr.eval()
+    else:
+        print addr, addrtype
+        assert(False)
+
+    rval =  "lda $%04x\t; %s\n" % (addr,comment)
+    rval += "sta $%02x\t; %s" % (regno,comment)
+    return rval;
+
+#############################
+
+def gen_6502_opcode_ST(item):
+    ctx = item["ctx"]
+    dump = item["dump"]
+    comment = dump(item)
+    return "; %s" % comment
+
+#############################
+
+def gen_6502_opcode_ADD(item):
+    ctx = item["ctx"]
+    dump = item["dump"]
+    comment = dump(item)
+    return "; %s" % comment
+
+#############################
+
+def gen_6502_opcode_ADC(item):
+    ctx = item["ctx"]
+    dump = item["dump"]
+    comment = dump(item)
+    return "; %s" % comment
+
+#############################
+
+def gen_6502_opcode_ADIW(item):
+    ctx = item["ctx"]
+    dump = item["dump"]
+    comment = dump(item)
+    return "; %s" % comment
+
+#############################
+
+def gen_6502_opcode_CPI(item):
+    ctx = item["ctx"]
+    dump = item["dump"]
+    comment = dump(item)
+    return "; %s" % comment
+
+#############################
+
+def gen_6502_opcode_CPC(item):
+    ctx = item["ctx"]
+    dump = item["dump"]
+    comment = dump(item)
+    return "; %s" % comment
+
+#############################
+
+def gen_6502_opcode_BRNE(item):
+    ctx = item["ctx"]
+    dump = item["dump"]
+    comment = dump(item)
+    return "; %s" % comment
+
+#############################
+
+def gen_6502_opcode_RET(item):
+    return "rts         ; RET"
+
+#############################
+
+def gen_6502_opcode(item):
+    avropcode = item["opcode"]
+    if avropcode == "ldi":
+        return gen_6502_opcode_LDI(item)
+    elif avropcode == "lds":
+        return gen_6502_opcode_LDS(item)
+    elif avropcode == "st":
+        return gen_6502_opcode_ST(item)
+    elif avropcode == "add":
+        return gen_6502_opcode_ADD(item)
+    elif avropcode == "adc":
+        return gen_6502_opcode_ADC(item)
+    elif avropcode == "adiw":
+        return gen_6502_opcode_ADIW(item)
+    elif avropcode == "cpi":
+        return gen_6502_opcode_CPI(item)
+    elif avropcode == "cpc":
+        return gen_6502_opcode_CPC(item)
+    elif avropcode == "brne":
+        return gen_6502_opcode_BRNE(item)
+    elif avropcode == "ret":
+        return gen_6502_opcode_RET(item)
+
+#############################
 
 def p_statement_OPCODE(p):
     '''statement : OPCODE opcodeitems
