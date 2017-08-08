@@ -234,6 +234,8 @@ def onOpcode(toklist):
 # Parsing rules
 ###############################################################################
 
+output_list = []
+
 precedence = (
     ('left', '+', '-'),
     ('left', '*', '/'),
@@ -326,35 +328,55 @@ def p_expression_name(p):
 
 def p_statement_las(p):
     'statement : IDENTIFIER ":"'
-    print("\n%s:\n" % p[1])
+    def gen(v):
+        return "\n%s:\n" % v[1]
+    output_list.append([gen,p[:]])
 
 def p_statement_assign(p):
     'statement : IDENTIFIER "=" expression'
-    print("  %s = %s\n" % (p[1],p[3]))
+    def gen(v):
+        return "  %s = %s\n" % (v[1],v[3])
+    output_list.append([gen,p[:]])
 
 def p_statement_opc(p):
     '''statement : OPCODE opcodeitems
        statement : OPCODE'''
+
+    def gen(data):
+        c_p = data[0]
+        c_o = data[1]
+        outstr = ""
+        for item in c_o:
+            outstr += "%s " % item
+        return "\t%s [ %s]" % (c_p[1],outstr )
+
     global opcitems
-    outstr = ""
-    for item in opcitems:
-        outstr += "%s " % str(item)
-    print("\t%s [ %s]" % (p[1],outstr ))
+    data = [ p[:], opcitems[:] ]
+    output_list.append( [gen,data] )
     opcitems = []
 
 def p_statement_dir(p):
     '''statement : DIRECTIVE directiveitems
        statement : DIRECTIVE'''
+
+    def gen(data):
+        c_p = data[0]
+        c_o = data[1]
+        outstr = ""
+        for item in c_o:
+            outstr += "%s " % item
+        return "  %s [ %s]" % (c_p[1],outstr )
+
     global diritems
-    outstr = ""
-    for item in diritems:
-        outstr += "%s " % str(item)
-    print("  %s [ %s]" % (p[1],outstr ))
+    data = [ p[:], diritems[:] ]
+    output_list.append( [gen,data] )
     diritems = []
 
 def p_statement_com(p):
     'statement : COMMENT'
-    print("\n%s\n" % p[1])
+    def gen(v):
+        return "\n%s\n" % v[1]
+    output_list.append([gen,p[:]])
 
 def p_statements(p):
     '''statements : statement statements
@@ -384,6 +406,13 @@ yacc.yacc()
 
 with open("test.tok","w") as fo:
   with open("test.avr","r") as fin:
+    output_list = []
     for line in fin:
         yacc.parse(line,debug=False)
+    for item in output_list:
+        gen = item[0]
+        p = item[1]
+        #print gen, p
+        str = gen(p)
+        print str
     #yacc.parse(input)
