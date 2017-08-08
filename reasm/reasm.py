@@ -237,10 +237,12 @@ def onOpcode(toklist):
 precedence = (
     ('left', '+', '-'),
     ('left', '*', '/'),
-    ('right', 'UMINUS'),
+    #('right', 'UMINUS'),
 )
 
 #######################################
+
+diritems = []
 
 def p_directiveitem(p):
     '''directiveitem : STRING 
@@ -248,9 +250,11 @@ def p_directiveitem(p):
                      | DIRECTIVE
                      | ","
                      | "@"
+                     | "-"
                      | NUMBER
                      | HEXNUMBER'''
-    print("diri <%s>" % p[1])
+    #print("diri <%s>" % p[1])
+    diritems.append(p[1])
 
 def p_directiveitems(p):
     '''directiveitems : directiveitem directiveitems
@@ -259,9 +263,12 @@ def p_directiveitems(p):
 
 #######################################
 
+opcitems = []
+
 def p_opcodeitem(p):
     '''opcodeitem : expression 
-                  | "," '''
+                  | ","'''
+    opcitems.append(p[1])
 
 def p_opcodeitems(p):
     '''opcodeitems : opcodeitem opcodeitems
@@ -269,91 +276,94 @@ def p_opcodeitems(p):
 
 #######################################
 
+class expr_node:
+    def __init__(self,a,op,b):
+        self._a = a
+        self._op = op
+        self._b = b
+    def __str__(self):
+        if self._op:
+            return "expr_node( %s %s %s )" % (self._a,self._op,self._b)
+        else:
+            return "expr_node( %s )" % (self._a)
+
 def p_expression_binop(p):
     '''expression : expression '+' expression
                   | expression '-' expression
                   | expression '*' expression
                   | expression '/' expression'''
-    print("expbin <%s>" % p[1])
-    #if p[2] == '+':
-    #    p[0] = p[1] + p[3]
-    #elif p[2] == '-':
-    #    p[0] = p[1] - p[3]
-    #elif p[2] == '*':
-    #    p[0] = p[1] * p[3]
-    #elif p[2] == '/':
-    #    p[0] = p[1] / p[3]
+    if p[2] == '+':
+        p[0] = expr_node(p[1],"+",p[3])
+    elif p[2] == '-':
+        p[0] = expr_node(p[1],"-",p[3])
+    elif p[2] == '*':
+        p[0] = expr_node(p[1],"*",p[3])
+    elif p[2] == '/':
+        p[0] = expr_node(p[1],"/",p[3])
 
 
 def p_expression_uminus(p):
-    "expression : '-' expression %prec UMINUS"
-    print("expumi <%s>" % p[1])
-    #p[0] = -p[2]
+    "expression : '-' expression"
+    p[0] = expr_node(None,"-",p[2])
 
 
 def p_expression_group(p):
     "expression : '(' expression ')'"
-    print("expgrp <%s>" % p[1])
-    #p[0] = p[2]
+    p[0] = p[2]
 
 
 def p_expression_number(p):
     '''expression : NUMBER
                   | HEXNUMBER'''
-    print("expnum <%s>" % p[1])
-    #p[0] = p[1]
+    p[0] = p[1]
 
 
 def p_expression_name(p):
     "expression : IDENTIFIER"
-    print("expid <%s>" % p[1])
-    #try:
-    #    p[0] = identifiers[p[1]]
-    #except LookupError:
-    #    pass
-        #print("Undefined identifier '%s'" % p[1])
-        #p[0] = 0
+    p[0] = p[1]
 
 #######################################
 
 def p_statement_las(p):
     'statement : IDENTIFIER ":"'
-    print("st_las <%s>" % p[1])
-    #print(p[1])
+    print("\n%s:\n" % p[1])
 
 def p_statement_assign(p):
     'statement : IDENTIFIER "=" expression'
-    print("st_assign <%s>" % p[1])
-    #identifiers[p[1]] = p[3]
-
-def p_statement_expr(p):
-    'statement : expression'
-    print("st_expr <%s>" % p[1])
-    #print(p[1])
+    print("  %s = %s\n" % (p[1],p[3]))
 
 def p_statement_opc(p):
-    'statement : OPCODE opcodeitems'
-    print("st_opc <%s>" % p[1])
+    '''statement : OPCODE opcodeitems
+       statement : OPCODE'''
+    global opcitems
+    outstr = ""
+    for item in opcitems:
+        outstr += "%s " % str(item)
+    print("\t%s [ %s]" % (p[1],outstr ))
+    opcitems = []
 
 def p_statement_dir(p):
     '''statement : DIRECTIVE directiveitems
        statement : DIRECTIVE'''
-    print("st_dir <%s>" % p[1])
+    global diritems
+    outstr = ""
+    for item in diritems:
+        outstr += "%s " % str(item)
+    print("  %s [ %s]" % (p[1],outstr ))
+    diritems = []
 
 def p_statement_com(p):
     'statement : COMMENT'
-    print("st_com <%s>" % p[1])
+    print("\n%s\n" % p[1])
 
 def p_statements(p):
     '''statements : statement statements
        statements : statement'''
-    #print("statements <%s>" % p[0])
 
 #######################################
 
 def p_compilationunit(p):
     "compilationunit : statements"
-    #print("comu <%s>" % p[1])
 
 #######################################
 
