@@ -16,30 +16,29 @@ main: /* $0000 */
 .L__stack_usage = 0
 /* $0000 */ ldi [ r25 , 0 ]
 /* $0002 */ ldi [ r24 , 0 ]
-/* $0004 */ ldi [ r18 , lo8 1 ]
 
-.L2: /* $0006 */
+.L2: /* $0004 */
 
-/* $0006 */ lds [ ZL , $0021 /* TEST_PTR */ ]
-/* $000a */ lds [ ZH , expr_node( $0021 /* TEST_PTR */ + 1 ) ]
-/* $000e */ add [ ZL , r24 ]
-/* $0010 */ adc [ ZH , r25 ]
-/* $0012 */ st [ Z , r18 ]
-/* $0014 */ adiw [ r24 , 1 ]
-/* $0016 */ cpi [ r24 , 40 ]
-/* $0018 */ cpc [ r25 , 1 /* __zero_reg__ */ ]
-/* $001a */ brne [ $0006 /* .L2 */ ]
-/* $001c */ ldi [ r25 , 0 ]
-/* $001e */ ldi [ r24 , 0 ]
+/* $0004 */ lds [ ZL , $001f /* TEST_PTR */ ]
+/* $0008 */ lds [ ZH , TEST_PTR + 1 ]
+/* $000c */ add [ ZL , r24 ]
+/* $000e */ adc [ ZH , r25 ]
+/* $0010 */ st [ Z , r24 ]
+/* $0012 */ adiw [ r24 , 1 ]
+/* $0014 */ cpi [ r24 , 40 ]
+/* $0016 */ cpc [ r25 , 1 /* __zero_reg__ */ ]
+/* $0018 */ brne [ $0004 /* .L2 */ ]
+/* $001a */ ldi [ r25 , 0 ]
+/* $001c */ ldi [ r24 , 0 ]
 /* epilogue start */
-/* $0020 */ ret [ ]
-.size [ main /* $0000 */ , . /* $0021 */ - main /* $0000 */ ]
+/* $001e */ ret [ ]
+.size [ main /* $0000 */ , . /* $001f */ - main /* $0000 */ ]
 .global [ TEST_PTR ]
 .data [ ]
 .type [ TEST_PTR , @ object ]
 .size [ TEST_PTR , 2 ]
 
-TEST_PTR: /* $0021 */
+TEST_PTR: /* $001f */
 
 .word [ - 10240 ]
 .ident [ "GCC: (GNU) 7.1.0" ]
