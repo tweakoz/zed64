@@ -79,21 +79,27 @@ class context:
     if item in _regmap:
         item = _regmap[item]
     elif item in self._labels:
+        mapped = self._labels[item]
+        if mapped in main_ctx._PCMAP:
+            mapped = main_ctx._PCMAP[mapped]
         if comment:
           if rev:
-            item = "%s /* $%04x */" % (item,self._labels[item])
+            item = "%s /* $%04x */" % (item,mapped)
           else:
             item = "$%04x /* %s */" % (self._labels[item],item)
         else:
-            item = "%d" % (self._labels[item])
+            item = "%d" % (mapped)
     elif item in self._identifiers:
+        mapped = self._identifiers[item]
+        if mapped in main_ctx._PCMAP:
+            mapped = main_ctx._PCMAP[mapped]
         if comment:
           if rev:
-            item = "%s /* %s */" % (item,self._identifiers[item])
+            item = "%s /* %s */" % (item,mapped)
           else:
-            item = "%s /* %s */" % (self._identifiers[item],item)
+            item = "%s /* %s */" % (mapped,item)
         else:
-            item = "%d" % (self._identifiers[item])
+            item = "%d" % (mapped)
     elif item == ".":
         if comment:
           if rev:
@@ -276,7 +282,7 @@ def genabsaddr(addr):
 
     addrtype = type(addr)
 
-    print addr
+    #print addr
     if addrtype == type(str):
         if addr=='X':
             addr = 26
@@ -290,9 +296,17 @@ def genabsaddr(addr):
             addr = "0x"+addr[1:]
             addr = int(addr)
         elif addr in main_ctx._identifiers:
+            name = addr
             addr = int(main_ctx._identifiers[addr])
+            #print "IDEN: %s:$%04x" % (name,addr)
+            if addr in main_ctx._PCMAP:
+                addr = main_ctx._PCMAP[addr]
         elif addr in main_ctx._labels:
+            name = addr
             addr = int(main_ctx._labels[addr])
+            #print "LABL: %s:$%04x" % (name,addr)
+            if addr in main_ctx._PCMAP:
+                addr = main_ctx._PCMAP[addr]
         else:
             addr = int(addr)
     elif addrtype == type(int):
@@ -457,6 +471,7 @@ def gen_6502_opcode_BRNE(item):
 #############################
 
 def gen_6502_opcode_RET(item):
+    main_ctx._mos_pc += 1
     return "rts         ; RET"
 
 #############################
@@ -467,7 +482,7 @@ def gen_6502_opcode_WORD(item):
     comment = dump(item)
     opcitems = item["opcitems"][0]
 
-    print "%s" % opcitems
+    #print "%s" % opcitems
 
     wordval = int(opcitems[1])
     if opcitems[0]=='-':
@@ -649,11 +664,17 @@ with open("test.avr","r") as fin:
   with open("test.dump","w") as fout:
     for item in dump_strings:
         fout.write(item+"\n")
-        print item
+        #print item
   ###########################################
   # generate dump 6502 (from _output_items)
   ###########################################
   dump_strings = []
+  for item in _output_items:
+    if "gen6502" in item:
+      dump = item["gen6502"]
+      str = dump(item)
+  dump_strings = []
+  main_ctx._mos_pc = 0
   for item in _output_items:
     if "gen6502" in item:
       dump = item["gen6502"]
