@@ -72,7 +72,7 @@ class context:
     self._identifiers = {}
     self._labels = {}
     self._avr_pc = 0
-    self._mos_pc = 0
+    self._mos_pc = 4
     self._PCMAP = {}
 
   def mapitem(self,item,rev=False,comment=True):
@@ -315,7 +315,8 @@ def gen_6502_opcode_ST(item):
     src = genabsaddr(s)
 
     rval  = "lda $%02x\n" % (src)
-    rval += "sta $%02x" % (dest)
+    rval += "ldy #$00\n"
+    rval += "sta ($%02x),y" % (dest)
     main_ctx._mos_pc += 4
 
     return rval
@@ -599,8 +600,11 @@ def p_statement_ASSIGNLABEL(p):
     ###################
     global main_ctx
     label = p[1]
+    if label=="main":
+        label = "_main"
     data = [label,main_ctx._avr_pc]
     main_ctx._labels[label] = main_ctx._avr_pc
+
 
     _output_items.append({"dump":dump,
                           "PC":main_ctx._avr_pc,
@@ -708,7 +712,7 @@ with open("test.avr","r") as fin:
       dump = item["gen6502"]
       str = dump(item)
   dump_strings = []
-  main_ctx._mos_pc = 4096
+  main_ctx._mos_pc = 0x1004
   for item in _output_items:
     if "gen6502" in item:
       dump = item["gen6502"]
@@ -717,6 +721,7 @@ with open("test.avr","r") as fin:
           dump_strings.append(str)
   # write dump6502
   with open("test.dump6502","w") as fout:
+    fout.write('.segment  "CODE"\n')
     fout.write(".ORG $1000\n")    
     fout.write(".FEATURE leading_dot_in_identifiers\n")
     fout.write("\n;;;; avr init ;;;;\n")
@@ -728,5 +733,6 @@ with open("test.avr","r") as fin:
 
 ###########################################
 
-os.system("ca65 test.dump6502 -l test.lst6502 -o test.o6502")
-      
+os.system("ca65 -t none crt0.s -o gen/crt0.o -l gen/crt0.lst")
+os.system("ca65 test.dump6502 -l test.lst6502 -o gen/test.o")
+os.system("ld65 -v -vm -C test.cfg -m gen/test1.map -o gen/test1.bin gen/crt0.o gen/test.o supervision.lib")      

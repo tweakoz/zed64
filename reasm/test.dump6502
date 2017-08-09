@@ -1,3 +1,4 @@
+.segment  "CODE"
 .ORG $1000
 .FEATURE leading_dot_in_identifiers
 
@@ -5,71 +6,72 @@
 lda #$00
 sta $01
 
-;;;; MOS_PC=$1000   AVR_PC=$0000 ;;;;
+;;;; MOS_PC=$1004   AVR_PC=$0000 ;;;;
 __SP_H__ = 62 ; __SP_H__ = 0x3e
 
-;;;; MOS_PC=$1000   AVR_PC=$0000 ;;;;
+;;;; MOS_PC=$1004   AVR_PC=$0000 ;;;;
 __SP_L__ = 61 ; __SP_L__ = 0x3d
 
-;;;; MOS_PC=$1000   AVR_PC=$0000 ;;;;
+;;;; MOS_PC=$1004   AVR_PC=$0000 ;;;;
 __SREG__ = 63 ; __SREG__ = 0x3f
 
-;;;; MOS_PC=$1000   AVR_PC=$0000 ;;;;
+;;;; MOS_PC=$1004   AVR_PC=$0000 ;;;;
 __tmp_reg__ = 0 ; __tmp_reg__ = 0
 
-;;;; MOS_PC=$1000   AVR_PC=$0000 ;;;;
+;;;; MOS_PC=$1004   AVR_PC=$0000 ;;;;
 __zero_reg__ = 1 ; __zero_reg__ = 1
 
-;;;; MOS_PC=$1000   AVR_PC=$0000 ;;;;
-main: ; LABEL
+;;;; MOS_PC=$1004   AVR_PC=$0000 ;;;;
+_main: ; LABEL
 
-;;;; MOS_PC=$1000   AVR_PC=$0000 ;;;;
+;;;; MOS_PC=$1004   AVR_PC=$0000 ;;;;
 .L__stack_usage = 0 ; .L__stack_usage = 0
 
-;;;; MOS_PC=$1000   AVR_PC=$0000 ;;;;
+;;;; MOS_PC=$1004   AVR_PC=$0000 ;;;;
 ;;;; ldi [ r25 , 0 ] ;;;;
 lda #$00
 sta  $19
 
 
-;;;; MOS_PC=$1004   AVR_PC=$0002 ;;;;
+;;;; MOS_PC=$1008   AVR_PC=$0002 ;;;;
 ;;;; ldi [ r24 , 0 ] ;;;;
 lda #$00
 sta  $18
 
 
-;;;; MOS_PC=$1008   AVR_PC=$0004 ;;;;
+;;;; MOS_PC=$100c   AVR_PC=$0004 ;;;;
 .L2: ; LABEL
 
-;;;; MOS_PC=$1008   AVR_PC=$0004 ;;;;
+;;;; MOS_PC=$100c   AVR_PC=$0004 ;;;;
 ;;;; lds [ ZL , $001f /* TEST_PTR */ ] ;;;;
 lda  TEST_PTR
 sta  $1e
 
-;;;; MOS_PC=$100d   AVR_PC=$0008 ;;;;
+;;;; MOS_PC=$1011   AVR_PC=$0008 ;;;;
 ;;;; lds [ ZH , TEST_PTR + 1 ] ;;;;
 lda  TEST_PTR + 1
 sta  $1f
 
-;;;; MOS_PC=$1011   AVR_PC=$000c ;;;;
+;;;; MOS_PC=$1015   AVR_PC=$000c ;;;;
 ;;;; add [ ZL , r24 ] ;;;;
 clc
 lda $18
 adc $1e
 sta $1e
 
-;;;; MOS_PC=$1018   AVR_PC=$000e ;;;;
+;;;; MOS_PC=$101c   AVR_PC=$000e ;;;;
 ;;;; adc [ ZH , r25 ] ;;;;
 lda $19
 adc $1f
 sta $1f
 
-;;;; MOS_PC=$101e   AVR_PC=$0010 ;;;;
+;;;; MOS_PC=$1022   AVR_PC=$0010 ;;;;
 ;;;; st [ Z , r24 ] ;;;;
 lda $18
-sta $1e
+ldy #$00
+sta ($1e),y
 
-;;;; MOS_PC=$1022   AVR_PC=$0012 ;;;;
+;;;; MOS_PC=$1026   AVR_PC=$0012 ;;;;
 ;;;; adiw [ r24 , 1 ] ;;;;
 clc
 lda #<$0001
@@ -80,42 +82,42 @@ adc  $19
 sta  $19
 
 
-;;;; MOS_PC=$102f   AVR_PC=$0014 ;;;;
+;;;; MOS_PC=$1033   AVR_PC=$0014 ;;;;
 ;;;; cpi [ r24 , 40 ] ;;;;
 lda  $18
 cmp #$28
 
 
-;;;; MOS_PC=$1033   AVR_PC=$0016 ;;;;
+;;;; MOS_PC=$1037   AVR_PC=$0016 ;;;;
 ;;;; cpc [ r25 , 1 /* __zero_reg__ */ ] ;;;;
 lda  $19
 sbc  $01
 
 
-;;;; MOS_PC=$1037   AVR_PC=$0018 ;;;;
+;;;; MOS_PC=$103b   AVR_PC=$0018 ;;;;
 ;;;; brne [ $0004 /* .L2 */ ] ;;;;
-bne  $1008 ; delta=-47
+bne  $100c ; delta=-47
 
 
-;;;; MOS_PC=$1039   AVR_PC=$001a ;;;;
+;;;; MOS_PC=$103d   AVR_PC=$001a ;;;;
 ;;;; ldi [ r25 , 0 ] ;;;;
 lda #$00
 sta  $19
 
 
-;;;; MOS_PC=$103d   AVR_PC=$001c ;;;;
+;;;; MOS_PC=$1041   AVR_PC=$001c ;;;;
 ;;;; ldi [ r24 , 0 ] ;;;;
 lda #$00
 sta  $18
 
 
-;;;; MOS_PC=$1041   AVR_PC=$001e ;;;;
+;;;; MOS_PC=$1045   AVR_PC=$001e ;;;;
 ;;;; ret [ ] ;;;;
 rts         ; RET
 
-;;;; MOS_PC=$1042   AVR_PC=$001f ;;;;
+;;;; MOS_PC=$1046   AVR_PC=$001f ;;;;
 TEST_PTR: ; LABEL
 
-;;;; MOS_PC=$1042   AVR_PC=$001f ;;;;
+;;;; MOS_PC=$1046   AVR_PC=$001f ;;;;
 .WORD $d800; .word [ - 10240 ]
 

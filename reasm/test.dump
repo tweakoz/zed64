@@ -8,7 +8,7 @@ __zero_reg__ = 1
 .global [ main ]
 .type [ main , @ function ]
 
-main: /* $0000 */
+_main: /* $0000 */
 
 /* prologue: function */
 /* frame size = 0 */
@@ -32,7 +32,7 @@ main: /* $0000 */
 /* $001c */ ldi [ r24 , 0 ]
 /* epilogue start */
 /* $001e */ ret [ ]
-.size [ main /* $0000 */ , . /* $001f */ - main /* $0000 */ ]
+.size [ main , . /* $001f */ - main ]
 .global [ TEST_PTR ]
 .data [ ]
 .type [ TEST_PTR , @ object ]
