@@ -69,3 +69,7 @@ sta  $18	; /* $001e */ ldi [ r24 , 0 ]
 
 ;;;; MOS_PC=$0048   AVR_PC=$0020 ;;;;
 rts         ; RET
+
+;;;; MOS_PC=$0048   AVR_PC=$0021 ;;;;
+.WORD $d800; .word [ - 10240 ]
+

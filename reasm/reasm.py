@@ -461,6 +461,25 @@ def gen_6502_opcode_RET(item):
 
 #############################
 
+def gen_6502_opcode_WORD(item):
+    ctx = item["ctx"]
+    dump = item["dump"]
+    comment = dump(item)
+    opcitems = item["opcitems"][0]
+
+    print "%s" % opcitems
+
+    wordval = int(opcitems[1])
+    if opcitems[0]=='-':
+        wordval = 65536-wordval
+
+    rval  = ".WORD $%04x; %s\n" % (wordval,comment)
+    main_ctx._mos_pc += 2
+
+    return rval
+
+#############################
+
 _opcode_table = {
     "ldi":  { "adv": 2, "gen":gen_6502_opcode_LDI },    
     "lds":  { "adv": 4, "gen":gen_6502_opcode_LDS },    
@@ -472,6 +491,7 @@ _opcode_table = {
     "cpc":  { "adv": 2, "gen":gen_6502_opcode_CPC },    
     "brne": { "adv": 2, "gen":gen_6502_opcode_BRNE },    
     "ret":  { "adv": 1, "gen":gen_6502_opcode_RET },    
+    ".word":  { "adv": 2, "gen":gen_6502_opcode_WORD },    
 }
 
 #############################
@@ -530,25 +550,46 @@ def p_statement_DIRECTIVE(p):
        statement : DIRECTIVE'''
     ###################
     def dump(item):
-        data = item["data"]
         ctx = item["ctx"]
-        c_p = data[0]
-        c_o = data[1]
-        directive = c_p[1]
+        directive = item["directive"]
+        diritems = item["diritems"]
         outstr = ""
-        for coitem in c_o:
-            mapped = ctx.mapitem(coitem,rev=True)
+        for ditem in diritems:
+            mapped = ctx.mapitem(ditem,rev=True)
             outstr += "%s " % mapped
         return "%s [ %s]" % (directive,outstr )
     ###################
+    def gen6502word(item):
+        avropcode = item["opcode"]
+        assert(avropcode in _opcode_table)
+        opcode_data = _opcode_table[avropcode]
+        opcode_gen = opcode_data["gen"]
+        avrpc = item["PC"]
+
+        main_ctx._PCMAP[avrpc] = main_ctx._mos_pc
+        rval  = ";;;; MOS_PC=$%04x   AVR_PC=$%04x ;;;;\n" % (main_ctx._mos_pc,avrpc)
+        rval += opcode_gen(item)
+        return rval
+    ###################
     global diritems
-    data = [ p[:], diritems[:] ]
-    _output_items.append( {"dump":dump,"data":data,"ctx":deepcopy(main_ctx)} )
-    diritems = []
     directive = p[1]
+    itemscopy = diritems[:]
+    outdata = {"dump":dump,
+               "directive": directive,
+               "diritems":itemscopy,
+               "ctx":deepcopy(main_ctx)
+    }
+    ###################
     if directive == ".word":
         global main_ctx
+        outdata["PC"] = main_ctx._avr_pc
+        outdata["opcode"] = ".word"
+        outdata["opcitems"] = itemscopy,
+        outdata["gen6502"] = gen6502word
         main_ctx._avr_pc += 2
+    ###################
+    diritems = []
+    _output_items.append( outdata )
 
 ###########################################################
 # comment
