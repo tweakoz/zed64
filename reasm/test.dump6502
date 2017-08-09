@@ -1,22 +1,71 @@
+.ORG $0000
+;;;; MOS_PC=$0000   AVR_PC=$0000 ;;;;
 lda #$00	; /* $0000 */ ldi [ r25 , 0 ]
 sta  $19	; /* $0000 */ ldi [ r25 , 0 ]
+
+;;;; MOS_PC=$0004   AVR_PC=$0002 ;;;;
 lda #$00	; /* $0002 */ ldi [ r24 , 0 ]
 sta  $18	; /* $0002 */ ldi [ r24 , 0 ]
+
+;;;; MOS_PC=$0008   AVR_PC=$0004 ;;;;
 lda #$01	; /* $0004 */ ldi [ r18 , lo8 1 ]
 sta  $12	; /* $0004 */ ldi [ r18 , lo8 1 ]
+
+;;;; MOS_PC=$000c   AVR_PC=$0006 ;;;;
 lda  $21	; /* $0006 */ lds [ ZL , $0021 /* TEST_PTR */ ]
 sta  $1e	; /* $0006 */ lds [ ZL , $0021 /* TEST_PTR */ ]
+
+;;;; MOS_PC=$0010   AVR_PC=$000a ;;;;
 lda  $22	; /* $000a */ lds [ ZH , expr_node( $0021 /* TEST_PTR */ + 1 ) ]
 sta  $1f	; /* $000a */ lds [ ZH , expr_node( $0021 /* TEST_PTR */ + 1 ) ]
-; /* $000e */ add [ ZL , r24 ]
-; /* $0010 */ adc [ ZH , r25 ]
-; /* $0012 */ st [ Z , r18 ]
-; /* $0014 */ adiw [ r24 , 1 ]
-; /* $0016 */ cpi [ r24 , 40 ]
-; /* $0018 */ cpc [ r25 , 1 /* __zero_reg__ */ ]
-; /* $001a */ brne [ $0006 /* .L2 */ ]
+
+;;;; MOS_PC=$0014   AVR_PC=$000e ;;;;
+clc         ; /* $000e */ add [ ZL , r24 ]
+lda $18     ; /* $000e */ add [ ZL , r24 ]
+adc $1e     ; /* $000e */ add [ ZL , r24 ]
+sta $1e     ; /* $000e */ add [ ZL , r24 ]
+
+;;;; MOS_PC=$001b   AVR_PC=$0010 ;;;;
+lda $19     ; /* $0010 */ adc [ ZH , r25 ]
+adc $1f     ; /* $0010 */ adc [ ZH , r25 ]
+sta $1f     ; /* $0010 */ adc [ ZH , r25 ]
+
+;;;; MOS_PC=$0021   AVR_PC=$0012 ;;;;
+lda $12     ; /* $0012 */ st [ Z , r18 ]
+sta $1e     ; /* $0012 */ st [ Z , r18 ]
+lda $13     ; /* $0012 */ st [ Z , r18 ]
+sta $1f     ; /* $0012 */ st [ Z , r18 ]
+
+;;;; MOS_PC=$0029   AVR_PC=$0014 ;;;;
+clc         ; /* $0014 */ adiw [ r24 , 1 ]
+lda #$01    ; /* $0014 */ adiw [ r24 , 1 ]
+adc  $18    ; /* $0014 */ adiw [ r24 , 1 ]
+sta  $18    ; /* $0014 */ adiw [ r24 , 1 ]
+lda #$00    ; /* $0014 */ adiw [ r24 , 1 ]
+adc  $19    ; /* $0014 */ adiw [ r24 , 1 ]
+sta  $19    ; /* $0014 */ adiw [ r24 , 1 ]
+
+;;;; MOS_PC=$0036   AVR_PC=$0016 ;;;;
+lda  $18    ; /* $0016 */ cpi [ r24 , 40 ]
+cmp #$28    ; /* $0016 */ cpi [ r24 , 40 ]
+
+
+;;;; MOS_PC=$003a   AVR_PC=$0018 ;;;;
+lda  $19    ; /* $0018 */ cpc [ r25 , 1 /* __zero_reg__ */ ]
+sbc #$01    ; /* $0018 */ cpc [ r25 , 1 /* __zero_reg__ */ ]
+
+
+;;;; MOS_PC=$003e   AVR_PC=$001a ;;;;
+bne  $000c    ; (delta=-50) /* $001a */ brne [ $0006 /* .L2 */ ]
+
+
+;;;; MOS_PC=$0040   AVR_PC=$001c ;;;;
 lda #$00	; /* $001c */ ldi [ r25 , 0 ]
 sta  $19	; /* $001c */ ldi [ r25 , 0 ]
+
+;;;; MOS_PC=$0044   AVR_PC=$001e ;;;;
 lda #$00	; /* $001e */ ldi [ r24 , 0 ]
 sta  $18	; /* $001e */ ldi [ r24 , 0 ]
+
+;;;; MOS_PC=$0048   AVR_PC=$0020 ;;;;
 rts         ; RET

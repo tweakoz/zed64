@@ -58,19 +58,6 @@ lexer = lex.lex() # Build the lexer
 # reassembler contextual data
 ###############################################################################
 
-_opcode_table = {
-    "ldi":  {"adv": 2},    
-    "lds":  {"adv": 4},    
-    "add":  {"adv": 2},    
-    "adc":  {"adv": 2},    
-    "adiw": {"adv": 2},    
-    "st":   {"adv": 2},    
-    "cpi":  {"adv": 2},    
-    "cpc":  {"adv": 2},    
-    "brne": {"adv": 2},    
-    "ret":  {"adv": 1},    
-}
-
 _regmap = {
     "r26": "XL",
     "r27": "XH",
@@ -85,6 +72,9 @@ class context:
     self._identifiers = {}
     self._labels = {}
     self._avr_pc = 0
+    self._mos_pc = 0
+    self._PCMAP = {}
+
   def mapitem(self,item,rev=False,comment=True):
     if item in _regmap:
         item = _regmap[item]
@@ -272,29 +262,39 @@ def gen_6502_opcode_LDI(item):
         rval =  "lda #$%02x\t; %s\n" % (int(immv),comment)
         regno = int(dest[1:])
         rval += "sta  $%02x\t; %s" % (regno,comment)
+        main_ctx._mos_pc += 4
     elif len(opcitems)==3:
         rval =  "lda #$%02x\t; %s\n" % (int(imm),comment)
         regno = int(dest[1:])
         rval += "sta  $%02x\t; %s" % (regno,comment)
+        main_ctx._mos_pc += 4
     return rval
 
 #############################
 
-def gen_6502_opcode_LDS(item):
-    ctx = item["ctx"]
-    dump = item["dump"]
-    opcitems = item["opcitems"]
-    dest = opcitems[0]
-    regno = int(dest[1:])
-    pc = item["PC"]
-    comment = dump(item)
-    
-    addr = ctx.mapitem(opcitems[2],comment=False)
-    
+def genabsaddr(addr):
+
     addrtype = type(addr)
 
+    print addr
     if addrtype == type(str):
-        addr = int(addr)
+        if addr=='X':
+            addr = 26
+        elif addr=='Y':
+            addr = 28
+        elif addr=='Z':
+            addr = 30
+        elif addr[0]=='r':
+            addr = int(addr[1:])
+        elif addr[0]=='$':
+            addr = "0x"+addr[1:]
+            addr = int(addr)
+        elif addr in main_ctx._identifiers:
+            addr = int(main_ctx._identifiers[addr])
+        elif addr in main_ctx._labels:
+            addr = int(main_ctx._labels[addr])
+        else:
+            addr = int(addr)
     elif addrtype == type(int):
         addr = addr
     elif isinstance(addr,expr_node):
@@ -303,11 +303,31 @@ def gen_6502_opcode_LDS(item):
         print addr, addrtype
         assert(False)
 
+    return addr    
+
+#############################
+
+def gen_6502_opcode_LDS(item):
+    ctx = item["ctx"]
+    dump = item["dump"]
+    opcitems = item["opcitems"]
+    dest = genabsaddr(opcitems[0])
+    pc = item["PC"]
+    comment = dump(item)
+    
+    addr = ctx.mapitem(opcitems[2],comment=False)
+    addr = genabsaddr(addr)
+
     if addr<256:
         rval =  "lda  $%2x\t; %s\n" % (addr,comment)
+        main_ctx._mos_pc += 2
     else:
         rval =  "lda  $%04x\t; %s\n" % (addr,comment)
-    rval += "sta  $%02x\t; %s" % (regno,comment)
+        main_ctx._mos_pc += 3
+
+    rval += "sta  $%02x\t; %s" % (dest,comment)
+    main_ctx._mos_pc += 2
+
     return rval;
 
 #############################
@@ -315,56 +335,124 @@ def gen_6502_opcode_LDS(item):
 def gen_6502_opcode_ST(item):
     ctx = item["ctx"]
     dump = item["dump"]
+    opcitems = item["opcitems"]
+    d = opcitems[0]
+    s = opcitems[2]
+    dest = genabsaddr(d)
+    src = genabsaddr(s)
     comment = dump(item)
-    return "; %s" % comment
+
+    numb = 1
+    if d in ['X','Y','Z']:
+        numb = 2
+
+    rval  = "lda $%02x     ; %s\n" % (src,comment)
+    rval += "sta $%02x     ; %s" % (dest,comment)
+    main_ctx._mos_pc += 4
+    if numb==2:
+      rval += "\nlda $%02x     ; %s\n" % (src+1,comment)
+      rval += "sta $%02x     ; %s" % (dest+1,comment)
+      main_ctx._mos_pc += 4
+
+    return rval
 
 #############################
 
 def gen_6502_opcode_ADD(item):
     ctx = item["ctx"]
     dump = item["dump"]
+    opcitems = item["opcitems"]
+    dest = genabsaddr(opcitems[0])
+    src = genabsaddr(opcitems[2])
     comment = dump(item)
-    return "; %s" % comment
+    rval =  "clc         ; %s\n" % comment
+    rval += "lda $%02x     ; %s\n" % (src,comment)
+    rval += "adc $%02x     ; %s\n" % (dest,comment)
+    rval += "sta $%02x     ; %s" % (dest,comment)
+    main_ctx._mos_pc += 7
+    return rval
 
 #############################
 
 def gen_6502_opcode_ADC(item):
     ctx = item["ctx"]
     dump = item["dump"]
+    opcitems = item["opcitems"]
+    dest = genabsaddr(opcitems[0])
+    src = genabsaddr(opcitems[2])
     comment = dump(item)
-    return "; %s" % comment
+    rval  = "lda $%02x     ; %s\n" % (src,comment)
+    rval += "adc $%02x     ; %s\n" % (dest,comment)
+    rval += "sta $%02x     ; %s" % (dest,comment)
+    main_ctx._mos_pc += 6
+    return rval
 
 #############################
 
 def gen_6502_opcode_ADIW(item):
     ctx = item["ctx"]
     dump = item["dump"]
+    opcitems = item["opcitems"]
+    dest = genabsaddr(opcitems[0])
+    src = genabsaddr(opcitems[2])
     comment = dump(item)
-    return "; %s" % comment
+    rval =  "clc         ; %s\n" % comment
+    rval += "lda #$%02x    ; %s\n" % (src,comment)
+    rval += "adc  $%02x    ; %s\n" % (dest,comment)
+    rval += "sta  $%02x    ; %s\n" % (dest,comment)
+    rval += "lda #$00    ; %s\n" % (comment)
+    rval += "adc  $%02x    ; %s\n" % (dest+1,comment)
+    rval += "sta  $%02x    ; %s" % (dest+1,comment)
+    main_ctx._mos_pc += 13
+    return rval
 
 #############################
 
 def gen_6502_opcode_CPI(item):
     ctx = item["ctx"]
     dump = item["dump"]
+    opcitems = item["opcitems"]
+    reg = genabsaddr(opcitems[0])
+    imm = genabsaddr(opcitems[2])
     comment = dump(item)
-    return "; %s" % comment
+    rval  = "lda  $%02x    ; %s\n" % (reg,comment)
+    rval += "cmp #$%02x    ; %s\n" % (imm,comment)
+    main_ctx._mos_pc += 4
+    return rval
 
 #############################
 
 def gen_6502_opcode_CPC(item):
     ctx = item["ctx"]
     dump = item["dump"]
+    opcitems = item["opcitems"]
+    reg = genabsaddr(opcitems[0])
+    imm = genabsaddr(opcitems[2])
     comment = dump(item)
-    return "; %s" % comment
+    rval  = "lda  $%02x    ; %s\n" % (reg,comment)
+    rval += "sbc #$%02x    ; %s\n" % (imm,comment)
+    main_ctx._mos_pc += 4
+    return rval
 
 #############################
 
 def gen_6502_opcode_BRNE(item):
     ctx = item["ctx"]
     dump = item["dump"]
+    opcitems = item["opcitems"]
+    absaddr = genabsaddr(opcitems[0])
+
+    mapped = absaddr
+    if mapped in main_ctx._PCMAP:
+        mapped = main_ctx._PCMAP[absaddr] 
+
+    curpc = main_ctx._mos_pc
+    delta = mapped-curpc
+
     comment = dump(item)
-    return "; %s" % comment
+    rval  = "bne  $%04x    ; (delta=%d) %s\n" % (mapped,delta,comment)
+    main_ctx._mos_pc += 2
+    return rval
 
 #############################
 
@@ -373,28 +461,32 @@ def gen_6502_opcode_RET(item):
 
 #############################
 
+_opcode_table = {
+    "ldi":  { "adv": 2, "gen":gen_6502_opcode_LDI },    
+    "lds":  { "adv": 4, "gen":gen_6502_opcode_LDS },    
+    "add":  { "adv": 2, "gen":gen_6502_opcode_ADD },    
+    "adc":  { "adv": 2, "gen":gen_6502_opcode_ADC },    
+    "adiw": { "adv": 2, "gen":gen_6502_opcode_ADIW },    
+    "st":   { "adv": 2, "gen":gen_6502_opcode_ST },    
+    "cpi":  { "adv": 2, "gen":gen_6502_opcode_CPI },    
+    "cpc":  { "adv": 2, "gen":gen_6502_opcode_CPC },    
+    "brne": { "adv": 2, "gen":gen_6502_opcode_BRNE },    
+    "ret":  { "adv": 1, "gen":gen_6502_opcode_RET },    
+}
+
+#############################
+
 def gen_6502_opcode(item):
     avropcode = item["opcode"]
-    if avropcode == "ldi":
-        return gen_6502_opcode_LDI(item)
-    elif avropcode == "lds":
-        return gen_6502_opcode_LDS(item)
-    elif avropcode == "st":
-        return gen_6502_opcode_ST(item)
-    elif avropcode == "add":
-        return gen_6502_opcode_ADD(item)
-    elif avropcode == "adc":
-        return gen_6502_opcode_ADC(item)
-    elif avropcode == "adiw":
-        return gen_6502_opcode_ADIW(item)
-    elif avropcode == "cpi":
-        return gen_6502_opcode_CPI(item)
-    elif avropcode == "cpc":
-        return gen_6502_opcode_CPC(item)
-    elif avropcode == "brne":
-        return gen_6502_opcode_BRNE(item)
-    elif avropcode == "ret":
-        return gen_6502_opcode_RET(item)
+    assert(avropcode in _opcode_table)
+    opcode_data = _opcode_table[avropcode]
+    opcode_gen = opcode_data["gen"]
+    avrpc = item["PC"]
+
+    main_ctx._PCMAP[avrpc] = main_ctx._mos_pc
+    rval  = ";;;; MOS_PC=$%04x   AVR_PC=$%04x ;;;;\n" % (main_ctx._mos_pc,avrpc)
+    rval += opcode_gen(item)
+    return rval
 
 #############################
 
@@ -529,7 +621,12 @@ with open("test.avr","r") as fin:
           dump_strings.append(str)
   # write dump6502
   with open("test.dump6502","w") as fout:
+    fout.write(".ORG $0000")    
     for item in dump_strings:
-        fout.write(item+"\n")
-  ###########################################
+        fout.write("\n"+item+"\n")
+
+
+###########################################
+
+os.system("ca65 test.dump6502 -l test.lst6502")
       
