@@ -111,6 +111,74 @@ class context:
     return item
 
 main_ctx = context()
+_output_items = []
+
+###############################################################################
+
+def genabsaddr(addr):
+
+    addrtype = type(addr)
+
+    #print addr
+    if addrtype == type(str):
+        if addr=='X':
+            addr = 26
+        elif addr=='Y':
+            addr = 28
+        elif addr=='Z':
+            addr = 30
+        elif addr[0]=='r':
+            addr = int(addr[1:])
+        elif addr[0]=='$':
+            addr = "0x"+addr[1:]
+            addr = int(addr)
+        elif addr in main_ctx._identifiers:
+            name = addr
+            addr = int(main_ctx._identifiers[addr])
+            #print "IDEN: %s:$%04x" % (name,addr)
+            if addr in main_ctx._PCMAP:
+                addr = main_ctx._PCMAP[addr]
+        elif addr in main_ctx._labels:
+            name = addr
+            addr = int(main_ctx._labels[addr])
+            #print "LABL: %s:$%04x" % (name,addr)
+            if addr in main_ctx._PCMAP:
+                addr = main_ctx._PCMAP[addr]
+        else:
+            addr = int(addr)
+    elif addrtype == type(int):
+        addr = addr
+    elif isinstance(addr,expr_node):
+        addr = addr.eval()
+    else:
+        print addr, addrtype
+        assert(False)
+
+    return addr    
+
+###############################################################################
+
+class expr_node:
+    def __init__(self,a,op,b):
+        self._a = a
+        self._op = op
+        self._b = b
+    def __str__(self):
+        if self._op:
+            a = main_ctx.mapitem(self._a)
+            b = main_ctx.mapitem(self._b)
+            return "expr_node( %s %s %s )" % (a,self._op,b)
+        else:
+            a = main_ctx.mapitem(self._a)
+            return "expr_node( %s )" % (a)
+    def eval(self):
+        a = main_ctx.mapitem(self._a,comment=False)
+        b = main_ctx.mapitem(self._b,comment=False)
+        op = self._op
+        rval = None
+        if op == "+":
+            rval = int(a)+int(b)
+        return rval
 
 ###############################################################################
 # PARSER
@@ -156,29 +224,6 @@ def p_opcodeitems(p):
 
 ###############################################################################
 
-class expr_node:
-    def __init__(self,a,op,b):
-        self._a = a
-        self._op = op
-        self._b = b
-    def __str__(self):
-        if self._op:
-            a = main_ctx.mapitem(self._a)
-            b = main_ctx.mapitem(self._b)
-            return "expr_node( %s %s %s )" % (a,self._op,b)
-        else:
-            a = main_ctx.mapitem(self._a)
-            return "expr_node( %s )" % (a)
-    def eval(self):
-        a = main_ctx.mapitem(self._a,comment=False)
-        b = main_ctx.mapitem(self._b,comment=False)
-        op = self._op
-        rval = None
-        if op == "+":
-            rval = int(a)+int(b)
-        return rval
-
-###################
 def p_expression_binop(p):
     '''expression : expression '+' expression
                   | expression '-' expression
@@ -209,29 +254,6 @@ def p_expression_number(p):
 def p_expression_name(p):
     "expression : IDENTIFIER"
     p[0] = p[1]
-
-###############################################################################
-# label assignment
-###########################################################
-
-_output_items = []
-
-def p_statement_ASSIGNLABEL(p):
-    'statement : IDENTIFIER ":"'
-    ###################
-    def dump(item):
-        data = item["data"]
-        label = data[0]
-        pc = data[1]
-        return "\n%s: /* $%04x */\n" % (label,pc)
-    ###################
-    global main_ctx
-    label = p[1]
-    data = [label,main_ctx._avr_pc]
-    main_ctx._labels[label] = main_ctx._avr_pc
-    _output_items.append({"dump":dump,
-                          "data":data,
-                          "ctx":deepcopy(main_ctx)})
 
 ###########################################################
 # identifier assignment
@@ -275,49 +297,6 @@ def gen_6502_opcode_LDI(item):
         rval += "sta  $%02x\t; %s" % (regno,comment)
         main_ctx._mos_pc += 4
     return rval
-
-#############################
-
-def genabsaddr(addr):
-
-    addrtype = type(addr)
-
-    #print addr
-    if addrtype == type(str):
-        if addr=='X':
-            addr = 26
-        elif addr=='Y':
-            addr = 28
-        elif addr=='Z':
-            addr = 30
-        elif addr[0]=='r':
-            addr = int(addr[1:])
-        elif addr[0]=='$':
-            addr = "0x"+addr[1:]
-            addr = int(addr)
-        elif addr in main_ctx._identifiers:
-            name = addr
-            addr = int(main_ctx._identifiers[addr])
-            #print "IDEN: %s:$%04x" % (name,addr)
-            if addr in main_ctx._PCMAP:
-                addr = main_ctx._PCMAP[addr]
-        elif addr in main_ctx._labels:
-            name = addr
-            addr = int(main_ctx._labels[addr])
-            #print "LABL: %s:$%04x" % (name,addr)
-            if addr in main_ctx._PCMAP:
-                addr = main_ctx._PCMAP[addr]
-        else:
-            addr = int(addr)
-    elif addrtype == type(int):
-        addr = addr
-    elif isinstance(addr,expr_node):
-        addr = addr.eval()
-    else:
-        print addr, addrtype
-        assert(False)
-
-    return addr    
 
 #############################
 
@@ -495,6 +474,17 @@ def gen_6502_opcode_WORD(item):
 
 #############################
 
+def gen_6502_opcode_LABEL(item):
+    ctx = item["ctx"]
+    name = item["name"]
+    #dump = item["dump"]
+    #comment = dump(item).replace(".","_")
+    comment = None
+    rval  = "AVRLABEL_%s: ; %s" % (name.replace(".","_"),name)
+    return rval
+
+#############################
+
 _opcode_table = {
     "ldi":  { "adv": 2, "gen":gen_6502_opcode_LDI },    
     "lds":  { "adv": 4, "gen":gen_6502_opcode_LDS },    
@@ -507,6 +497,7 @@ _opcode_table = {
     "brne": { "adv": 2, "gen":gen_6502_opcode_BRNE },    
     "ret":  { "adv": 1, "gen":gen_6502_opcode_RET },    
     ".word":  { "adv": 2, "gen":gen_6502_opcode_WORD },    
+    "LABEL":  { "adv": 2, "gen":gen_6502_opcode_LABEL },    
 }
 
 #############################
@@ -605,6 +596,32 @@ def p_statement_DIRECTIVE(p):
     ###################
     diritems = []
     _output_items.append( outdata )
+
+###############################################################################
+# label assignment
+###########################################################
+
+def p_statement_ASSIGNLABEL(p):
+    'statement : IDENTIFIER ":"'
+    ###################
+    def dump(item):
+        data = item["data"]
+        label = data[0]
+        pc = data[1]
+        return "\n%s: /* $%04x */\n" % (label,pc)
+    ###################
+    global main_ctx
+    label = p[1]
+    data = [label,main_ctx._avr_pc]
+    main_ctx._labels[label] = main_ctx._avr_pc
+
+    _output_items.append({"dump":dump,
+                          "PC":main_ctx._avr_pc,
+                          "opcode":"LABEL",
+                          "name":label,
+                          "data":data,
+                          "gen6502":gen_6502_opcode,
+                          "ctx":deepcopy(main_ctx)})
 
 ###########################################################
 # comment

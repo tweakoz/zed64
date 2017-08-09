@@ -4,6 +4,9 @@ Current file: test.dump6502
 
 000000r 1               .ORG $0000
 000000  1               ;;;; MOS_PC=$0000   AVR_PC=$0000 ;;;;
+000000  1               AVRLABEL_main: ; main
+000000  1               
+000000  1               ;;;; MOS_PC=$0000   AVR_PC=$0000 ;;;;
 000000  1  A9 00        lda #$00	; /* $0000 */ ldi [ r25 , 0 ]
 000002  1  85 19        sta  $19	; /* $0000 */ ldi [ r25 , 0 ]
 000004  1               
@@ -14,6 +17,9 @@ Current file: test.dump6502
 000008  1               ;;;; MOS_PC=$0008   AVR_PC=$0004 ;;;;
 000008  1  A9 01        lda #$01	; /* $0004 */ ldi [ r18 , lo8 1 ]
 00000A  1  85 12        sta  $12	; /* $0004 */ ldi [ r18 , lo8 1 ]
+00000C  1               
+00000C  1               ;;;; MOS_PC=$000c   AVR_PC=$0006 ;;;;
+00000C  1               AVRLABEL__L2: ; .L2
 00000C  1               
 00000C  1               ;;;; MOS_PC=$000c   AVR_PC=$0006 ;;;;
 00000C  1  A5 49        lda  $49	; /* $0006 */ lds [ ZL , $0021 /* TEST_PTR */ ]
@@ -73,6 +79,9 @@ Current file: test.dump6502
 000048  1               
 000048  1               ;;;; MOS_PC=$0048   AVR_PC=$0020 ;;;;
 000048  1  60           rts         ; RET
+000049  1               
+000049  1               ;;;; MOS_PC=$0049   AVR_PC=$0021 ;;;;
+000049  1               AVRLABEL_TEST_PTR: ; TEST_PTR
 000049  1               
 000049  1               ;;;; MOS_PC=$0049   AVR_PC=$0021 ;;;;
 000049  1  00 D8        .WORD $d800; .word [ - 10240 ]

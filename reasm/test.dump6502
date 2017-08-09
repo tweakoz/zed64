@@ -1,5 +1,8 @@
 .ORG $0000
 ;;;; MOS_PC=$0000   AVR_PC=$0000 ;;;;
+AVRLABEL_main: ; main
+
+;;;; MOS_PC=$0000   AVR_PC=$0000 ;;;;
 lda #$00	; /* $0000 */ ldi [ r25 , 0 ]
 sta  $19	; /* $0000 */ ldi [ r25 , 0 ]
 
@@ -10,6 +13,9 @@ sta  $18	; /* $0002 */ ldi [ r24 , 0 ]
 ;;;; MOS_PC=$0008   AVR_PC=$0004 ;;;;
 lda #$01	; /* $0004 */ ldi [ r18 , lo8 1 ]
 sta  $12	; /* $0004 */ ldi [ r18 , lo8 1 ]
+
+;;;; MOS_PC=$000c   AVR_PC=$0006 ;;;;
+AVRLABEL__L2: ; .L2
 
 ;;;; MOS_PC=$000c   AVR_PC=$0006 ;;;;
 lda  $49	; /* $0006 */ lds [ ZL , $0021 /* TEST_PTR */ ]
@@ -69,6 +75,9 @@ sta  $18	; /* $001e */ ldi [ r24 , 0 ]
 
 ;;;; MOS_PC=$0048   AVR_PC=$0020 ;;;;
 rts         ; RET
+
+;;;; MOS_PC=$0049   AVR_PC=$0021 ;;;;
+AVRLABEL_TEST_PTR: ; TEST_PTR
 
 ;;;; MOS_PC=$0049   AVR_PC=$0021 ;;;;
 .WORD $d800; .word [ - 10240 ]
