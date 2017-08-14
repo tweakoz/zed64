@@ -16,7 +16,7 @@ BasicEnv = Environment( ENV=os.environ )
 
 utpp = SConscript('ork.unittestpp/ork.unittestpp.sconstruct')
 core = SConscript('ork.core/ork.core.sconstruct')
-cncsim = SConscript('ork.cncsim/ork.cncsim.sconstruct')
+#cncsim = SConscript('ork.cncsim/ork.cncsim.sconstruct')
 
 #####################################################
 
@@ -27,4 +27,4 @@ def DeclDep( itemlist, deplist ):
     Depends( item, it2 )
 
 DeclDep( core, utpp )
-DeclDep( cncsim, core )
+#DeclDep( cncsim, core )

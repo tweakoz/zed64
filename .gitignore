@@ -1,3 +1,6 @@
+.sconsign.dblite
+ork.build.ini
+stage
 parse.dump
 *.dSYM
 .DS_Store

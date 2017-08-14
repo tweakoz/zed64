@@ -63,12 +63,12 @@ int main( int argc, const char** argv )
     printf( "\nCPU reset done..\n");
 
 
-    runUI();
-    //while(1)
+    //runUI();
+    while(1)
     {
-		//cpu.Run(8);
-        //printf("[enter]");
-        //char ch = getchar();
+		cpu.Run(8);
+        printf("[enter]");
+        char ch = getchar();
     }
 	return 0;
 }

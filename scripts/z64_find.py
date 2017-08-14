@@ -31,7 +31,7 @@ if __name__ == "__main__":
   os.chdir(wsdir)
   find_word = sys.argv[1]
   print("searching for word<%s>" % find_word)
-  subdirs =  "nexys4 xilinx_lib "
-  extensions  = " .v "
+  subdirs =  "nexys4 xilinx_lib 6502sim verilog-6502"
+  extensions  = " .v .cpp .hpp .inl .py"
 
   search.visit(find_word,visitor(),subdirs,extensions)
