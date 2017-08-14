@@ -2,7 +2,7 @@ auto TEST_PTR = (volatile char*) 0xd800;
 
 int main(int argc, const char** argv)
 {
-    for( int i=0; i<40; i++ )
+    for( unsigned char i=0; i<40; i++ )
     {
         TEST_PTR[i] = i;
     }

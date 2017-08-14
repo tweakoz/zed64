@@ -1,3 +1,7 @@
+parse.dump
+*.dSYM
+.DS_Store
+*.o6502
 *.pyc
 *.twx
 *.o

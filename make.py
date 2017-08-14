@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys, os, md5, string
+from collections import OrderedDict
 sys.path.append("./src/") 
 sys.path.append("./scripts/") 
 import localopts
@@ -21,10 +22,6 @@ NX4ROOT = Z64ROOT+"/zed64"
 ################################################33
 
 timescale = "1ns/1ns"
-
-def usage():
-    print "usage make.py prep|synver|synvhd|ise|sidasm|sim|simv|compile|cc65test"
-    sys.exit(0)
 
 ################################################33
 # IO ports
@@ -79,7 +76,7 @@ u.emit("zed64/rtl/nexys_gen.ucf")
 
 ################################################33
 
-def compile(opts=""):
+def _compile_impl(opts=""):
     CXXFLAGS = "--std=c++11 -I /usr/local/include/iverilog -O3"
 #    CXXFLAGS = "--std=c++11 -I /usr/include/iverilog -O3"
     os.chdir(NX4ROOT+"/vpi")
@@ -121,14 +118,8 @@ def compile(opts=""):
     cmd += " zed64/rtl/nexys4_top.v"
     print cmd
     os.system(cmd)
-
-################################################33
-
-if len(sys.argv)!=2:
-    usage()
-
 ########################################
-if sys.argv[1]=="synver":
+def _synver():
 
     vparams = verilog_params("zed64/rtl/gen/",timescale,ios)
 
@@ -159,10 +150,10 @@ if sys.argv[1]=="synver":
     print("Generating Rom2 complete..")
 
 ########################################
-elif sys.argv[1]=="synvhd":
+def _synvhd():
     vidcon.gen_vhdl(ios)
 ########################################
-elif sys.argv[1]=="cc65test":
+def _cc65Test():
     os.chdir(NX4ROOT+"/testprogs")
     os.system("make")
     os.system("hexdump -C ./gen/test1.bin > ./gen/test1.hex")
@@ -171,33 +162,33 @@ elif sys.argv[1]=="cc65test":
     os.system("make")
     os.system("./6502sim.exe ../zed64/testprogs/gen/test1.bin")
 ########################################
-elif sys.argv[1]=="compile":
+def _compile():
     os.chdir(Z64ROOT)
-    compile("-Wall")
+    _compile_impl("-Wall")
     #iverilog -s hello_pli -y. -mhello_vpi -o hello_pli.exe hello_pli.v 
     #vvp -M. ./hello_pli.exe
     sys.exit(0)
     os.chdir(Z64ROOT+"/vpitest")
     os.system("make")
 ########################################
-elif sys.argv[1]=="sim":
-    compile("-DDO_VPI -DDO_SIM")
+def _sim():
+    _compile_impl("-DDO_VPI -DDO_SIM")
     os.system("vvp -M%s nx4test.exe" % (NX4ROOT+"/vpi") )
 ########################################
-elif sys.argv[1]=="simv":
-    compile("-DDO_DUMP -DDO_SIM")
+def _simv():
+    _compile_impl("-DDO_DUMP -DDO_SIM")
     os.system("vvp nx4test.exe" )
     os.system("gtkwave n4.vcd n4.gtkw")
 ########################################
-elif sys.argv[1]=="ise":
+def _ise():
     print localopts.ISE_BIN_DIR()
     os.system("%s/ise zed64/zed64.xise"%localopts.ISE_BIN_DIR())
 ########################################
-elif sys.argv[1]=="sidasm":
+def _sidasm():
     os.chdir("./sidtest")
     os.system( "./aspasm.py ./test.asm")
 ########################################
-elif sys.argv[1]=="prep":
+def _prep():
     os.system("rm -rf isedir")
     os.system("rm -rf isim")
     os.system("rm -rf zed64/rtl/gen")
@@ -208,7 +199,46 @@ elif sys.argv[1]=="prep":
     os.system("ln -s isedir/isim isim" )
     os.system("./make.py synver")
 ########################################
+def _reasm_build():
+    os.chdir("%s/reasm" % Z64ROOT)
+    os.system("./reasm.py")
+def _reasm_test():
+    os.chdir(Z64ROOT)
+    os.system("./6502sim/6502sim.exe ./reasm/gen/test1.bin ")
+########################################
+targets = {
+    "synver":_synver,
+    "synvhd":_synvhd,
+    "cc65Test":_cc65Test,
+    "compile":_compile,
+    "sim":_sim,
+    "simv":_simv,
+    "ise":_ise,
+    "sidasm":_sidasm,
+    "prep":_prep,
+    "reasm_build":_reasm_build,
+    "reasm_test":_reasm_test,
+}
+########################################
+def usage():
+    targetlist = ""
+    keycount = len(targets.keys())
+    keynum = 0
+    for item in targets.keys():
+        targetlist += "%s" % item
+        if keynum != keycount-1:
+            targetlist += " | "
+        keynum += 1
+    print "usage make.py target[ %s ]" % targetlist
+    sys.exit(0)
+########################################
+target = None
+if len(sys.argv)==2:
+    target = sys.argv[1]
+########################################
+if target in targets:
+    item = targets[target]
+    item()
 else:
     usage()
-
-
+########################################
