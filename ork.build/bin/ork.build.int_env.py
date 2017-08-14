@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 
-import os
-import sys
+import os, sys, platform
 
+SYSTEM = platform.system()
+print "SYSTEM<%s>" % SYSTEM
 as_main = (__name__ == '__main__')
 
 ###########################################
@@ -64,6 +65,12 @@ EDA="/opt/eda"
 prepend_env("PATH","%s/bin" % EDA)
 prepend_env("PATH","%s/scripts" % Z64ROOT)
 set_env("Z64ROOT",Z64ROOT)
+
+if SYSTEM=="Darwin":
+    set_env("Z64BUILDPLATFORM","OSX")
+else:
+    set_env("Z64BUILDPLATFORM","IX")
+
 ###########################################
 
 print

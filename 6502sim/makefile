@@ -1,6 +1,6 @@
 #todo : switch to scons
 
-CFLAGS = -g --std=c++11 -I $(Z64ROOT)/stage/include -DOSX
+CFLAGS = -g --std=c++11 -I $(Z64ROOT)/stage/include -D$(Z64BUILDPLATFORM)
 LFLAGS = -L$(Z64ROOT)/stage/lib -lork.core.OSX.release -lglfw3 -ldrawtext -framework OpenGL
 
 all:
