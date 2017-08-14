@@ -8,6 +8,7 @@
 
 uint8_t memory[65536];
 
+void runUI();
 
 void busWrite( uint16_t addr, uint8_t data )
 {
@@ -62,11 +63,12 @@ int main( int argc, const char** argv )
     printf( "\nCPU reset done..\n");
 
 
-    while(1)
+    runUI();
+    //while(1)
     {
-		cpu.Run(8);
-        printf("[enter]");
-        char ch = getchar();
+		//cpu.Run(8);
+        //printf("[enter]");
+        //char ch = getchar();
     }
 	return 0;
 }

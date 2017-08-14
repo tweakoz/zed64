@@ -1,7 +1,8 @@
 
 #include "mos6502.h"
 #include <assert.h>
-
+#include <GLFW/glfw3.h>
+#include "drawtext.h"
 
 #define GENINS(m,op) {#op,_am##m,&mos6502::Op_##op}
 

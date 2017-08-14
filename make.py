@@ -171,6 +171,10 @@ def _compile():
     os.chdir(Z64ROOT+"/vpitest")
     os.system("make")
 ########################################
+def _6502sim():
+    os.chdir("./6502sim")
+    os.system( "make")
+########################################
 def _sim():
     _compile_impl("-DDO_VPI -DDO_SIM")
     os.system("vvp -M%s nx4test.exe" % (NX4ROOT+"/vpi") )
@@ -218,6 +222,7 @@ targets = {
     "prep":_prep,
     "reasm_build":_reasm_build,
     "reasm_test":_reasm_test,
+    "6502sim":_6502sim,
 }
 ########################################
 def usage():

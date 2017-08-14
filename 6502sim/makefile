@@ -1,2 +1,5 @@
+CFLAGS = -g --std=c++11
+LFLAGS = -lglfw3 -ldrawtext -framework OpenGL
+
 all:
-	clang++ -g --std=c++11 main.cpp mos6502.cpp -o 6502sim.exe
+	clang++ $(CFLAGS) main.cpp mos6502.cpp ui.cpp -o 6502sim.exe $(LFLAGS) 
