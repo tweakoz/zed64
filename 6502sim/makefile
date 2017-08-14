@@ -2,7 +2,7 @@
 
 CFLAGS = -g --std=c++11 -I $(Z64ROOT)/stage/include -D$(Z64BUILDPLATFORM)
 
-LFLAGS = -L$(Z64ROOT)/stage/lib -lork.core.OSX.release -lglfw3 -ldrawtext
+LFLAGS = -L$(Z64ROOT)/stage/lib -lork.core.$(Z64BUILDPLATFORM).release -lglfw3 -ldrawtext
 
 ifeq ($(Z64BUILDPLATFORM),OSX)
 LFLAGS += -framework OpenGL
