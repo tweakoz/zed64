@@ -1,21 +1,14 @@
 #include "mos6502.h"
-#include <assert.h>
 #include <GLFW/glfw3.h>
 #include "drawtext.h"
-#include <string.h>
-#include <stdarg.h>
-#include <string>
-#include <vector>
-#include <list>
-#include <set>
 
 using namespace ork;
 ///////////////////////////////////////////////////////////////////////////////
 std::list<insline> _inslinelist;
 spsc_bounded_queue<insline> _inslineQ;
 spsc_bounded_queue<uicmd> _uiQ;
-extern std::set<uint16_t> addr_read_set;
-extern std::set<uint16_t> addr_write_set;
+extern LockedResource<addrset_t> addr_read_set;
+extern LockedResource<addrset_t> addr_write_set;
 uint8_t busReadNT( uint16_t addr );
 ///////////////////////////////////////////////////////////////////////////////
 static int width = 0;
@@ -309,8 +302,16 @@ void runUI()
             {   u16 addr = page+i;
                 u8 val = busReadNT(addr);
                 color = PAL;
-                bool was_read = ( addr_read_set.find(addr)!=addr_read_set.end());
-                bool was_writ = ( addr_write_set.find(addr)!=addr_write_set.end());
+
+                bool was_read;
+                bool was_writ;
+                
+                addr_read_set.AtomicOp([&](addrset_t& aset){
+                    was_read = (aset.find(addr)!=aset.end());
+                });
+                addr_write_set.AtomicOp([&](addrset_t& aset){
+                    was_writ = (aset.find(addr)!=aset.end());
+                });
 
                 if(was_read and was_writ)
                     color = YEL;

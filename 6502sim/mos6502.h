@@ -8,12 +8,22 @@
 //============================================================================
 
 #include <iostream>
+#include <assert.h>
+#include <string.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <string>
+#include <vector>
+#include <list>
+#include <set>
 #include <ork/types.h>
 #include <ork/concurrent_queue.hpp>
 #include <ork/stringutils.h>
 #include <ork/cvector3.h>
+#include <ork/mutex.h>
+#include <ork/thread.h>
 
 using namespace std;
 using namespace ork;
@@ -57,6 +67,8 @@ struct memacc
 };
 
 typedef std::vector<memacc> accesslist;
+typedef std::set<uint16_t> addrset_t;
+
 struct insline
 {
     int _pc, _lpc;
