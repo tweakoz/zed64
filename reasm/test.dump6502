@@ -28,208 +28,174 @@ _main: ; LABEL
 .L__stack_usage = 0 ; .L__stack_usage = 0
 
 ;;;; MOS_PC=$1004   AVR_PC=$0000 ;;;;
+;;;; ldi [ r21 , 0 ] ;;;;
+lda #$00
+sta  $15
+
+
+;;;; MOS_PC=$1008   AVR_PC=$0002 ;;;;
 ;;;; ldi [ r20 , 0 ] ;;;;
 lda #$00
 sta  $14
 
 
-;;;; MOS_PC=$1008   AVR_PC=$0002 ;;;;
-.L4: ; LABEL
-
-;;;; MOS_PC=$1008   AVR_PC=$0002 ;;;;
-;;;; ldi [ r23 , 0 ] ;;;;
-lda #$00
-sta  $17
-
-
 ;;;; MOS_PC=$100c   AVR_PC=$0004 ;;;;
-;;;; ldi [ r22 , 0 ] ;;;;
-lda #$00
-sta  $16
-
-
-;;;; MOS_PC=$1010   AVR_PC=$0006 ;;;;
 .L3: ; LABEL
 
-;;;; MOS_PC=$1010   AVR_PC=$0006 ;;;;
+;;;; MOS_PC=$100c   AVR_PC=$0004 ;;;;
 ;;;; ldi [ r24 , 0 ] ;;;;
 lda #$00
 sta  $18
 
 
-;;;; MOS_PC=$1014   AVR_PC=$0008 ;;;;
+;;;; MOS_PC=$1010   AVR_PC=$0006 ;;;;
 .L2: ; LABEL
 
-;;;; MOS_PC=$1014   AVR_PC=$0008 ;;;;
-;;;; lds [ ZL , $0047 /* CHAR_PTR */ ] ;;;;
+;;;; MOS_PC=$1010   AVR_PC=$0006 ;;;;
+;;;; lds [ ZL , $003d /* CHAR_PTR */ ] ;;;;
 lda  CHAR_PTR
 sta  $1e
 
-;;;; MOS_PC=$1019   AVR_PC=$000c ;;;;
+;;;; MOS_PC=$1015   AVR_PC=$000a ;;;;
 ;;;; lds [ ZH , CHAR_PTR + 1 ] ;;;;
 lda  CHAR_PTR + 1
 sta  $1f
 
-;;;; MOS_PC=$101d   AVR_PC=$0010 ;;;;
+;;;; MOS_PC=$1019   AVR_PC=$000e ;;;;
 ;;;; add [ ZL , r18 ] ;;;;
 clc
 lda $12
 adc $1e
 sta $1e
 
-;;;; MOS_PC=$1024   AVR_PC=$0012 ;;;;
+;;;; MOS_PC=$1020   AVR_PC=$0010 ;;;;
 ;;;; adc [ ZH , r19 ] ;;;;
 lda $13
 adc $1f
 sta $1f
 
-;;;; MOS_PC=$102a   AVR_PC=$0014 ;;;;
-;;;; add [ r25 , r24 ] ;;;;
-clc
+;;;; MOS_PC=$1026   AVR_PC=$0012 ;;;;
+;;;; st [ Z , r24 ] ;;;;
 lda $18
-adc $19
-sta $19
-
-;;;; MOS_PC=$1031   AVR_PC=$0016 ;;;;
-;;;; st [ Z , r25 ] ;;;;
-lda $19
 ldy #$00
 sta ($1e),y
 
-;;;; MOS_PC=$1035   AVR_PC=$0018 ;;;;
-;;;; lds [ ZL , $0045 /* COLR_PTR */ ] ;;;;
+;;;; MOS_PC=$102a   AVR_PC=$0014 ;;;;
+;;;; lds [ ZL , $003b /* COLR_PTR */ ] ;;;;
 lda  COLR_PTR
 sta  $1e
 
-;;;; MOS_PC=$103a   AVR_PC=$001c ;;;;
+;;;; MOS_PC=$102f   AVR_PC=$0018 ;;;;
 ;;;; lds [ ZH , COLR_PTR + 1 ] ;;;;
 lda  COLR_PTR + 1
 sta  $1f
 
-;;;; MOS_PC=$103e   AVR_PC=$0020 ;;;;
+;;;; MOS_PC=$1033   AVR_PC=$001c ;;;;
 ;;;; add [ ZL , r18 ] ;;;;
 clc
 lda $12
 adc $1e
 sta $1e
 
-;;;; MOS_PC=$1045   AVR_PC=$0022 ;;;;
+;;;; MOS_PC=$103a   AVR_PC=$001e ;;;;
 ;;;; adc [ ZH , r19 ] ;;;;
 lda $13
 adc $1f
 sta $1f
 
-;;;; MOS_PC=$104b   AVR_PC=$0024 ;;;;
-;;;; st [ Z , r25 ] ;;;;
-lda $19
+;;;; MOS_PC=$1040   AVR_PC=$0020 ;;;;
+;;;; st [ Z , r24 ] ;;;;
+lda $18
 ldy #$00
 sta ($1e),y
 
-;;;; MOS_PC=$104f   AVR_PC=$0026 ;;;;
+;;;; MOS_PC=$1044   AVR_PC=$0022 ;;;;
 ;;;; subi [ r24 , lo8 -1 ] ;;;;
 lda $18
 sec
 sbc #$ff
 sta $18
 
-;;;; MOS_PC=$1055   AVR_PC=$0028 ;;;;
+;;;; MOS_PC=$104b   AVR_PC=$0024 ;;;;
 ;;;; subi [ r18 , -1 ] ;;;;
 lda $12
 sec
 sbc #$ff
 sta $12
 
-;;;; MOS_PC=$105b   AVR_PC=$002a ;;;;
+;;;; MOS_PC=$1052   AVR_PC=$0026 ;;;;
 ;;;; sbci [ r19 , -1 ] ;;;;
 lda $13
 sbc #$ff
 sta $13
 
-;;;; MOS_PC=$1061   AVR_PC=$002c ;;;;
+;;;; MOS_PC=$1058   AVR_PC=$0028 ;;;;
 ;;;; cpi [ r24 , lo8 32 ] ;;;;
 lda #<$0020
 cmp #$18
 
 
-;;;; MOS_PC=$1065   AVR_PC=$002e ;;;;
-;;;; brne [ $0008 /* .L2 */ ] ;;;;
-bne  $1014 ; delta=-81
+;;;; MOS_PC=$105c   AVR_PC=$002a ;;;;
+;;;; brne [ $0006 /* .L2 */ ] ;;;;
+bne  $1010 ; delta=-76
 
 
-;;;; MOS_PC=$1067   AVR_PC=$0030 ;;;;
-;;;; subi [ r22 , -32 ] ;;;;
-lda $16
+;;;; MOS_PC=$105e   AVR_PC=$002c ;;;;
+;;;; subi [ r20 , -32 ] ;;;;
+lda $14
 sec
 sbc #$e0
-sta $16
+sta $14
 
-;;;; MOS_PC=$106d   AVR_PC=$0032 ;;;;
-;;;; sbci [ r23 , -1 ] ;;;;
-lda $17
+;;;; MOS_PC=$1065   AVR_PC=$002e ;;;;
+;;;; sbci [ r21 , -1 ] ;;;;
+lda $15
 sbc #$ff
-sta $17
+sta $15
 
-;;;; MOS_PC=$1073   AVR_PC=$0034 ;;;;
+;;;; MOS_PC=$106b   AVR_PC=$0030 ;;;;
 ;;;; ldi [ r24 , 4 ] ;;;;
 lda #$04
 sta  $18
 
 
-;;;; MOS_PC=$1077   AVR_PC=$0036 ;;;;
-;;;; cpc [ r23 , r24 ] ;;;;
-lda  $17
+;;;; MOS_PC=$106f   AVR_PC=$0032 ;;;;
+;;;; cpc [ r21 , r24 ] ;;;;
+lda  $15
 sbc  $18
 
 
-;;;; MOS_PC=$107b   AVR_PC=$0038 ;;;;
-;;;; brne [ $0006 /* .L3 */ ] ;;;;
-bne  $1010 ; delta=-107
+;;;; MOS_PC=$1073   AVR_PC=$0034 ;;;;
+;;;; brne [ $0004 /* .L3 */ ] ;;;;
+bne  $100c ; delta=-103
 
 
-;;;; MOS_PC=$107d   AVR_PC=$003a ;;;;
-;;;; subi [ r20 , lo8 -1 ] ;;;;
-lda $14
-sec
-sbc #$ff
-sta $14
-
-;;;; MOS_PC=$1083   AVR_PC=$003c ;;;;
-;;;; cpi [ r20 , lo8 32 ] ;;;;
-lda #<$0020
-cmp #$14
-
-
-;;;; MOS_PC=$1087   AVR_PC=$003e ;;;;
-;;;; brne [ $0002 /* .L4 */ ] ;;;;
-bne  $1008 ; delta=-127
-
-
-;;;; MOS_PC=$1089   AVR_PC=$0040 ;;;;
+;;;; MOS_PC=$1075   AVR_PC=$0036 ;;;;
 ;;;; ldi [ r25 , 0 ] ;;;;
 lda #$00
 sta  $19
 
 
-;;;; MOS_PC=$108d   AVR_PC=$0042 ;;;;
+;;;; MOS_PC=$1079   AVR_PC=$0038 ;;;;
 ;;;; ldi [ r24 , 0 ] ;;;;
 lda #$00
 sta  $18
 
 
-;;;; MOS_PC=$1091   AVR_PC=$0044 ;;;;
+;;;; MOS_PC=$107d   AVR_PC=$003a ;;;;
 ;;;; ret [ ] ;;;;
 rts         ; RET
 
-;;;; MOS_PC=$1092   AVR_PC=$0045 ;;;;
+;;;; MOS_PC=$107e   AVR_PC=$003b ;;;;
 COLR_PTR: ; LABEL
 
-;;;; MOS_PC=$1092   AVR_PC=$0045 ;;;;
+;;;; MOS_PC=$107e   AVR_PC=$003b ;;;;
 .WORD $d800; .word [ - 10240 ]
 
 
-;;;; MOS_PC=$1094   AVR_PC=$0047 ;;;;
+;;;; MOS_PC=$1080   AVR_PC=$003d ;;;;
 CHAR_PTR: ; LABEL
 
-;;;; MOS_PC=$1094   AVR_PC=$0047 ;;;;
+;;;; MOS_PC=$1080   AVR_PC=$003d ;;;;
 .WORD $d000; .word [ - 12288 ]
 

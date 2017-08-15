@@ -4,6 +4,9 @@
 import os, sys
 from copy import deepcopy
 
+#toz - syntax error r19 - missing opcode sbc
+#  cant add opcode due to ambiguous parse (sbc/sbci)
+
 ###############################################################################
 
 os.system("avr-g++ -O3 test.cpp -S -o test.avr")
@@ -408,7 +411,7 @@ def gen_6502_opcode_SUBI(item):
     rval += "sbc #$%02x\n" % (imm)
     rval += "sta $%02x" % (reg)
 
-    main_ctx._mos_pc += 6
+    main_ctx._mos_pc += 7
     return rval
 
 #############################

@@ -15,7 +15,7 @@ static int width = 0;
 static int height = 0;
 static float fontscale = 0.5f;
 bool showvideo = false;
-const int knumpagev = 16;
+int knumpagev = 16;
 
 ///////////////////////////////////////////////////////////////////////////////
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -140,6 +140,8 @@ void runUI()
     {
 
         glfwGetFramebufferSize(window, &width, &height);
+
+        knumpagev = (height-500)/24;
 
         int numins = (height-(20*(knumpagev+6)))/24;
 
@@ -302,7 +304,7 @@ void runUI()
 
         for( const auto& page : pages )
         {
-            x = 64 + (ipage/knumpagev)*640;
+            x = 8 + (ipage/knumpagev)*480;
             y = mpbasey + (ipage%knumpagev)*20;
 
             fvec3 color = WHI;
@@ -339,7 +341,7 @@ void runUI()
                     color = RED;
                 else if(was_read)
                     color = GRN;
-                drawtext( FormatString("%02x",val), x+64+(i*32),y, fontscale*0.8, color );
+                drawtext( FormatString("%02X",val), x+64+(i*24),y, fontscale*0.6, color );
             }
 
             ipage++;

@@ -14,61 +14,53 @@ _main: /* $0000 */
 /* frame size = 0 */
 /* stack size = 0 */
 .L__stack_usage = 0
-/* $0000 */ ldi [ r20 , 0 ]
+/* $0000 */ ldi [ r21 , 0 ]
+/* $0002 */ ldi [ r20 , 0 ]
 
-.L4: /* $0002 */
+.L3: /* $0004 */
 
-/* $0002 */ ldi [ r23 , 0 ]
-/* $0004 */ ldi [ r22 , 0 ]
+/* $0004 */ ldi [ r24 , 0 ]
 
-.L3: /* $0006 */
+.L2: /* $0006 */
 
-/* $0006 */ ldi [ r24 , 0 ]
-
-.L2: /* $0008 */
-
-/* $0008 */ lds [ ZL , $0047 /* CHAR_PTR */ ]
-/* $000c */ lds [ ZH , CHAR_PTR + 1 ]
-/* $0010 */ add [ ZL , r18 ]
-/* $0012 */ adc [ ZH , r19 ]
-/* $0014 */ add [ r25 , r24 ]
-/* $0016 */ st [ Z , r25 ]
-/* $0018 */ lds [ ZL , $0045 /* COLR_PTR */ ]
-/* $001c */ lds [ ZH , COLR_PTR + 1 ]
-/* $0020 */ add [ ZL , r18 ]
-/* $0022 */ adc [ ZH , r19 ]
-/* $0024 */ st [ Z , r25 ]
-/* $0026 */ subi [ r24 , lo8 -1 ]
-/* $0028 */ subi [ r18 , -1 ]
-/* $002a */ sbci [ r19 , -1 ]
-/* $002c */ cpi [ r24 , lo8 32 ]
-/* $002e */ brne [ $0008 /* .L2 */ ]
-/* $0030 */ subi [ r22 , -32 ]
-/* $0032 */ sbci [ r23 , -1 ]
-/* $0034 */ ldi [ r24 , 4 ]
-/* $0036 */ cpc [ r23 , r24 ]
-/* $0038 */ brne [ $0006 /* .L3 */ ]
-/* $003a */ subi [ r20 , lo8 -1 ]
-/* $003c */ cpi [ r20 , lo8 32 ]
-/* $003e */ brne [ $0002 /* .L4 */ ]
-/* $0040 */ ldi [ r25 , 0 ]
-/* $0042 */ ldi [ r24 , 0 ]
+/* $0006 */ lds [ ZL , $003d /* CHAR_PTR */ ]
+/* $000a */ lds [ ZH , CHAR_PTR + 1 ]
+/* $000e */ add [ ZL , r18 ]
+/* $0010 */ adc [ ZH , r19 ]
+/* $0012 */ st [ Z , r24 ]
+/* $0014 */ lds [ ZL , $003b /* COLR_PTR */ ]
+/* $0018 */ lds [ ZH , COLR_PTR + 1 ]
+/* $001c */ add [ ZL , r18 ]
+/* $001e */ adc [ ZH , r19 ]
+/* $0020 */ st [ Z , r24 ]
+/* $0022 */ subi [ r24 , lo8 -1 ]
+/* $0024 */ subi [ r18 , -1 ]
+/* $0026 */ sbci [ r19 , -1 ]
+/* $0028 */ cpi [ r24 , lo8 32 ]
+/* $002a */ brne [ $0006 /* .L2 */ ]
+/* $002c */ subi [ r20 , -32 ]
+/* $002e */ sbci [ r21 , -1 ]
+/* $0030 */ ldi [ r24 , 4 ]
+/* $0032 */ cpc [ r21 , r24 ]
+/* $0034 */ brne [ $0004 /* .L3 */ ]
+/* $0036 */ ldi [ r25 , 0 ]
+/* $0038 */ ldi [ r24 , 0 ]
 /* epilogue start */
-/* $0044 */ ret [ ]
-.size [ main , . /* $0045 */ - main ]
+/* $003a */ ret [ ]
+.size [ main , . /* $003b */ - main ]
 .global [ COLR_PTR ]
 .data [ ]
 .type [ COLR_PTR , @ object ]
 .size [ COLR_PTR , 2 ]
 
-COLR_PTR: /* $0045 */
+COLR_PTR: /* $003b */
 
 .word [ - 10240 ]
 .global [ CHAR_PTR ]
 .type [ CHAR_PTR , @ object ]
 .size [ CHAR_PTR , 2 ]
 
-CHAR_PTR: /* $0047 */
+CHAR_PTR: /* $003d */
 
 .word [ - 12288 ]
 .ident [ "GCC: (GNU) 7.1.0" ]
