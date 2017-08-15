@@ -56,6 +56,23 @@ int main( int argc, const char** argv )
 		{
 			assert(false);
 		}
+
+        fin = fopen("roms/chargen.bin","rb");
+        if( fin )
+        {
+            fseek(fin,0,SEEK_END);
+            size_t size = ftell(fin);
+            printf( "rom2 size<%zu>\n", size );
+            assert(size==4096);
+            fseek(fin,0,SEEK_SET);
+            fread(memory+0x4000,size,1,fin);
+            fclose(fin);
+        }
+        else
+        {
+            assert(false);
+        }
+
 	}
 	else
 	{
@@ -84,7 +101,7 @@ int main( int argc, const char** argv )
             addr_write_set.AtomicOp([&](addrset_t& aset){aset.clear();});
 
             int numcycs = (runcount==-1)
-                        ? 1
+                        ? 1000
                         : runcount;
 
             cpu.Run(numcycs);
@@ -110,6 +127,7 @@ int main( int argc, const char** argv )
                             runcount = -1;
                             break;
                         case GLFW_KEY_ESCAPE:
+                            runcount = 1;
                             OKTOQUIT=true;
                             cont = true;
                             break;

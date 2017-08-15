@@ -14,6 +14,9 @@ uint8_t busReadNT( uint16_t addr );
 static int width = 0;
 static int height = 0;
 static float fontscale = 0.5f;
+bool showvideo = false;
+const int knumpagev = 16;
+
 ///////////////////////////////////////////////////////////////////////////////
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -24,6 +27,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     {
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, GL_TRUE);
+            break;
+        case 'V':
+            showvideo = ! showvideo;
             break;
     }
     uicmd uic = { key, mods };
@@ -119,12 +125,23 @@ void runUI()
     fvec3 PMAG(1,.5,1);
     fvec3 GRY(.7,.7,.7);
 
+    GLuint texobj = 3200;
+    glBindTexture(GL_TEXTURE_2D,texobj);
+    uint32_t framebuffer[65536];
+    memset(framebuffer,0,65536*4);
+
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,256,256,0,GL_RGBA,GL_UNSIGNED_BYTE,framebuffer);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
     while (!glfwWindowShouldClose(window))
     {
 
         glfwGetFramebufferSize(window, &width, &height);
 
-        int numins = ((height)-(20*18))/24;
+        int numins = (height-(20*(knumpagev+6)))/24;
 
         bool pullins = true;
         while(pullins)
@@ -150,7 +167,10 @@ void runUI()
         
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+        glDisable(GL_TEXTURE);
 
+        ///////////////////////////////
+        // draw instruction view header
         ///////////////////////////////
 
         glLoadIdentity();    
@@ -178,7 +198,7 @@ void runUI()
         // draw backgrounds
         /////////////////////////////////////////
 
-        int mpbasey = height-(20*12);
+        int mpbasey = height-(20*knumpagev);
 
         PushOrthoMVP(width,height);
 
@@ -207,7 +227,7 @@ void runUI()
         PopMVP();
 
         /////////////////////////////////////////
-        // draw instructions
+        // draw instruction view
         /////////////////////////////////////////
 
         drawtext( "MEMORY PAGE VIEW", 64,mpbasey-20, fontscale, PMAG );
@@ -273,7 +293,7 @@ void runUI()
         }
 
         ///////////////////////////////
-        // draw memory pages
+        // draw memory page view
         ///////////////////////////////
 
         x = 64;
@@ -282,8 +302,8 @@ void runUI()
 
         for( const auto& page : pages )
         {
-            x = 64 + (ipage/12)*640;
-            y = mpbasey + (ipage%12)*20;
+            x = 64 + (ipage/knumpagev)*640;
+            y = mpbasey + (ipage%knumpagev)*20;
 
             fvec3 color = WHI;
             if( page<256 )
@@ -305,7 +325,7 @@ void runUI()
 
                 bool was_read;
                 bool was_writ;
-                
+
                 addr_read_set.AtomicOp([&](addrset_t& aset){
                     was_read = (aset.find(addr)!=aset.end());
                 });
@@ -323,6 +343,79 @@ void runUI()
             }
 
             ipage++;
+        }
+
+        ///////////////////////////////
+
+        if( showvideo )
+        {
+            ///////////////////////////
+            // update framebuffer
+            ///////////////////////////
+
+            static int gline = 0;
+
+            uint32_t colors[16] = {
+
+                0xff000000, 0xff000080, 0xff008000, 0xff008080,
+                0xff800000, 0xff800080, 0xff808000, 0xff808080,
+                0xffc0c0c0, 0xff0000ff, 0xff00ff00, 0xff00ffff,
+                0xffff0000, 0xffff00ff, 0xffffff00, 0xffffffff,
+            };
+
+            for( int y=0; y<256; y++ )
+            {
+                int row = y/8;
+                int rowbase = row*32;
+                for( int x=0; x<256; x++ )
+                {
+                    int col = x/8;
+                    int charcell = rowbase+col;
+                    int chceladdr = charcell;
+                    u8 charval = busReadNT(0xd000+chceladdr);
+                    u8 colrval = busReadNT(0xd800+chceladdr);
+
+                    int icellsubx = x&7;
+                    int icellsuby = y&7;
+                    int icellsubaddr = (charval*8)+icellsuby;
+                    int icellbyte = busReadNT(0x4000+icellsubaddr);
+                    bool pix = icellbyte&(128>>icellsubx);
+                    uint32_t bgc = (colrval&0x0f);
+                    uint32_t fgc = (colrval&0xf0)>>16;
+                    uint32_t p = pix ? colors[fgc] : colors[bgc];
+                    framebuffer[y*256+x] = p;
+                }
+            }
+
+            glBindTexture(GL_TEXTURE_2D,texobj);
+            glTexSubImage2D(GL_TEXTURE_2D,0,0,0,256,256,GL_RGBA,GL_UNSIGNED_BYTE,framebuffer);
+            //gluGenerateMipmap(GL_TEXTURE_2D);
+
+            gline++;
+
+            ///////////////////////////
+            // draw video overlay quad
+            ///////////////////////////
+
+            PushOrthoMVP(width,height);
+
+            glEnable(GL_TEXTURE_2D);
+
+            glBegin(GL_QUADS);
+
+                y = 64;
+                int size = 1024;
+                glColor3f(1,1,1);
+                glTexCoord2f(0,0);
+                glVertex2i(0,0);
+                glTexCoord2f(1,0);
+                glVertex2i(size,0);
+                glTexCoord2f(1,1);
+                glVertex2i(size,size);
+                glTexCoord2f(0,1);
+                glVertex2i(0,size);
+
+            glEnd();
         }
 
         ///////////////////////////////

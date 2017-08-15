@@ -33,7 +33,7 @@ t_IDENTIFIER = r'[_.a-zA-Z][_.a-zA-Z0-9]*'
 t_DIRECTIVE = r'\.(stabn|stabs|stabd|stabn|file|text|global|type|section|startup|data|size|word|ident)'
 t_COMMENT = r'/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/'
 t_STRING = r'\"(.+?)?\"'
-t_OPCODE = r'(ldi|lds|st|rjmp|lpm|add|adc|adiw|cpi|cpc|brne|ret)'
+t_OPCODE = r'(ldi|lds|st|rjmp|lpm|add|adc|adiw|cpi|cpc|brne|sbci|subi|ret)'
 t_HEXNUMBER = r'0[xX][\da-f]+'
 t_NUMBER = r'[\d]+'
 
@@ -148,6 +148,9 @@ def genabsaddr(addr):
             addr = int(addr)
     elif addrtype == type(int):
         addr = addr
+        if addr<0:
+            addr = addr&0xff;
+
     elif isinstance(addr,expr_node):
         addr = addr.eval()
     else:
@@ -240,7 +243,7 @@ def p_expression_binop(p):
 ###################
 def p_expression_uminus(p):
     "expression : '-' expression"
-    p[0] = expr_node(0,"-",p[2])
+    p[0] = "-"+p[2]
 ###################
 def p_expression_group(p):
     "expression : '(' expression ')'"
@@ -350,6 +353,66 @@ def gen_6502_opcode_ADC(item):
 
 #############################
 
+def gen_6502_opcode_SBC(item):
+    assert(False)
+    ctx = item["ctx"]
+    opcitems = item["opcitems"]
+    dest = genabsaddr(opcitems[0])
+    src = genabsaddr(opcitems[2])
+    rval  = "lda $%02x\n" % (src)
+    rval += "sbc $%02x\n" % (dest)
+    rval += "sta $%02x" % (dest)
+    main_ctx._mos_pc += 6
+    return rval
+
+#############################
+
+def gen_6502_opcode_SBCI(item):
+    ctx = item["ctx"]
+    opcitems = item["opcitems"]
+    reg = genabsaddr(opcitems[0])
+    imm = opcitems[2]
+    if imm == "lo8":
+        imm = int(opcitems[3])
+        imm = imm&0xff;
+    else:
+        imm = int(imm)
+    if imm<0:
+        imm = imm&0xff;
+    rval  = "lda $%02x\n" % (reg)
+    rval += "sbc #$%02x\n" % (imm)
+    rval += "sta $%02x" % (reg)
+    main_ctx._mos_pc += 6
+    return rval
+
+#############################
+
+def gen_6502_opcode_SUBI(item):
+    ctx = item["ctx"]
+    opcitems = item["opcitems"]
+    reg = genabsaddr(opcitems[0])
+    imm = opcitems[2]
+
+    if imm == "lo8":
+        imm = int(opcitems[3])
+        imm = imm&0xff;
+    else:
+        imm = int(imm)
+
+    if imm<0:
+        imm = imm&0xff;
+
+    print "reg<%s> imm<%s>\n" % (reg,imm)
+    rval  = "lda $%02x\n" % (reg)
+    rval += "sec\n"
+    rval += "sbc #$%02x\n" % (imm)
+    rval += "sta $%02x" % (reg)
+
+    main_ctx._mos_pc += 6
+    return rval
+
+#############################
+
 def gen_6502_opcode_ADIW(item):
     ctx = item["ctx"]
     opcitems = item["opcitems"]
@@ -370,10 +433,27 @@ def gen_6502_opcode_ADIW(item):
 def gen_6502_opcode_CPI(item):
     ctx = item["ctx"]
     opcitems = item["opcitems"]
-    reg = genabsaddr(opcitems[0])
-    imm = genabsaddr(opcitems[2])
-    rval  = "lda  $%02x\n" % (reg)
-    rval += "cmp #$%02x\n" % (imm)
+    #reg = genabsaddr(opcitems[0])
+    rval = ""
+    dest = opcitems[0]
+    if len(opcitems)==4: # reg , mod immv
+        mod = opcitems[2]
+        immv = int(opcitems[3])
+        regno = int(dest[1:])
+        if mod=="lo8":
+            rval +=  "lda #<$%04x\n" % (immv)
+        #rval += "sta  $%02x\n" % (regno)
+        rval += "cmp #$%02x\n" % (regno)
+    elif len(opcitems)==3: # reg , immv
+        imm = int(opcitems[2])
+        rval +=  "lda #$%02x\n" % (imm)
+        regno = int(dest[1:])
+        #rval += "sta  $%02x\n" % (regno)
+        rval += "cmp #$%02x\n" % (regno)
+
+    #imm = genabsaddr(opcitems[2])
+    #rval  = "lda  $%02x\n" % (reg)
+    #rval += "cmp #$%02x\n" % (imm)
     main_ctx._mos_pc += 4
     return rval
 
@@ -450,15 +530,18 @@ def gen_6502_opcode_ASSIGN(item):
 #############################
 
 _opcode_table = {
-    "ldi":  { "adv": 2, "gen":gen_6502_opcode_LDI },    
-    "lds":  { "adv": 4, "gen":gen_6502_opcode_LDS },    
-    "add":  { "adv": 2, "gen":gen_6502_opcode_ADD },    
     "adc":  { "adv": 2, "gen":gen_6502_opcode_ADC },    
+    "add":  { "adv": 2, "gen":gen_6502_opcode_ADD },    
     "adiw": { "adv": 2, "gen":gen_6502_opcode_ADIW },    
-    "st":   { "adv": 2, "gen":gen_6502_opcode_ST },    
+    "brne": { "adv": 2, "gen":gen_6502_opcode_BRNE },    
     "cpi":  { "adv": 2, "gen":gen_6502_opcode_CPI },    
     "cpc":  { "adv": 2, "gen":gen_6502_opcode_CPC },    
-    "brne": { "adv": 2, "gen":gen_6502_opcode_BRNE },    
+    "ldi":  { "adv": 2, "gen":gen_6502_opcode_LDI },    
+    "lds":  { "adv": 4, "gen":gen_6502_opcode_LDS },    
+    #"sbc":  { "adv": 2, "gen":gen_6502_opcode_SBC },    
+    "sbci":  { "adv": 2, "gen":gen_6502_opcode_SBCI },    
+    "subi":  { "adv": 2, "gen":gen_6502_opcode_SUBI },    
+    "st":   { "adv": 2, "gen":gen_6502_opcode_ST },    
     "ret":  { "adv": 1, "gen":gen_6502_opcode_RET },    
     ".word":  { "adv": 2, "gen":gen_6502_opcode_WORD },    
     "LABEL":  { "adv": 2, "gen":gen_6502_opcode_LABEL },    
