@@ -7,7 +7,7 @@ LFLAGS = -L$(Z64ROOT)/stage/lib -lork.core.$(Z64BUILDPLATFORM).release -lglfw3 -
 ifeq ($(Z64BUILDPLATFORM),OSX)
 LFLAGS += -framework OpenGL
 else
-LFLAGS += -lGL
+LFLAGS += -lGL -lpthread -lXxf86vm -lX11 -lXrandr -lXinerama -lXcursor -lrt -ldl
 endif
 
 all:
