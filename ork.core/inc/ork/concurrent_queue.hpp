@@ -40,6 +40,10 @@ struct spsc_bounded_queue
 	{
 		return mImpl.try_pop(item);
 	}
+    T pop() // blocking
+    {
+        return mImpl.pop();
+    }
 
 	impl_t mImpl;
 	static const size_t kSIZE = sizeof(T);
