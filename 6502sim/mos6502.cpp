@@ -1,7 +1,10 @@
 
 #include "mos6502.h"
 #include <assert.h>
+#include <GLFW/glfw3.h>
+#include "drawtext.h"
 
+extern spsc_bounded_queue<insline> _inslineQ;
 
 #define GENINS(m,op) {#op,_am##m,&mos6502::Op_##op}
 
@@ -420,13 +423,13 @@ void mos6502::Reset()
 		
     sp = 0xFD;
     
-    status |= CONSTANT;
+    status |= MOS65_CONSTANT;
     
 	cycles = 6; // according to the datasheet, the reset routine takes 6 clock cycles
 
 	illegalOpcode = false;
-	
-    printf( "%s%s", getAccString().c_str(),RESETX);
+
+    _memaccesses.clear();	
 
 	return;
 }
@@ -475,16 +478,16 @@ auto GRN = rgb256(0,255,0);
 uint8_t mos6502::Read(uint16_t addr)
 {
     auto data = _read(addr);
-    _accstring += Format( "%s(%04x:%02x)", GRN.c_str(),addr, data );
+    _memaccesses.push_back({false,data,addr});
     return data;
 }
 void mos6502::Write(uint16_t addr,uint8_t data)
 {
-    _accstring += Format( "%s(%04x:%02x)", RED.c_str(), addr, data );
+    _memaccesses.push_back(memacc{true,data,addr});
     _write(addr,data);
 }
 
-static std::string statusstring(uint8_t st)
+std::string statusstring(uint8_t st)
 {
     std::string rval = "";
     if(st&1)
@@ -504,61 +507,6 @@ static std::string statusstring(uint8_t st)
     return rval;
 }
 
-std::string mos6502::compstatline()
-{
-    static auto CW = rgb256(255,255,255);
-    static auto CG = rgb256(128,128,128);
-    static auto NCH = rgb256(128,128,160);
-    static auto CH1 = rgb256(255,128,128);
-    static auto CH2 = rgb256(255,128,255);
-    static auto C1 = rgb256(128,128,224);
-    static auto C2 = rgb256(255,100,100);
-    static auto C3 = rgb256(0,160,160);
-    static auto CGX= rgb256(128,128,128);
-
-    auto PC = this->pc-1;
-    auto SP = this->sp;
-    auto X = this->X;
-    auto Y = this->Y;
-    auto A = this->A;
-    auto ST = statusstring(this->status);
-
-    static uint8_t LSP = SP;
-    static auto LST = ST;
-    static uint8_t LX = X;
-    static uint8_t LY = Y;
-    static uint8_t LA = A;
-
-    bool chg_sp = LSP!=SP;
-    bool chg_st = LST!=ST;
-    bool chg_a = LA!=A;
-    bool chg_x = LX!=X;
-    bool chg_y = LY!=Y;
-
-
-    LST = ST;
-    LSP = SP;
-    LA = A;
-    LX = X;
-    LY = Y;
-
-    std::string statusline = "";
-
-    statusline += CG+" pc:"+(_pcCHG?rgb256(255,255,0):CW)+Format( "%04X", PC );
-
-    statusline += (chg_sp?CH1:NCH)+" sp:"+(chg_sp?C2:C1)+Format("%02X",SP);
-    statusline += (chg_a?CH1:NCH)+" a:"+(chg_a?C2:C1)+Format("%02X",A);
-    statusline += (chg_x?CH1:NCH)+" x:"+(chg_x?C2:C1)+Format("%02X",X);
-    statusline += (chg_y?CH1:NCH)+" y:"+(chg_y?C2:C1)+Format("%02X",Y);
-    statusline += (chg_st?CH1:NCH)+" st:"+(chg_st?C2:C1)+Format("[%s]",ST.c_str());
-
-    int sizeline = statusline.length()-11*12;
-    int space = 38-sizeline;
-    statusline += "  ";
-
-    return Format( "%-*s", (int)statusline.length()+space, statusline.c_str() );
-}
-
 void mos6502::Run(uint32_t n)
 {
 	uint32_t start = cycles;
@@ -576,16 +524,15 @@ void mos6502::Run(uint32_t n)
 		Exec();
 
 		cycles++;
+        _inscount++;
 	}
+
 }
 
-auto EXECCOLOR = rgb256(255,255,128);
+auto EXECCOLOR = std::string("");//rgb256(255,255,128);
 
 void mos6502::Exec()
 {
-
-    auto outline = compstatline();
-
     _pcCHG = false;
     _braNOCHG = false;
 
@@ -594,11 +541,14 @@ void mos6502::Exec()
     auto insMODE = _curins.addr._name;
     auto insNAME = _curins._name;
 
+    insline _insline;
+
+    _insline._lpc = pc-1;
+
+
     if(insMODE == "IMP")
     {
-        insstr = Format( "  %s%s          ", EXECCOLOR.c_str()
-                                   , insNAME.c_str() );
-
+        insstr = insNAME;
     }
     else if(insMODE=="REL")
     {        
@@ -606,9 +556,7 @@ void mos6502::Exec()
         if (offset & 0x80) offset |= 0xFF00;    
         auto addr = pc + 1 + (int16_t)offset;
 
-        insstr = Format( "  %s%s $%04X          ", EXECCOLOR.c_str()
-                                       , insNAME.c_str()
-                                       , addr );
+        insstr = Format( "%s $%04X", insNAME.c_str(), addr );
     }
     else if(insMODE=="ABS")
     {
@@ -616,9 +564,7 @@ void mos6502::Exec()
         auto hi = _read(pc+1);
         uint16_t addr = uint16_t(lo)|uint16_t(hi)<<8;
 
-        insstr = Format( "  %s%s $%04X          ", EXECCOLOR.c_str()
-                                       , insNAME.c_str()
-                                       , addr );
+        insstr = Format( "%s $%04X", insNAME.c_str(), addr );
     }
     else if(insMODE=="ABX")
     {
@@ -626,9 +572,7 @@ void mos6502::Exec()
         auto hi = _read(pc+1);
         uint16_t addr = uint16_t(lo)|uint16_t(hi)<<8;
 
-        insstr = Format( "  %s%s $%04X,x          ", EXECCOLOR.c_str()
-                                       , insNAME.c_str()
-                                       , addr );
+        insstr = Format( "%s $%04X,x", insNAME.c_str(), addr );
     }
     else if(insMODE=="ABY")
     {
@@ -636,89 +580,89 @@ void mos6502::Exec()
         auto hi = _read(pc+1);
         uint16_t addr = uint16_t(lo)|uint16_t(hi)<<8;
 
-        insstr = Format( "  %s%s $%04X,y          ", EXECCOLOR.c_str()
-                                       , insNAME.c_str()
-                                       , addr );
+        insstr = Format( "%s $%04X,y", insNAME.c_str(), addr );
     }
     else if(insMODE=="INX") // Indexed Indirect (x)
     {
-        insstr = Format( "  %s%s ($%02X,x)            ", EXECCOLOR.c_str()
-                                       , insNAME.c_str()
-                                       , _read(pc));
+        insstr = Format( "%s ($%02X,x)", insNAME.c_str(), _read(pc));
     }
     else if(insMODE=="INY") // Indirect Indexed (y)
     {
-        insstr = Format( "  %s%s ($%02X),y            ", EXECCOLOR.c_str()
-                                       , insNAME.c_str()
-                                       , _read(pc));
+        insstr = Format( "%s ($%02X),y", insNAME.c_str(), _read(pc));
     }
     else if(insMODE=="IMM")
     {
         auto immval = _read(pc);
 
-        insstr = Format( "  %s%s #$%02X          ", EXECCOLOR.c_str()
-                                       , insNAME.c_str()
-                                       , immval );
+        insstr = Format( "%s #$%02X", insNAME.c_str(), immval );
     }
     else if(insMODE=="ZER")
     {
         auto zerval = _read(pc);
 
-        insstr = Format( "  %s%s $%02X          ", EXECCOLOR.c_str()
-                                       , insNAME.c_str()
-                                       , zerval );
+        insstr = Format( "%s $%02X", insNAME.c_str(), zerval );
     }
     else
     {
-        insstr = Format( "  %s%s(%s)          ", EXECCOLOR.c_str()
-                                               , insNAME.c_str()
-                                               , insMODE.c_str() );
+        insstr = Format( "%s(%s)", insNAME.c_str(), insMODE.c_str() );
     }
     int len = 24-(insstr.length()-12);
-    outline += Format("%-*s", insstr.length()+len, insstr.c_str());
 
     auto addrmode = _curins.addr;
     auto addrcalc = addrmode.compute;
     assert(addrcalc!=nullptr);
 	uint16_t src = (this->*addrcalc)();
 
-    outline += getAccString();
+
+    ////////////////////////////////
+    // EXECUTE INSTRUCTION
+    ////////////////////////////////
+
+    _insline._lsp = sp;
+    _insline._lst = status;
+    _insline._la = A;
+    _insline._lx = X;
+    _insline._ly = Y;
+    _insline._preacc = _memaccesses;
+    _memaccesses.clear();
+
 	(this->*_curins.code)(src);
-    auto nas = getAccString();
-    if( nas.length() )
-        outline += rgb256(255,255,0)+" | " + nas;
 
-    std::string bgcolor = (cycles==1) ? rgb256bg(64,64,64)
-                                     : rgb256bg(0,0,0);
+    _insline._pcjmp = _pcCHG;
+    _insline._pc = pc-1;
+    _insline._sp = sp;
+    _insline._st = status;
+    _insline._a = A;
+    _insline._x = X;
+    _insline._y = Y;
+    _insline._postacc = _memaccesses;
+    _memaccesses.clear();
+
+    ////////////////////////////////
+
+    _insline._bgcolor = (cycles==1) ? fvec3(.5,.5,.5) : fvec3(0,0,0);
+
     if(insNAME=="JMP")
-        bgcolor = rgb256bg(0,0,64);
+        _insline._bgcolor = fvec3(0,0,.25);
     else if(insNAME=="JSR")
-        bgcolor = rgb256bg(128,0,128);
+        _insline._bgcolor = fvec3(.35,.15,.35);
     else if(insNAME=="RTS")
-        bgcolor = rgb256bg(64,0,64);
+        _insline._bgcolor = fvec3(.4,.4,.7);
     else if( _pcCHG)
-        bgcolor = rgb256bg(0,64,0);
+        _insline._bgcolor = fvec3(.15,.35,.15);
     else if(_braNOCHG)
-        bgcolor = rgb256bg(64,0,0);
-
-    outline = bgcolor+outline;
-
-	printf( "%s%s\n", outline.c_str(),RESETX);
+        _insline._bgcolor = fvec3(.5,0,0);
 
     if( illegalOpcode )
     {
         printf( "\n(ILLEGAL INSTRUCTION) exiting...\n");
         exit(0);        
     }
-}
 
-std::string mos6502::getAccString()
-{
-    auto rval = _accstring;
-    _accstring = "";
-    return rval;
-}
+    _insline._instext = insstr;
 
+    _inslineQ.push(_insline);
+}
 
 void mos6502::Op_ILLEGAL(uint16_t src)
 {
@@ -855,7 +799,7 @@ void mos6502::Op_BRK(uint16_t src)
 	pc++;
 	StackPush((pc >> 8) & 0xFF);
 	StackPush(pc & 0xFF);
-	StackPush(status | BREAK);
+	StackPush(status | MOS65_BREAK);
 	SET_INTERRUPT(1);
     setPC((Read(irqVectorH) << 8) + Read(irqVectorL));
 }
@@ -1083,7 +1027,7 @@ void mos6502::Op_PHA(uint16_t src)
 
 void mos6502::Op_PHP(uint16_t src)
 {	
-	StackPush(status | BREAK);
+	StackPush(status | MOS65_BREAK);
 }
 
 void mos6502::Op_PLA(uint16_t src)

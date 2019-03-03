@@ -32,6 +32,7 @@ public:
 	void push(const Element& item); 
 	bool try_push(const Element& item);
 	bool try_pop(Element& item);
+    Element pop();
 
 private:
 
@@ -103,6 +104,22 @@ bool SpScRingBuf<Element, Size>::try_pop(Element& item)
 	return true;
 
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+template<typename Element, size_t Size>
+Element SpScRingBuf<Element, Size>::pop()
+{
+    Element rval;
+    bool bpopped = try_pop(rval);
+    while(false==bpopped)
+    {
+        usleep(1000);
+        bpopped = try_pop(rval);
+    }
+    return rval;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 

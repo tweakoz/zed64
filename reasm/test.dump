@@ -14,32 +14,54 @@ _main: /* $0000 */
 /* frame size = 0 */
 /* stack size = 0 */
 .L__stack_usage = 0
-/* $0000 */ ldi [ r25 , 0 ]
-/* $0002 */ ldi [ r24 , 0 ]
+/* $0000 */ ldi [ r21 , 0 ]
+/* $0002 */ ldi [ r20 , 0 ]
 
-.L2: /* $0004 */
+.L3: /* $0004 */
 
-/* $0004 */ lds [ ZL , $001f /* TEST_PTR */ ]
-/* $0008 */ lds [ ZH , TEST_PTR + 1 ]
-/* $000c */ add [ ZL , r24 ]
-/* $000e */ adc [ ZH , r25 ]
-/* $0010 */ st [ Z , r24 ]
-/* $0012 */ adiw [ r24 , 1 ]
-/* $0014 */ cpi [ r24 , 40 ]
-/* $0016 */ cpc [ r25 , 1 /* __zero_reg__ */ ]
-/* $0018 */ brne [ $0004 /* .L2 */ ]
-/* $001a */ ldi [ r25 , 0 ]
-/* $001c */ ldi [ r24 , 0 ]
+/* $0004 */ ldi [ r24 , 0 ]
+
+.L2: /* $0006 */
+
+/* $0006 */ lds [ ZL , $003d /* CHAR_PTR */ ]
+/* $000a */ lds [ ZH , CHAR_PTR + 1 ]
+/* $000e */ add [ ZL , r18 ]
+/* $0010 */ adc [ ZH , r19 ]
+/* $0012 */ st [ Z , r24 ]
+/* $0014 */ lds [ ZL , $003b /* COLR_PTR */ ]
+/* $0018 */ lds [ ZH , COLR_PTR + 1 ]
+/* $001c */ add [ ZL , r18 ]
+/* $001e */ adc [ ZH , r19 ]
+/* $0020 */ st [ Z , r24 ]
+/* $0022 */ subi [ r24 , lo8 -1 ]
+/* $0024 */ subi [ r18 , -1 ]
+/* $0026 */ sbci [ r19 , -1 ]
+/* $0028 */ cpi [ r24 , lo8 32 ]
+/* $002a */ brne [ $0006 /* .L2 */ ]
+/* $002c */ subi [ r20 , -32 ]
+/* $002e */ sbci [ r21 , -1 ]
+/* $0030 */ ldi [ r24 , 4 ]
+/* $0032 */ cpc [ r21 , r24 ]
+/* $0034 */ brne [ $0004 /* .L3 */ ]
+/* $0036 */ ldi [ r25 , 0 ]
+/* $0038 */ ldi [ r24 , 0 ]
 /* epilogue start */
-/* $001e */ ret [ ]
-.size [ main , . /* $001f */ - main ]
-.global [ TEST_PTR ]
+/* $003a */ ret [ ]
+.size [ main , . /* $003b */ - main ]
+.global [ COLR_PTR ]
 .data [ ]
-.type [ TEST_PTR , @ object ]
-.size [ TEST_PTR , 2 ]
+.type [ COLR_PTR , @ object ]
+.size [ COLR_PTR , 2 ]
 
-TEST_PTR: /* $001f */
+COLR_PTR: /* $003b */
 
 .word [ - 10240 ]
+.global [ CHAR_PTR ]
+.type [ CHAR_PTR , @ object ]
+.size [ CHAR_PTR , 2 ]
+
+CHAR_PTR: /* $003d */
+
+.word [ - 12288 ]
 .ident [ "GCC: (GNU) 7.1.0" ]
 .global [ __do_copy_data ]

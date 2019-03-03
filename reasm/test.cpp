@@ -1,10 +1,17 @@
-auto TEST_PTR = (volatile char*) 0xd800;
+auto CHAR_PTR = (volatile char*) 0xd000;
+auto COLR_PTR = (volatile char*) 0xd800;
 
 int main(int argc, const char** argv)
 {
-    for( unsigned char i=0; i<40; i++ )
+    unsigned char base = 0;
+    for( unsigned short j=0; j<32; j++ )
     {
-        TEST_PTR[i] = i;
+        int offset = j<<5;
+        for( unsigned char i=0; i<32; i++ )
+        {
+            CHAR_PTR[offset+i] = base+i;
+            COLR_PTR[offset+i] = base+i;
+        }
     }
     return 0;
 }

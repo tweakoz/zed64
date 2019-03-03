@@ -8,41 +8,83 @@
 //============================================================================
 
 #include <iostream>
+#include <assert.h>
+#include <string.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <string>
+#include <vector>
+#include <list>
+#include <set>
+#include <ork/types.h>
+#include <ork/concurrent_queue.hpp>
+#include <ork/stringutils.h>
+#include <ork/cvector3.h>
+#include <ork/mutex.h>
+#include <ork/thread.h>
 
 using namespace std;
+using namespace ork;
 
-#define NEGATIVE  0x80
-#define OVERFLOW  0x40
-#define CONSTANT  0x20
-#define BREAK     0x10
-#define DECIMAL   0x08
-#define INTERRUPT 0x04
-#define ZERO      0x02
-#define CARRY     0x01
+#define MOS65_NEGATIVE  0x80
+#define MOS65_OVERFLOW  0x40
+#define MOS65_CONSTANT  0x20
+#define MOS65_BREAK     0x10
+#define MOS65_DECIMAL   0x08
+#define MOS65_INTERRUPT 0x04
+#define MOS65_ZERO      0x02
+#define MOS65_CARRY     0x01
 
-#define SET_NEGATIVE(x) (x ? (status |= NEGATIVE) : (status &= (~NEGATIVE)) )
-#define SET_OVERFLOW(x) (x ? (status |= OVERFLOW) : (status &= (~OVERFLOW)) )
-#define SET_CONSTANT(x) (x ? (status |= CONSTANT) : (status &= (~CONSTANT)) )
-#define SET_BREAK(x) (x ? (status |= BREAK) : (status &= (~BREAK)) )
-#define SET_DECIMAL(x) (x ? (status |= DECIMAL) : (status &= (~DECIMAL)) )
-#define SET_INTERRUPT(x) (x ? (status |= INTERRUPT) : (status &= (~INTERRUPT)) )
-#define SET_ZERO(x) (x ? (status |= ZERO) : (status &= (~ZERO)) )
-#define SET_CARRY(x) (x ? (status |= CARRY) : (status &= (~CARRY)) )
+#define SET_NEGATIVE(x) (x ? (status |= MOS65_NEGATIVE) : (status &= (~MOS65_NEGATIVE)) )
+#define SET_OVERFLOW(x) (x ? (status |= MOS65_OVERFLOW) : (status &= (~MOS65_OVERFLOW)) )
+#define SET_CONSTANT(x) (x ? (status |= MOS65_CONSTANT) : (status &= (~MOS65_CONSTANT)) )
+#define SET_BREAK(x) (x ? (status |= MOS65_BREAK) : (status &= (~MOS65_BREAK)) )
+#define SET_DECIMAL(x) (x ? (status |= MOS65_DECIMAL) : (status &= (~MOS65_DECIMAL)) )
+#define SET_INTERRUPT(x) (x ? (status |= MOS65_INTERRUPT) : (status &= (~MOS65_INTERRUPT)) )
+#define SET_ZERO(x) (x ? (status |= MOS65_ZERO) : (status &= (~MOS65_ZERO)) )
+#define SET_CARRY(x) (x ? (status |= MOS65_CARRY) : (status &= (~MOS65_CARRY)) )
 
-#define IF_NEGATIVE() ((status & NEGATIVE) ? true : false)
-#define IF_OVERFLOW() ((status & OVERFLOW) ? true : false)
-#define IF_CONSTANT() ((status & CONSTANT) ? true : false)
-#define IF_BREAK() ((status & BREAK) ? true : false)
-#define IF_DECIMAL() ((status & DECIMAL) ? true : false)
-#define IF_INTERRUPT() ((status & INTERRUPT) ? true : false)
-#define IF_ZERO() ((status & ZERO) ? true : false)
-#define IF_CARRY() ((status & CARRY) ? true : false)
+#define IF_NEGATIVE() ((status & MOS65_NEGATIVE) ? true : false)
+#define IF_OVERFLOW() ((status & MOS65_OVERFLOW) ? true : false)
+#define IF_CONSTANT() ((status & MOS65_CONSTANT) ? true : false)
+#define IF_BREAK() ((status & MOS65_BREAK) ? true : false)
+#define IF_DECIMAL() ((status & MOS65_DECIMAL) ? true : false)
+#define IF_INTERRUPT() ((status & MOS65_INTERRUPT) ? true : false)
+#define IF_ZERO() ((status & MOS65_ZERO) ? true : false)
+#define IF_CARRY() ((status & MOS65_CARRY) ? true : false)
 
+struct uicmd
+{
+    int _key, _mods;
+};
+struct memacc
+{
+    bool _write;
+    uint8_t _val;
+    uint16_t _addr;
+};
+
+typedef std::vector<memacc> accesslist;
+typedef std::set<uint16_t> addrset_t;
+
+struct insline
+{
+    int _pc, _lpc;
+    bool _pcjmp;
+    fvec3 _bgcolor;
+    u8 _sp, _a, _x, _y, _st;
+    u8 _lsp, _la, _lx, _ly, _lst;
+    std::string _instext;
+    accesslist _preacc;
+    accesslist _postacc;
+};
 
 struct mos6502
 {
+    accesslist _memaccesses;
+
 	// registers
 	uint8_t A; // accumulator
 	uint8_t X; // X-index
@@ -205,13 +247,11 @@ struct mos6502
 	inline uint8_t StackPop();
 	
     std::string compstatline();
-    std::string _accstring;
-
-    std::string getAccString();
 
     bool _pcCHG;
     bool _braNOCHG;
     void setPC(uint16_t npc);
+    uint64_t _inscount;
 
 public:
 	

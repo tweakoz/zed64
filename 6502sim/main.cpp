@@ -2,21 +2,31 @@
 // copyright (c) 2017 Michael T. Mayers
 
 #include "mos6502.h"
-#include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <GLFW/glfw3.h>
+
+extern spsc_bounded_queue<uicmd> _uiQ;
 
 uint8_t memory[65536];
 
+void runUI();
+LockedResource<addrset_t> addr_read_set;
+LockedResource<addrset_t> addr_write_set;
 
 void busWrite( uint16_t addr, uint8_t data )
 {
 	memory[addr] = data;
+    addr_write_set.AtomicOp([&](addrset_t& aset){aset.insert(addr);});
 }
 uint8_t busRead( uint16_t addr )
 {
 	uint8_t data = memory[addr];
+    addr_read_set.AtomicOp([&](addrset_t& aset){aset.insert(addr);});
 	return data;
+}
+uint8_t busReadNT( uint16_t addr )
+{
+    uint8_t data = memory[addr];
+    return data;
 }
 
 int main( int argc, const char** argv )
@@ -46,6 +56,23 @@ int main( int argc, const char** argv )
 		{
 			assert(false);
 		}
+
+        fin = fopen("roms/chargen.bin","rb");
+        if( fin )
+        {
+            fseek(fin,0,SEEK_END);
+            size_t size = ftell(fin);
+            printf( "rom2 size<%zu>\n", size );
+            assert(size==4096);
+            fseek(fin,0,SEEK_SET);
+            fread(memory+0x4000,size,1,fin);
+            fclose(fin);
+        }
+        else
+        {
+            assert(false);
+        }
+
 	}
 	else
 	{
@@ -56,17 +83,76 @@ int main( int argc, const char** argv )
 	memory[0xfffc] = 0x00;
 	memory[0xfffd] = 0x02;
 
-    printf( "Performing CPU reset\n");
-	mos6502 cpu(busRead,busWrite);
-	cpu.Reset();
-    printf( "\nCPU reset done..\n");
+    bool OKTOQUIT = false;
 
+    ork::thread cputhread;
+    cputhread.start([&](){
+        printf( "Performing CPU reset\n");
+        mos6502 cpu(busRead,busWrite);
+        cpu.Reset();
+        printf( "\nCPU reset done..\n");
+        int runcount = 1;
 
-    while(1)
-    {
-		cpu.Run(8);
-        printf("[enter]");
-        char ch = getchar();
-    }
+        uicmd uic;
+
+        while(false==OKTOQUIT)
+        {
+            addr_read_set.AtomicOp([&](addrset_t& aset){aset.clear();});
+            addr_write_set.AtomicOp([&](addrset_t& aset){aset.clear();});
+
+            int numcycs = (runcount==-1)
+                        ? 1000
+                        : runcount;
+
+            cpu.Run(numcycs);
+
+            bool cont = false;
+
+            while(false==cont)
+            {
+                usleep(100);
+    
+                bool got = _uiQ.try_pop(uic);
+
+                if( got )
+                {
+                    int mod = uic._mods;
+                    bool isshift = mod&GLFW_MOD_SHIFT;
+                    bool isalt = mod&GLFW_MOD_ALT;
+
+                    switch( uic._key )
+                    {
+                        case 'R':
+                            cont = true;
+                            runcount = -1;
+                            break;
+                        case GLFW_KEY_ESCAPE:
+                            runcount = 1;
+                            OKTOQUIT=true;
+                            cont = true;
+                            break;
+                        case GLFW_KEY_SPACE:
+                            cont = true;
+                            runcount = isshift?4:1;
+                            break;
+                        case GLFW_KEY_ENTER:
+                            cont = true;
+                            runcount = isshift
+                                     ? (isalt?10000:100)
+                                     : 10;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else if(OKTOQUIT)
+                    cont = true;
+                else if(runcount==-1)
+                    cont = true;
+            }
+        }
+    });
+
+    runUI();
 	return 0;
 }
